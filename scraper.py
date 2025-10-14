@@ -53,18 +53,23 @@ def extract_building_data(building_url):
     for script in script_tags:
         if script.string and 'OpenSeadragon' in script.string:
             script_content = script.string
+
+            # TEMPORARY DEBUG - REMOVE LATER
+            # print("=== FOUND OPENSEADRAGON SCRIPT ===")
+            # print(script_content[:2000])  # Print first 2000 characters
             
             # Extract tileSources (floor plan image)
-            tile_match = re.search(r'tileSources:\s*["\']([^"\']+)["\']', script_content)
+            # tile_match = re.search(r'tileSources:\s*["\']([^"\']+)["\']', script_content)
+            tile_match = re.search(r'tileSources:\s*\["([^"]+)"\]', script_content)
             if tile_match:
                 data['floor_plan_image'] = tile_match.group(1)
             
             # Extract overlays (arrow locations and image IDs)
-            # Look for patterns like: id: 'image_id', x: 0.123, y: 0.456
-            overlay_pattern = r'id:\s*["\']([^"\']+)["\'],\s*x:\s*([\d.]+),\s*y:\s*([\d.]+)'
+            # Look for patterns like: x: 0.123, y: 0.456, id: 'image_id'
+            overlay_pattern = r'\{x:\s*([-\d.]+),\s*y:\s*([-\d.]+),\s*id:\s*["\']([^"\']+)["\']\}'
             overlays = re.findall(overlay_pattern, script_content)
             
-            for image_id, x, y in overlays:
+            for x, y, image_id in overlays:
                 data['overlays'].append({
                     'image_id': image_id,
                     'x': float(x),
@@ -114,7 +119,8 @@ def download_arrow_images(data, output_dir='output'):
         
         # Construct image URL - typically in an 'images' subdirectory
         # The full-size image usually has the same ID as the thumbnail
-        image_url = urljoin(base_url, f"images/{image_id}.jpg")
+        # image_url = urljoin(base_url, f"images/{image_id}.jpg")
+        image_url = urljoin(base_url, f"imgs/{image_id}.jpg")
         
         filename = f"{image_id}.jpg"
         filepath = os.path.join(output_dir, filename)
@@ -219,7 +225,8 @@ def scrape_all_buildings():
 
 if __name__ == "__main__":
     # Test with ONE building first:
-    scrape_single_building("https://mcid.mcah.columbia.edu/media/plotted-images/maps/Beaumont-sur-Oise-Eglise-Saint-Leonor/")
+    # scrape_single_building("https://mcid.mcah.columbia.edu/media/plotted-images/maps/Beaumont-sur-Oise-Eglise-Saint-Leonor/")
+    scrape_single_building("https://mcid.mcah.columbia.edu/media/plotted-images/maps/Albi-Cathedrale-Sainte-Cecile/")
     
     # Once that works, comment out the line above and uncomment this to do all:
     # scrape_all_buildings()
