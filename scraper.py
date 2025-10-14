@@ -6,9 +6,12 @@ import re
 import time
 from urllib.parse import urljoin
 
-# Third-party
-import requests
+# Local application imports
+from download_floorplan_tiles import download_and_stitch_tiles
+
+# Third-party imports
 from bs4 import BeautifulSoup
+import requests
 
 # Get List of All Map Directories
 def get_all_map_directories():
@@ -80,7 +83,7 @@ def extract_building_data(building_url):
 
 # Download Floor Plan Image
 def download_floor_plan(data, output_dir='output'):
-    """Download the floor plan image"""
+    """Download the floor plan by stitching together tiles from .dzi"""
     os.makedirs(output_dir, exist_ok=True)
     
     building_name = data['building_name']
@@ -90,19 +93,19 @@ def download_floor_plan(data, output_dir='output'):
     if not floor_plan_url.startswith('http'):
         floor_plan_url = urljoin(data['building_url'], floor_plan_url)
     
-    # Determine file extension
-    ext = os.path.splitext(floor_plan_url)[1] or '.jpg'
-    filename = f"{building_name}_floorplan{ext}"
-    filepath = os.path.join(output_dir, filename)
+    # Output path for the stitched image
+    output_path = os.path.join(output_dir, f"{building_name}_floorplan.jpg")
     
-    print(f"Downloading floor plan: {floor_plan_url}")
-    response = requests.get(floor_plan_url)
+    print(f"Downloading and stitching floor plan from: {floor_plan_url}")
     
-    with open(filepath, 'wb') as f:
-        f.write(response.content)
+    # Use the tile stitching function
+    success = download_and_stitch_tiles(floor_plan_url, output_path)
     
-    print(f"Saved to: {filepath}")
-    return filepath
+    if success:
+        return output_path
+    else:
+        print(f"Failed to download floor plan")
+        return None
 
 # Download All Arrow Images (Full Resolution)
 def download_arrow_images(data, output_dir='output'):
