@@ -40,15 +40,7 @@ def extract_building_data(building_url):
     Extract floor plan image, arrow coordinates, and image IDs from a building's page
     Returns a dictionary with all the data
     """
-    # response = requests.get(building_url)
-    # soup = BeautifulSoup(response.content, 'html.parser')
-
     response = requests.get(building_url)
-    # Try getting the index.html directly
-    if not building_url.endswith('/'):
-        building_url += '/'
-    index_url = building_url + 'index.html'
-    response = requests.get(index_url)
     soup = BeautifulSoup(response.content, 'html.parser')
     
     # Find the script tag containing the OpenSeadragon viewer configuration
@@ -63,9 +55,9 @@ def extract_building_data(building_url):
 
     # Extract directions from HTML overlays
     directions_map = {}
-    overlay_divs = soup.find_all('div', class_='openseadragon-overlay')
+    overlay_divs = soup.find_all('div', onclick=True)  # Find all divs with onclick attribute
     
-    print(f"DEBUG: Found {len(overlay_divs)} overlay divs")  # ADD THIS
+    print(f"DEBUG: Found {len(overlay_divs)} overlay divs")
     
     for overlay_div in overlay_divs:
         overlay_id = overlay_div.get('id')
@@ -75,20 +67,15 @@ def extract_building_data(building_url):
             classes = icon_div.get('class', [])
             direction = classes[1] if len(classes) > 1 else 'UNKNOWN'
             directions_map[overlay_id] = direction
-            print(f"DEBUG: {overlay_id} -> {direction}")  # ADD THIS
+            # print(f"DEBUG: {overlay_id} -> {direction}")
     
-    print(f"DEBUG: Directions map has {len(directions_map)} entries")  # ADD THIS
+    print(f"DEBUG: Directions map has {len(directions_map)} entries")
     
     for script in script_tags:
         if script.string and 'OpenSeadragon' in script.string:
             script_content = script.string
-
-            # TEMPORARY DEBUG - REMOVE LATER
-            # print("=== FOUND OPENSEADRAGON SCRIPT ===")
-            # print(script_content[:2000])  # Print first 2000 characters
             
             # Extract tileSources (floor plan image)
-            # tile_match = re.search(r'tileSources:\s*["\']([^"\']+)["\']', script_content)
             tile_match = re.search(r'tileSources:\s*\["([^"]+)"\]', script_content)
             if tile_match:
                 data['floor_plan_image'] = tile_match.group(1)
