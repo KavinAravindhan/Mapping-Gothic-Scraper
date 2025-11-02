@@ -208,3 +208,5 @@ __marimo__/
 
 # <changes: KAR>
 maps_output/
+maps_output_Oct23/
+*.zip

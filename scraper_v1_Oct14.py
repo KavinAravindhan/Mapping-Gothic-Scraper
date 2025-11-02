@@ -40,15 +40,7 @@ def extract_building_data(building_url):
     Extract floor plan image, arrow coordinates, and image IDs from a building's page
     Returns a dictionary with all the data
     """
-    # response = requests.get(building_url)
-    # soup = BeautifulSoup(response.content, 'html.parser')
-
     response = requests.get(building_url)
-    # Try getting the index.html directly
-    if not building_url.endswith('/'):
-        building_url += '/'
-    index_url = building_url + 'index.html'
-    response = requests.get(index_url)
     soup = BeautifulSoup(response.content, 'html.parser')
     
     # Find the script tag containing the OpenSeadragon viewer configuration
@@ -60,24 +52,6 @@ def extract_building_data(building_url):
         'floor_plan_image': None,
         'overlays': []
     }
-
-    # Extract directions from HTML overlays
-    directions_map = {}
-    overlay_divs = soup.find_all('div', class_='openseadragon-overlay')
-    
-    print(f"DEBUG: Found {len(overlay_divs)} overlay divs")  # ADD THIS
-    
-    for overlay_div in overlay_divs:
-        overlay_id = overlay_div.get('id')
-        icon_div = overlay_div.find('div', class_='icon')
-        if overlay_id and icon_div:
-            # Get direction from class (e.g., "icon NE" -> "NE")
-            classes = icon_div.get('class', [])
-            direction = classes[1] if len(classes) > 1 else 'UNKNOWN'
-            directions_map[overlay_id] = direction
-            print(f"DEBUG: {overlay_id} -> {direction}")  # ADD THIS
-    
-    print(f"DEBUG: Directions map has {len(directions_map)} entries")  # ADD THIS
     
     for script in script_tags:
         if script.string and 'OpenSeadragon' in script.string:
@@ -102,8 +76,7 @@ def extract_building_data(building_url):
                 data['overlays'].append({
                     'image_id': image_id,
                     'x': float(x),
-                    'y': float(y),
-                    'direction': directions_map.get(image_id, 'UNKNOWN')
+                    'y': float(y)
                 })
     
     return data
@@ -189,14 +162,13 @@ def save_coordinates_csv(data, output_path):
     """Save arrow coordinates to CSV"""
     with open(output_path, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
-        writer.writerow(['image_id', 'x', 'y', 'direction'])
+        writer.writerow(['image_id', 'x', 'y'])
         
         for overlay in data['overlays']:
             writer.writerow([
                 overlay['image_id'],
                 overlay['x'],
-                overlay['y'],
-                overlay.get('direction', 'UNKNOWN')
+                overlay['y']
             ])
     
     print(f"Saved coordinates to: {output_path}")
@@ -256,8 +228,8 @@ def scrape_all_buildings():
 
 if __name__ == "__main__":
     # Test with ONE building first:
-    scrape_single_building("https://mcid.mcah.columbia.edu/media/plotted-images/maps/Beaumont-sur-Oise-Eglise-Saint-Leonor/")
-    # scrape_single_building("https://mcid.mcah.columbia.edu/media/plotted-images/maps/Albi-Cathedrale-Sainte-Cecile/")
+    # scrape_single_building("https://mcid.mcah.columbia.edu/media/plotted-images/maps/Beaumont-sur-Oise-Eglise-Saint-Leonor/")
+    scrape_single_building("https://mcid.mcah.columbia.edu/media/plotted-images/maps/Albi-Cathedrale-Sainte-Cecile/")
     
     # Once that works, comment out the line above and uncomment this to do all:
     # scrape_all_buildings()

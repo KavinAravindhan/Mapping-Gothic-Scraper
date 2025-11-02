@@ -1,0 +1,93 @@
+curl -X POST 'https://app.heartex.com/api/tasks/' \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxMTk1OTExLCJpYXQiOjE3NjExOTU2MTEsImp0aSI6IjY0N2Y4MWIxNWM0NDRjNDNhNzEzZmMwZGZiMzg3Y2NjIiwidXNlcl9pZCI6IjEwNTU3NyJ9.B_6tL43UcEvYcTEOG8Wb8cXwfsYT4heVsMZ5exZ42I0" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": {
+      "image1": "https://storage.googleapis.com/metrics_annotation_images/full/0081f8a0-feea-4145-a1d2-4ed411660188.jpg",
+      "image2": "https://storage.googleapis.com/metrics_annotation_images/full/009e5284-cbd1-4034-8495-4428c83ace67.jpg",
+      "image3": "https://storage.googleapis.com/metrics_annotation_images/full/0081f8a0-feea-4145-a1d2-4ed411660188.jpg",
+      "image4": "https://storage.googleapis.com/metrics_annotation_images/full/009e5284-cbd1-4034-8495-4428c83ace67.jpg",
+      "image5": "https://storage.googleapis.com/metrics_annotation_images/full/0081f8a0-feea-4145-a1d2-4ed411660188.jpg"
+    },
+    "project": 198466
+  }'
+
+CREATE TASKS
+
+curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxMTk1OTExLCJpYXQiOjE3NjExOTU2MTEsImp0aSI6IjY0N2Y4MWIxNWM0NDRjNDNhNzEzZmMwZGZiMzg3Y2NjIiwidXNlcl9pZCI6IjEwNTU3NyJ9.B_6tL43UcEvYcTEOG8Wb8cXwfsYT4heVsMZ5exZ42I0" \
+  -X POST 'https://app.heartex.com/api/projects/198466/import' \
+  -F 'file=@tasks.json'
+
+REFRESH TOKEN
+
+curl -X POST 'https://app.heartex.com/api/token/refresh' \
+  -H "Content-Type: application/json" \
+  -d '{"refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6ODA2ODM5NDk4MywiaWF0IjoxNzYxMTk0OTgzLCJqdGkiOiI0ZWI4ZTEzMDcyMjA0N2I2OGYwMDdkNGM2MDBiMmUyZiIsInVzZXJfaWQiOiIxMDU1NzcifQ.Mi0MxCjIomHJCxtQGqd05SxITMutfR8ppa-AIjddu5E"}'
+
+
+REFRESH TOKEN AND GET USER ID
+
+ACCESS_TOKEN=$(curl -s -X POST 'https://app.heartex.com/api/token/refresh' \
+  -H "Content-Type: application/json" \
+  -d '{"refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6ODA2ODM5NDk4MywiaWF0IjoxNzYxMTk0OTgzLCJqdGkiOiI0ZWI4ZTEzMDcyMjA0N2I2OGYwMDdkNGM2MDBiMmUyZiIsInVzZXJfaWQiOiIxMDU1NzcifQ.Mi0MxCjIomHJCxtQGqd05SxITMutfR8ppa-AIjddu5E"}' | grep -o '"access":"[^"]*' | cut -d'"' -f4) && \
+curl -H "Authorization: Bearer $ACCESS_TOKEN" \
+  -X GET 'https://app.heartex.com/api/projects/198466/members'
+
+
+GET USER ID
+
+curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxMzM0Mjc2LCJpYXQiOjE3NjEzMzM5NzYsImp0aSI6IjM1ZjljNWMyYzZmZjQ2MmZiZjA1NTY5OTg5ZjM4Y2FkIiwidXNlcl9pZCI6IjEwNTU3NyJ9.7CqfU1lewORaouX4YdaqEYrWvBqh1F_CeL5cOS1ikuc" \
+  -X GET 'https://app.heartex.com/api/projects/198466/members'
+
+CREATE TASK ASSIGNEE
+
+curl -X POST "https://app.heartex.com/api/projects/198466/tasks/TASK_ID/assignees" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "AN",
+    "users": [USER_ID]
+  }'
+
+curl -X POST "https://app.heartex.com/api/projects/198466/tasks/225264004/assignees" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "AN",
+    "users": [105577]
+  }'
+
+
+CREATE AND ASSIGN IN ONE GO
+
+# Get fresh token
+ACCESS_TOKEN=$(curl -s -X POST 'https://app.heartex.com/api/token/refresh' \
+  -H "Content-Type: application/json" \
+  -d '{"refresh": "YOUR_REFRESH_TOKEN"}' | grep -o '"access":"[^"]*' | cut -d'"' -f4)
+
+# Create task
+TASK_RESPONSE=$(curl -s -X POST 'https://app.heartex.com/api/tasks/' \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": {
+      "image1": "URL1",
+      "image2": "URL2",
+      "image3": "URL3",
+      "image4": "URL4",
+      "image5": "URL5"
+    },
+    "project": 198466
+  }')
+
+# Extract task ID
+TASK_ID=$(echo $TASK_RESPONSE | grep -o '"id":[0-9]*' | cut -d':' -f2)
+
+# Assign task
+curl -X POST "https://app.heartex.com/api/projects/198466/tasks/$TASK_ID/assignees" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "AN",
+    "users": [105577]
+  }'

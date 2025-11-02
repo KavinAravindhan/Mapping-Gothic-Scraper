@@ -1,0 +1,1158 @@
+[
+    {
+        "style": "byzantine",
+        "style_pretty": "Byzantine",
+        "building_name": "chiesa_di_santa_fosca,_torcello",
+        "building_name_pretty": "Chiesa di Santa Fosca, Torcello",
+        "building_images": [
+            "2023_photocoll_0469_0066.jpg",
+            "2224_lantern_546_045.jpg",
+            "2425_venice2024_santafoscatorcello_img_007.jpg",
+            "2425_venice2024_santafoscatorcello_img_014.jpg",
+            "2425_venice2024_santafoscatorcello_img_017.jpg",
+            "2425_venice2024_santafoscatorcello_img_027.jpg",
+            "2425_venice2024_santafoscatorcello_img_029.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Chiesa%20di%20Santa%20Fosca%2C%20Torcello/2023_photocoll_0469_0066.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Chiesa%20di%20Santa%20Fosca%2C%20Torcello/2224_lantern_546_045.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Chiesa%20di%20Santa%20Fosca%2C%20Torcello/2425_venice2024_santafoscatorcello_img_007.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Chiesa%20di%20Santa%20Fosca%2C%20Torcello/2425_venice2024_santafoscatorcello_img_014.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Chiesa%20di%20Santa%20Fosca%2C%20Torcello/2425_venice2024_santafoscatorcello_img_017.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Chiesa%20di%20Santa%20Fosca%2C%20Torcello/2425_venice2024_santafoscatorcello_img_027.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Chiesa%20di%20Santa%20Fosca%2C%20Torcello/2425_venice2024_santafoscatorcello_img_029.jpg"
+        ]
+    },
+    {
+        "style": "byzantine",
+        "style_pretty": "Byzantine",
+        "building_name": "basilica_di_san_vitale",
+        "building_name_pretty": "Basilica di San Vitale",
+        "building_images": [
+            "2224_lantern_165_027.jpg",
+            "2224_lantern_165_040.jpg",
+            "2224_lantern_546_004.jpg",
+            "vitale_pano_screenshot_1.jpg",
+            "vitale_pano_screenshot_2.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20San%20Vitale/2224_lantern_165_027.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20San%20Vitale/2224_lantern_165_040.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20San%20Vitale/2224_lantern_546_004.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20San%20Vitale/vitale_pano_screenshot_1.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20San%20Vitale/vitale_pano_screenshot_2.jpg"
+        ]
+    },
+    {
+        "style": "byzantine",
+        "style_pretty": "Byzantine",
+        "building_name": "basilica_di_sant_apollinare_in_classe",
+        "building_name_pretty": "Basilica di Sant_Apollinare in Classe",
+        "building_images": [
+            "2023_photocoll_0286_0075.jpg",
+            "2023_photocoll_0286_0081.jpg",
+            "2023_photocoll_0286_0082.jpg",
+            "2224_lantern_545_080.jpg",
+            "apollinare_classe_pano_screenshot_1.png",
+            "apollinare_classe_pano_screenshot_2.png"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Sant_Apollinare%20in%20Classe/2023_photocoll_0286_0075.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Sant_Apollinare%20in%20Classe/2023_photocoll_0286_0081.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Sant_Apollinare%20in%20Classe/2023_photocoll_0286_0082.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Sant_Apollinare%20in%20Classe/2224_lantern_545_080.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Sant_Apollinare%20in%20Classe/apollinare_classe_pano_screenshot_1.png",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Sant_Apollinare%20in%20Classe/apollinare_classe_pano_screenshot_2.png"
+        ]
+    },
+    {
+        "style": "byzantine",
+        "style_pretty": "Byzantine",
+        "building_name": "basilica_di_sant_apollinare_nuovo",
+        "building_name_pretty": "Basilica di Sant_Apollinare Nuovo",
+        "building_images": [
+            "2224_lantern_165_012.jpg",
+            "2224_lantern_545_085.jpg",
+            "2224_lantern_545_087.jpg",
+            "apollinare_nuovo_pano_screenshot.jpg",
+            "apollinare_nuovo_pano_screenshot_2.jpg",
+            "apollinare_nuovo_pano_screenshot_3.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Sant_Apollinare%20Nuovo/2224_lantern_165_012.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Sant_Apollinare%20Nuovo/2224_lantern_545_085.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Sant_Apollinare%20Nuovo/2224_lantern_545_087.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Sant_Apollinare%20Nuovo/apollinare_nuovo_pano_screenshot.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Sant_Apollinare%20Nuovo/apollinare_nuovo_pano_screenshot_2.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Sant_Apollinare%20Nuovo/apollinare_nuovo_pano_screenshot_3.jpg"
+        ]
+    },
+    {
+        "style": "byzantine",
+        "style_pretty": "Byzantine",
+        "building_name": "basilica_di_santa_maria_assunta,_torcello",
+        "building_name_pretty": "Basilica di Santa Maria Assunta, Torcello",
+        "building_images": [
+            "2023_photocoll_0469_0069.jpg",
+            "2224_lantern_139_106.jpg",
+            "2425_venice2024_santamariaassuntatorcello_img_012.jpg",
+            "2425_venice2024_santamariaassuntatorcello_img_013.jpg",
+            "2425_venice2024_santamariaassuntatorcello_img_018.jpg",
+            "2425_venice2024_santamariaassuntatorcello_img_020.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Santa%20Maria%20Assunta%2C%20Torcello/2023_photocoll_0469_0069.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Santa%20Maria%20Assunta%2C%20Torcello/2224_lantern_139_106.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Santa%20Maria%20Assunta%2C%20Torcello/2425_venice2024_santamariaassuntatorcello_img_012.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Santa%20Maria%20Assunta%2C%20Torcello/2425_venice2024_santamariaassuntatorcello_img_013.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Santa%20Maria%20Assunta%2C%20Torcello/2425_venice2024_santamariaassuntatorcello_img_018.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Byzantine/Basilica%20di%20Santa%20Maria%20Assunta%2C%20Torcello/2425_venice2024_santamariaassuntatorcello_img_020.jpg"
+        ]
+    },
+    {
+        "style": "english_gothic",
+        "style_pretty": "English Gothic",
+        "building_name": "wells",
+        "building_name_pretty": "Wells",
+        "building_images": [
+            "2224_lantern_086_065.jpg",
+            "2224_lantern_566_056.jpg",
+            "2224_lantern_566_057.jpg",
+            "2437_00005.jpg",
+            "2437_00009.jpg",
+            "2437_00016.jpg",
+            "2437_00040.jpg",
+            "2437_00059.jpg",
+            "2437_00066.jpg",
+            "2437_00078.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Wells/2224_lantern_086_065.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Wells/2224_lantern_566_056.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Wells/2224_lantern_566_057.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Wells/2437_00005.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Wells/2437_00009.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Wells/2437_00016.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Wells/2437_00040.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Wells/2437_00059.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Wells/2437_00066.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Wells/2437_00078.jpg"
+        ]
+    },
+    {
+        "style": "english_gothic",
+        "style_pretty": "English Gothic",
+        "building_name": "lincoln",
+        "building_name_pretty": "Lincoln",
+        "building_images": [
+            "2023_photocoll_0248_0058.jpg",
+            "2023_photocoll_0248_0096.jpg",
+            "2224_lantern_565_056.jpg",
+            "2224_lantern_565_060.jpg",
+            "2224_lantern_565_065.jpg",
+            "2383_00002.jpg",
+            "2383_00013.jpg",
+            "2383_00016.jpg",
+            "2383_00023.jpg",
+            "2383_00028.jpg",
+            "2383_00063.jpg",
+            "2383_00100.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Lincoln/2023_photocoll_0248_0058.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Lincoln/2023_photocoll_0248_0096.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Lincoln/2224_lantern_565_056.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Lincoln/2224_lantern_565_060.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Lincoln/2224_lantern_565_065.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Lincoln/2383_00002.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Lincoln/2383_00013.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Lincoln/2383_00016.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Lincoln/2383_00023.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Lincoln/2383_00028.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Lincoln/2383_00063.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Lincoln/2383_00100.jpg"
+        ]
+    },
+    {
+        "style": "english_gothic",
+        "style_pretty": "English Gothic",
+        "building_name": "canterbury",
+        "building_name_pretty": "Canterbury",
+        "building_images": [
+            "1285_00006.jpg",
+            "1285_00016.jpg",
+            "1285_00019.jpg",
+            "1285_00031.jpg",
+            "1285_00072.jpg",
+            "1285_00118.jpg",
+            "1285_00150.jpg",
+            "2023_photocoll_0244_0086.jpg",
+            "2023_photocoll_0244_0090.jpg",
+            "2023_photocoll_0244_0100.jpg",
+            "2224_lantern_048_077.jpg",
+            "2224_lantern_548_081.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Canterbury/1285_00006.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Canterbury/1285_00016.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Canterbury/1285_00019.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Canterbury/1285_00031.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Canterbury/1285_00072.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Canterbury/1285_00118.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Canterbury/1285_00150.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Canterbury/2023_photocoll_0244_0086.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Canterbury/2023_photocoll_0244_0090.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Canterbury/2023_photocoll_0244_0100.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Canterbury/2224_lantern_048_077.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Canterbury/2224_lantern_548_081.jpg"
+        ]
+    },
+    {
+        "style": "english_gothic",
+        "style_pretty": "English Gothic",
+        "building_name": "salisbury",
+        "building_name_pretty": "Salisbury",
+        "building_images": [
+            "2023_photocoll_0250_0053.jpg",
+            "2023_photocoll_0250_0057.jpg",
+            "2224_lantern_566_025.jpg",
+            "2224_lantern_566_030.jpg",
+            "2224_lantern_566_034.jpg",
+            "2433_00004.jpg",
+            "2433_00015.jpg",
+            "2433_00017.jpg",
+            "2433_00031.jpg",
+            "2433_00043.jpg",
+            "2433_00052.jpg",
+            "2433_00055.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Salisbury/2023_photocoll_0250_0053.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Salisbury/2023_photocoll_0250_0057.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Salisbury/2224_lantern_566_025.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Salisbury/2224_lantern_566_030.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Salisbury/2224_lantern_566_034.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Salisbury/2433_00004.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Salisbury/2433_00015.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Salisbury/2433_00017.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Salisbury/2433_00031.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Salisbury/2433_00043.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Salisbury/2433_00052.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/Salisbury/2433_00055.jpg"
+        ]
+    },
+    {
+        "style": "english_gothic",
+        "style_pretty": "English Gothic",
+        "building_name": "york",
+        "building_name_pretty": "York",
+        "building_images": [
+            "2023_photocoll_0250_0002.jpg",
+            "2023_photocoll_0251_0081.jpg",
+            "2023_photocoll_0251_0088.jpg",
+            "2224_lantern_048_080.jpg",
+            "2224_lantern_086_067.jpg",
+            "2440_00012.jpg",
+            "2440_00019.jpg",
+            "2440_00023.jpg",
+            "2440_00031.jpg",
+            "2440_00033.jpg",
+            "2440_00046.jpg",
+            "2440_00048.jpg",
+            "2440_00063.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/York/2023_photocoll_0250_0002.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/York/2023_photocoll_0251_0081.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/York/2023_photocoll_0251_0088.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/York/2224_lantern_048_080.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/York/2224_lantern_086_067.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/York/2440_00012.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/York/2440_00019.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/York/2440_00023.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/York/2440_00031.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/York/2440_00033.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/York/2440_00046.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/York/2440_00048.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/English%20Gothic/York/2440_00063.jpg"
+        ]
+    },
+    {
+        "style": "french_early_gothic",
+        "style_pretty": "French Early Gothic",
+        "building_name": "paris,_notre-dame",
+        "building_name_pretty": "Paris, Notre-Dame",
+        "building_images": [
+            "1164_00274.jpg",
+            "1164_00309.jpg",
+            "1164_00318.jpg",
+            "1164_00328.jpg",
+            "1164_00395.jpg",
+            "1164_00422.jpg",
+            "1164_00483.jpg",
+            "1164_00527.jpg",
+            "1164_00610.jpg",
+            "1164_00655.jpg",
+            "2023_photocoll_0211_0038.jpg",
+            "2224_lantern_048_011.jpg",
+            "2224_lantern_415_028.jpg",
+            "2224_lantern_415_032.jpg",
+            "2224_lantern_415_047.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Paris%2C%20Notre-Dame/1164_00274.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Paris%2C%20Notre-Dame/1164_00309.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Paris%2C%20Notre-Dame/1164_00318.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Paris%2C%20Notre-Dame/1164_00328.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Paris%2C%20Notre-Dame/1164_00395.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Paris%2C%20Notre-Dame/1164_00422.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Paris%2C%20Notre-Dame/1164_00483.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Paris%2C%20Notre-Dame/1164_00527.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Paris%2C%20Notre-Dame/1164_00610.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Paris%2C%20Notre-Dame/1164_00655.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Paris%2C%20Notre-Dame/2023_photocoll_0211_0038.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Paris%2C%20Notre-Dame/2224_lantern_048_011.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Paris%2C%20Notre-Dame/2224_lantern_415_028.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Paris%2C%20Notre-Dame/2224_lantern_415_032.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Paris%2C%20Notre-Dame/2224_lantern_415_047.jpg"
+        ]
+    },
+    {
+        "style": "french_early_gothic",
+        "style_pretty": "French Early Gothic",
+        "building_name": "senlis",
+        "building_name_pretty": "Senlis",
+        "building_images": [
+            "1050_00011.jpg",
+            "1050_00028.jpg",
+            "1050_00039.jpg",
+            "1050_00067.jpg",
+            "1050_00075.jpg",
+            "1050_00123.jpg",
+            "1050_00164.jpg",
+            "2023_photocoll_0228_0183.jpg",
+            "2023_photocoll_0228_0193.jpg",
+            "2023_photocoll_0228_0200.jpg",
+            "2023_photocoll_0228_0206.jpg",
+            "2224_lantern_418_013.jpg",
+            "2224_lantern_418_018.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Senlis/1050_00011.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Senlis/1050_00028.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Senlis/1050_00039.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Senlis/1050_00067.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Senlis/1050_00075.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Senlis/1050_00123.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Senlis/1050_00164.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Senlis/2023_photocoll_0228_0183.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Senlis/2023_photocoll_0228_0193.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Senlis/2023_photocoll_0228_0200.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Senlis/2023_photocoll_0228_0206.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Senlis/2224_lantern_418_013.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Senlis/2224_lantern_418_018.jpg"
+        ]
+    },
+    {
+        "style": "french_early_gothic",
+        "style_pretty": "French Early Gothic",
+        "building_name": "poitiers",
+        "building_name_pretty": "Poitiers",
+        "building_images": [
+            "1171_00002.jpg",
+            "1171_00022.jpg",
+            "1171_00023.jpg",
+            "1171_00028.jpg",
+            "1171_00052.jpg",
+            "1171_00084.jpg",
+            "2023_photocoll_0213_0105.jpg",
+            "2023_photocoll_0213_0120.jpg",
+            "2023_photocoll_0213_0137.jpg",
+            "2224_lantern_415_096.jpg",
+            "2224_lantern_415_098.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Poitiers/1171_00002.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Poitiers/1171_00022.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Poitiers/1171_00023.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Poitiers/1171_00028.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Poitiers/1171_00052.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Poitiers/1171_00084.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Poitiers/2023_photocoll_0213_0105.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Poitiers/2023_photocoll_0213_0120.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Poitiers/2023_photocoll_0213_0137.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Poitiers/2224_lantern_415_096.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Poitiers/2224_lantern_415_098.jpg"
+        ]
+    },
+    {
+        "style": "french_early_gothic",
+        "style_pretty": "French Early Gothic",
+        "building_name": "sens",
+        "building_name_pretty": "Sens",
+        "building_images": [
+            "1067_00007.jpg",
+            "1067_00024.jpg",
+            "1067_00036.jpg",
+            "1067_00051.jpg",
+            "1067_00075.jpg",
+            "1067_00078.jpg",
+            "1067_00148.jpg",
+            "2023_photocoll_0229_0003.jpg",
+            "2023_photocoll_0229_0026.jpg",
+            "2023_photocoll_0229_0028.jpg",
+            "2023_photocoll_0229_0128.jpg",
+            "2224_lantern_418_016.jpg",
+            "2224_lantern_418_019.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Sens/1067_00007.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Sens/1067_00024.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Sens/1067_00036.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Sens/1067_00051.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Sens/1067_00075.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Sens/1067_00078.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Sens/1067_00148.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Sens/2023_photocoll_0229_0003.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Sens/2023_photocoll_0229_0026.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Sens/2023_photocoll_0229_0028.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Sens/2023_photocoll_0229_0128.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Sens/2224_lantern_418_016.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Sens/2224_lantern_418_019.jpg"
+        ]
+    },
+    {
+        "style": "french_early_gothic",
+        "style_pretty": "French Early Gothic",
+        "building_name": "laon",
+        "building_name_pretty": "Laon",
+        "building_images": [
+            "1024_00002.jpg",
+            "1024_00012.jpg",
+            "1024_00021.jpg",
+            "1024_00041.jpg",
+            "1024_00053.jpg",
+            "1024_00083.jpg",
+            "1024_00144.jpg",
+            "2023_photocoll_0199_0002.jpg",
+            "2023_photocoll_0199_0039.jpg",
+            "2023_photocoll_0199_0082.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Laon/1024_00002.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Laon/1024_00012.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Laon/1024_00021.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Laon/1024_00041.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Laon/1024_00053.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Laon/1024_00083.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Laon/1024_00144.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Laon/2023_photocoll_0199_0002.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Laon/2023_photocoll_0199_0039.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/Laon/2023_photocoll_0199_0082.jpg"
+        ]
+    },
+    {
+        "style": "french_early_gothic",
+        "style_pretty": "French Early Gothic",
+        "building_name": "st_denis",
+        "building_name_pretty": "St Denis",
+        "building_images": [
+            "1182_00110.jpg",
+            "1182_00121.jpg",
+            "1182_00135.jpg",
+            "1182_00176.jpg",
+            "1182_00193.jpg",
+            "1182_00321.jpg",
+            "1415_amiens2014_saint_denis_img_005.jpg",
+            "2023_photocoll_0223_0146.jpg",
+            "2023_photocoll_0223_0167.jpg",
+            "2224_lantern_417_100.jpg",
+            "2224_lantern_417_113.jpg",
+            "2224_lantern_417_117.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/St%20Denis/1182_00110.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/St%20Denis/1182_00121.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/St%20Denis/1182_00135.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/St%20Denis/1182_00176.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/St%20Denis/1182_00193.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/St%20Denis/1182_00321.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/St%20Denis/1415_amiens2014_saint_denis_img_005.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/St%20Denis/2023_photocoll_0223_0146.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/St%20Denis/2023_photocoll_0223_0167.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/St%20Denis/2224_lantern_417_100.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/St%20Denis/2224_lantern_417_113.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Early%20Gothic/St%20Denis/2224_lantern_417_117.jpg"
+        ]
+    },
+    {
+        "style": "french_high_gothic-rayonnant",
+        "style_pretty": "French High Gothic-Rayonnant",
+        "building_name": "chartres",
+        "building_name_pretty": "Chartres",
+        "building_images": [
+            "1107_00205.jpg",
+            "1107_00220.jpg",
+            "1107_00240.jpg",
+            "1107_00343.jpg",
+            "1107_00378.jpg",
+            "2023_photocoll_0188_0092.jpg",
+            "2023_photocoll_0188_0097.jpg",
+            "2023_photocoll_0188_0147.jpg",
+            "2224_lantern_088_023.jpg",
+            "2224_lantern_182_004.jpg",
+            "2224_lantern_703_031.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Chartres/1107_00205.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Chartres/1107_00220.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Chartres/1107_00240.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Chartres/1107_00343.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Chartres/1107_00378.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Chartres/2023_photocoll_0188_0092.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Chartres/2023_photocoll_0188_0097.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Chartres/2023_photocoll_0188_0147.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Chartres/2224_lantern_088_023.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Chartres/2224_lantern_182_004.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Chartres/2224_lantern_703_031.jpg"
+        ]
+    },
+    {
+        "style": "french_high_gothic-rayonnant",
+        "style_pretty": "French High Gothic-Rayonnant",
+        "building_name": "reims",
+        "building_name_pretty": "Reims",
+        "building_images": [
+            "1044_00004.jpg",
+            "1044_00024.jpg",
+            "1044_00027.jpg",
+            "1044_00053.jpg",
+            "1044_00061.jpg",
+            "1044_00090.jpg",
+            "2023_photocoll_0215_0026.jpg",
+            "2023_photocoll_0215_0081.jpg",
+            "2023_photocoll_0218_0136.jpg",
+            "2224_lantern_056_114.jpg",
+            "2224_lantern_417_012.jpg",
+            "2224_lantern_417_032.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Reims/1044_00004.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Reims/1044_00024.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Reims/1044_00027.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Reims/1044_00053.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Reims/1044_00061.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Reims/1044_00090.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Reims/2023_photocoll_0215_0026.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Reims/2023_photocoll_0215_0081.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Reims/2023_photocoll_0218_0136.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Reims/2224_lantern_056_114.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Reims/2224_lantern_417_012.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Reims/2224_lantern_417_032.jpg"
+        ]
+    },
+    {
+        "style": "french_high_gothic-rayonnant",
+        "style_pretty": "French High Gothic-Rayonnant",
+        "building_name": "amiens",
+        "building_name_pretty": "Amiens",
+        "building_images": [
+            "1415_amiens2014_arch_ext_img_005_0.jpg",
+            "1415_amiens2014_ext_choir_img_010_0.jpg",
+            "1415_amiens2014_int_nave_img_005_0.jpg",
+            "1415_amiens2014_int_triforium_img_013_0.jpg",
+            "1415_amiens2014_stalls_general_img_003_0.jpg",
+            "1415_amiens2014_west_facade_img_004_0.jpg",
+            "1415_amiens2014_west_portal_center_img_017_0.jpg",
+            "2023_photocoll_0174_0049.jpg",
+            "2023_photocoll_0175_0029.jpg",
+            "2023_photocoll_0175_0055.jpg",
+            "2023_photocoll_0175_0059.jpg",
+            "2224_lantern_049_067 (1).jpg",
+            "2224_lantern_049_067.jpg",
+            "2224_lantern_183_072.jpg",
+            "2224_lantern_567_001.jpg",
+            "2224_lantern_567_031.jpg",
+            "2224_lantern_730_024.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Amiens/1415_amiens2014_arch_ext_img_005_0.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Amiens/1415_amiens2014_ext_choir_img_010_0.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Amiens/1415_amiens2014_int_nave_img_005_0.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Amiens/1415_amiens2014_int_triforium_img_013_0.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Amiens/1415_amiens2014_stalls_general_img_003_0.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Amiens/1415_amiens2014_west_facade_img_004_0.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Amiens/1415_amiens2014_west_portal_center_img_017_0.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Amiens/2023_photocoll_0174_0049.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Amiens/2023_photocoll_0175_0029.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Amiens/2023_photocoll_0175_0055.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Amiens/2023_photocoll_0175_0059.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Amiens/2224_lantern_049_067%20%281%29.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Amiens/2224_lantern_049_067.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Amiens/2224_lantern_183_072.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Amiens/2224_lantern_567_001.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Amiens/2224_lantern_567_031.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Amiens/2224_lantern_730_024.jpg"
+        ]
+    },
+    {
+        "style": "french_high_gothic-rayonnant",
+        "style_pretty": "French High Gothic-Rayonnant",
+        "building_name": "rouen",
+        "building_name_pretty": "Rouen",
+        "building_images": [
+            "1178_00001.jpg",
+            "1178_00015.jpg",
+            "1178_00041.jpg",
+            "1178_00049.jpg",
+            "1178_00050.jpg",
+            "2224_lantern_417_051.jpg",
+            "2224_lantern_417_052.jpg",
+            "2224_lantern_417_061.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Rouen/1178_00001.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Rouen/1178_00015.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Rouen/1178_00041.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Rouen/1178_00049.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Rouen/1178_00050.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Rouen/2224_lantern_417_051.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Rouen/2224_lantern_417_052.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Rouen/2224_lantern_417_061.jpg"
+        ]
+    },
+    {
+        "style": "french_high_gothic-rayonnant",
+        "style_pretty": "French High Gothic-Rayonnant",
+        "building_name": "beauvais",
+        "building_name_pretty": "Beauvais",
+        "building_images": [
+            "1006_00015.jpg",
+            "1006_00030.jpg",
+            "1006_00309.jpg",
+            "1006_00327.jpg",
+            "1415_amiens2014_beauvais_img_003_0.jpg",
+            "1415_amiens2014_beauvais_img_005_0.jpg",
+            "2023_photocoll_0182_0061.jpg",
+            "2224_lantern_567_057.jpg",
+            "2224_lantern_567_062.jpg",
+            "2224_lantern_567_065.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Beauvais/1006_00015.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Beauvais/1006_00030.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Beauvais/1006_00309.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Beauvais/1006_00327.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Beauvais/1415_amiens2014_beauvais_img_003_0.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Beauvais/1415_amiens2014_beauvais_img_005_0.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Beauvais/2023_photocoll_0182_0061.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Beauvais/2224_lantern_567_057.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Beauvais/2224_lantern_567_062.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20High%20Gothic-Rayonnant/Beauvais/2224_lantern_567_065.jpg"
+        ]
+    },
+    {
+        "style": "french_romanesque",
+        "style_pretty": "French Romanesque",
+        "building_name": "conques",
+        "building_name_pretty": "Conques",
+        "building_images": [
+            "1379_00022.jpg",
+            "1379_00024.jpg",
+            "1379_00056.jpg",
+            "1379_00098.jpg",
+            "1379_00112.jpg",
+            "1379_00122.jpg",
+            "1379_00170.jpg",
+            "2023_photocoll_0193_0005.jpg",
+            "2023_photocoll_0193_0041.jpg",
+            "2023_photocoll_0193_0108.jpg",
+            "2224_lantern_551_001.jpg",
+            "2224_lantern_551_003.jpg",
+            "2224_lantern_551_009.jpg",
+            "2224_lantern_692_100.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Conques/1379_00022.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Conques/1379_00024.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Conques/1379_00056.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Conques/1379_00098.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Conques/1379_00112.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Conques/1379_00122.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Conques/1379_00170.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Conques/2023_photocoll_0193_0005.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Conques/2023_photocoll_0193_0041.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Conques/2023_photocoll_0193_0108.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Conques/2224_lantern_551_001.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Conques/2224_lantern_551_003.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Conques/2224_lantern_551_009.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Conques/2224_lantern_692_100.jpg"
+        ]
+    },
+    {
+        "style": "french_romanesque",
+        "style_pretty": "French Romanesque",
+        "building_name": "caen",
+        "building_name_pretty": "Caen",
+        "building_images": [
+            "1098_00007.jpg",
+            "1098_00010.jpg",
+            "1098_00014.jpg",
+            "1098_00021.jpg",
+            "1098_00034.jpg",
+            "2023_photocoll_0186_0074.jpg",
+            "2023_photocoll_0186_0096.jpg",
+            "2023_photocoll_0186_0097.jpg",
+            "2224_lantern_550_012.jpg",
+            "2224_lantern_550_013.jpg",
+            "2224_lantern_550_015.jpg",
+            "2224_lantern_550_021.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Caen/1098_00007.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Caen/1098_00010.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Caen/1098_00014.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Caen/1098_00021.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Caen/1098_00034.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Caen/2023_photocoll_0186_0074.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Caen/2023_photocoll_0186_0096.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Caen/2023_photocoll_0186_0097.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Caen/2224_lantern_550_012.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Caen/2224_lantern_550_013.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Caen/2224_lantern_550_015.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Caen/2224_lantern_550_021.jpg"
+        ]
+    },
+    {
+        "style": "french_romanesque",
+        "style_pretty": "French Romanesque",
+        "building_name": "vezelay",
+        "building_name_pretty": "Vezelay",
+        "building_images": [
+            "1209_00002.jpg",
+            "1209_00006.jpg",
+            "1209_00022.jpg",
+            "1209_00028.jpg",
+            "1209_00036.jpg",
+            "1209_00047.jpg",
+            "2023_photocoll_0227_0003.jpg",
+            "2023_photocoll_0237_0028.jpg",
+            "2224_lantern_418_042.jpg",
+            "2224_lantern_553_051.jpg",
+            "2224_lantern_553_054.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Vezelay/1209_00002.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Vezelay/1209_00006.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Vezelay/1209_00022.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Vezelay/1209_00028.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Vezelay/1209_00036.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Vezelay/1209_00047.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Vezelay/2023_photocoll_0227_0003.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Vezelay/2023_photocoll_0237_0028.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Vezelay/2224_lantern_418_042.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Vezelay/2224_lantern_553_051.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Vezelay/2224_lantern_553_054.jpg"
+        ]
+    },
+    {
+        "style": "french_romanesque",
+        "style_pretty": "French Romanesque",
+        "building_name": "toulouse",
+        "building_name_pretty": "Toulouse",
+        "building_images": [
+            "1302_00023.jpg",
+            "1302_00038.jpg",
+            "1302_00043.jpg",
+            "1302_00053.jpg",
+            "1302_00097.jpg",
+            "1302_00117.jpg",
+            "2023_photocoll_0234_0117.jpg",
+            "2224_lantern_553_021.jpg",
+            "2224_lantern_553_022.jpg",
+            "2224_lantern_553_023.jpg",
+            "2224_lantern_553_025.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Toulouse/1302_00023.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Toulouse/1302_00038.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Toulouse/1302_00043.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Toulouse/1302_00053.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Toulouse/1302_00097.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Toulouse/1302_00117.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Toulouse/2023_photocoll_0234_0117.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Toulouse/2224_lantern_553_021.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Toulouse/2224_lantern_553_022.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Toulouse/2224_lantern_553_023.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/French%20Romanesque/Toulouse/2224_lantern_553_025.jpg"
+        ]
+    },
+    {
+        "style": "istanbul_byzantine",
+        "style_pretty": "Istanbul Byzantine",
+        "building_name": "fethiye",
+        "building_name_pretty": "Fethiye",
+        "building_images": [
+            "1213_istanbul2003_pammakaristoschurch_img_001.jpg",
+            "1213_istanbul2003_pammakaristoschurch_img_019.jpg",
+            "1213_istanbul2003_pammakaristoschurch_img_023.jpg",
+            "1213_istanbul2003_pammakaristoschurch_img_030.jpg",
+            "1314_istanbul2013_fethiyecamii_009.jpg",
+            "1314_istanbul2013_fethiyecamii_019.jpg",
+            "1314_istanbul2013_pammakaristoschurch_015.jpg",
+            "1314_istanbul2013_pammakaristoschurch_035.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Fethiye/1213_istanbul2003_pammakaristoschurch_img_001.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Fethiye/1213_istanbul2003_pammakaristoschurch_img_019.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Fethiye/1213_istanbul2003_pammakaristoschurch_img_023.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Fethiye/1213_istanbul2003_pammakaristoschurch_img_030.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Fethiye/1314_istanbul2013_fethiyecamii_009.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Fethiye/1314_istanbul2013_fethiyecamii_019.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Fethiye/1314_istanbul2013_pammakaristoschurch_015.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Fethiye/1314_istanbul2013_pammakaristoschurch_035.jpg"
+        ]
+    },
+    {
+        "style": "istanbul_byzantine",
+        "style_pretty": "Istanbul Byzantine",
+        "building_name": "gul",
+        "building_name_pretty": "Gul",
+        "building_images": [
+            "1314_istanbul2013_gulcamii_003.jpg",
+            "1314_istanbul2013_gulcamii_010.jpg",
+            "1314_istanbul2013_gulcamii_022.jpg",
+            "1314_istanbul2013_gulcamii_029.jpg",
+            "1314_istanbul2013_gulcamii_038.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Gul/1314_istanbul2013_gulcamii_003.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Gul/1314_istanbul2013_gulcamii_010.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Gul/1314_istanbul2013_gulcamii_022.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Gul/1314_istanbul2013_gulcamii_029.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Gul/1314_istanbul2013_gulcamii_038.jpg"
+        ]
+    },
+    {
+        "style": "istanbul_byzantine",
+        "style_pretty": "Istanbul Byzantine",
+        "building_name": "atik_mustafa",
+        "building_name_pretty": "Atik Mustafa",
+        "building_images": [
+            "1314_istanbul2013_atikmustafapashacamii_008.jpg",
+            "1314_istanbul2013_atikmustafapashacamii_010.jpg",
+            "1314_istanbul2013_atikmustafapashacamii_016.jpg",
+            "1314_istanbul2013_atikmustafapashacamii_044.jpg",
+            "1314_istanbul2013_atikmustafapashacamii_045.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Atik%20Mustafa/1314_istanbul2013_atikmustafapashacamii_008.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Atik%20Mustafa/1314_istanbul2013_atikmustafapashacamii_010.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Atik%20Mustafa/1314_istanbul2013_atikmustafapashacamii_016.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Atik%20Mustafa/1314_istanbul2013_atikmustafapashacamii_044.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Atik%20Mustafa/1314_istanbul2013_atikmustafapashacamii_045.jpg"
+        ]
+    },
+    {
+        "style": "istanbul_byzantine",
+        "style_pretty": "Istanbul Byzantine",
+        "building_name": "arap",
+        "building_name_pretty": "Arap",
+        "building_images": [
+            "1314_istanbul2013_arapcamii_img_001.jpg",
+            "1314_istanbul2013_arapcamii_img_010.jpg",
+            "1314_istanbul2013_arapcamii_img_030.jpg",
+            "1314_istanbul2013_arapcamii_img_046.jpg",
+            "1314_istanbul2013_arapcamii_img_064.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Arap/1314_istanbul2013_arapcamii_img_001.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Arap/1314_istanbul2013_arapcamii_img_010.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Arap/1314_istanbul2013_arapcamii_img_030.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Arap/1314_istanbul2013_arapcamii_img_046.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Arap/1314_istanbul2013_arapcamii_img_064.jpg"
+        ]
+    },
+    {
+        "style": "istanbul_byzantine",
+        "style_pretty": "Istanbul Byzantine",
+        "building_name": "kucuk",
+        "building_name_pretty": "Kucuk",
+        "building_images": [
+            "1314_istanbul2013_kucukayasofyacamii_078.jpg",
+            "1314_istanbul2013_kucukayasofyacamii_083.jpg",
+            "1314_istanbul2013_kucukayasofyacamii_097.jpg",
+            "1314_istanbul2013_kucukayasofyacamii_110.jpg",
+            "1314_istanbul2013_kucukayasofyacamii_137.jpg",
+            "1415_030_079.jpg",
+            "2224_lantern_544_040.jpg",
+            "2224_lantern_544_043.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Kucuk/1314_istanbul2013_kucukayasofyacamii_078.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Kucuk/1314_istanbul2013_kucukayasofyacamii_083.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Kucuk/1314_istanbul2013_kucukayasofyacamii_097.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Kucuk/1314_istanbul2013_kucukayasofyacamii_110.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Kucuk/1314_istanbul2013_kucukayasofyacamii_137.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Kucuk/1415_030_079.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Kucuk/2224_lantern_544_040.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Istanbul%20Byzantine/Kucuk/2224_lantern_544_043.jpg"
+        ]
+    },
+    {
+        "style": "norman_-_english_romanesque",
+        "style_pretty": "Norman - English Romanesque",
+        "building_name": "winchester",
+        "building_name_pretty": "Winchester",
+        "building_images": [
+            "2023_photocoll_0251_0031.jpg",
+            "2023_photocoll_0251_0040.jpg",
+            "2224_lantern_566_065.jpg",
+            "2438_00007.jpg",
+            "2438_00009.jpg",
+            "2438_00035.jpg",
+            "2438_00043.jpg",
+            "2438_00060.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Winchester/2023_photocoll_0251_0031.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Winchester/2023_photocoll_0251_0040.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Winchester/2224_lantern_566_065.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Winchester/2438_00007.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Winchester/2438_00009.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Winchester/2438_00035.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Winchester/2438_00043.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Winchester/2438_00060.jpg"
+        ]
+    },
+    {
+        "style": "norman_-_english_romanesque",
+        "style_pretty": "Norman - English Romanesque",
+        "building_name": "southwell_minster",
+        "building_name_pretty": "Southwell Minster",
+        "building_images": [
+            "2023_photocoll_0250_0085.jpg",
+            "2023_photocoll_0250_0089.jpg",
+            "2023_photocoll_0250_0096.jpg",
+            "2435_00002.jpg",
+            "2435_00019.jpg",
+            "2435_00020.jpg",
+            "2435_00027.jpg",
+            "2435_00038.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Southwell%20Minster/2023_photocoll_0250_0085.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Southwell%20Minster/2023_photocoll_0250_0089.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Southwell%20Minster/2023_photocoll_0250_0096.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Southwell%20Minster/2435_00002.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Southwell%20Minster/2435_00019.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Southwell%20Minster/2435_00020.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Southwell%20Minster/2435_00027.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Southwell%20Minster/2435_00038.jpg"
+        ]
+    },
+    {
+        "style": "norman_-_english_romanesque",
+        "style_pretty": "Norman - English Romanesque",
+        "building_name": "peterborough",
+        "building_name_pretty": "Peterborough",
+        "building_images": [
+            "2023_photocoll_0249_0113.jpg",
+            "2023_photocoll_0249_0129.jpg",
+            "2023_photocoll_0249_0145.jpg",
+            "2023_photocoll_0249_0161.jpg",
+            "2428_00002.jpg",
+            "2428_00013.jpg",
+            "2428_00016.jpg",
+            "2428_00019.jpg",
+            "2428_00031.jpg",
+            "2428_00046.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Peterborough/2023_photocoll_0249_0113.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Peterborough/2023_photocoll_0249_0129.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Peterborough/2023_photocoll_0249_0145.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Peterborough/2023_photocoll_0249_0161.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Peterborough/2428_00002.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Peterborough/2428_00013.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Peterborough/2428_00016.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Peterborough/2428_00019.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Peterborough/2428_00031.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Peterborough/2428_00046.jpg"
+        ]
+    },
+    {
+        "style": "norman_-_english_romanesque",
+        "style_pretty": "Norman - English Romanesque",
+        "building_name": "ely",
+        "building_name_pretty": "Ely",
+        "building_images": [
+            "2023_photocoll_0246_0042.jpg",
+            "2023_photocoll_0246_0053.jpg",
+            "2023_photocoll_0246_0092.jpg",
+            "2023_photocoll_0246_0115.jpg",
+            "2224_lantern_549_020.jpg",
+            "2224_lantern_564_084.jpg",
+            "2420_00011.jpg",
+            "2420_00017.jpg",
+            "2420_00018.jpg",
+            "2420_00056.jpg",
+            "2420_00077.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Ely/2023_photocoll_0246_0042.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Ely/2023_photocoll_0246_0053.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Ely/2023_photocoll_0246_0092.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Ely/2023_photocoll_0246_0115.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Ely/2224_lantern_549_020.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Ely/2224_lantern_564_084.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Ely/2420_00011.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Ely/2420_00017.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Ely/2420_00018.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Ely/2420_00056.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Ely/2420_00077.jpg"
+        ]
+    },
+    {
+        "style": "norman_-_english_romanesque",
+        "style_pretty": "Norman - English Romanesque",
+        "building_name": "durham",
+        "building_name_pretty": "Durham",
+        "building_images": [
+            "2023_photocoll_0245_0142.jpg",
+            "2023_photocoll_0245_0149.jpg",
+            "2023_photocoll_0245_0162.jpg",
+            "2023_photocoll_0245_0165.jpg",
+            "2152_00002.jpg",
+            "2152_00024.jpg",
+            "2152_00036.jpg",
+            "2152_00039.jpg",
+            "2152_00042.jpg",
+            "2224_lantern_549_005.jpg",
+            "2224_lantern_549_009.jpg",
+            "2224_lantern_549_018.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Durham/2023_photocoll_0245_0142.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Durham/2023_photocoll_0245_0149.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Durham/2023_photocoll_0245_0162.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Durham/2023_photocoll_0245_0165.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Durham/2152_00002.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Durham/2152_00024.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Durham/2152_00036.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Durham/2152_00039.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Durham/2152_00042.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Durham/2224_lantern_549_005.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Durham/2224_lantern_549_009.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Norman%20-%20English%20Romanesque/Durham/2224_lantern_549_018.jpg"
+        ]
+    },
+    {
+        "style": "venetian_gothic",
+        "style_pretty": "Venetian Gothic",
+        "building_name": "frari",
+        "building_name_pretty": "Frari",
+        "building_images": [
+            "2425_venice2024_santamariagloriosadeifrari_img_004.jpg",
+            "2425_venice2024_santamariagloriosadeifrari_img_007.jpg",
+            "2425_venice2024_santamariagloriosadeifrari_img_009.jpg",
+            "2425_venice2024_santamariagloriosadeifrari_img_021.jpg",
+            "2425_venice2024_santamariagloriosadeifrari_img_027.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Gothic/Frari/2425_venice2024_santamariagloriosadeifrari_img_004.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Gothic/Frari/2425_venice2024_santamariagloriosadeifrari_img_007.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Gothic/Frari/2425_venice2024_santamariagloriosadeifrari_img_009.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Gothic/Frari/2425_venice2024_santamariagloriosadeifrari_img_021.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Gothic/Frari/2425_venice2024_santamariagloriosadeifrari_img_027.jpg"
+        ]
+    },
+    {
+        "style": "venetian_gothic",
+        "style_pretty": "Venetian Gothic",
+        "building_name": "zaccaria",
+        "building_name_pretty": "Zaccaria",
+        "building_images": [
+            "2425_venice2024_sanzaccaria_img_004.jpg",
+            "2425_venice2024_sanzaccaria_img_009.jpg",
+            "2425_venice2024_sanzaccaria_img_010.jpg",
+            "2425_venice2024_sanzaccaria_img_024.jpg",
+            "2425_venice2024_sanzaccaria_img_026.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Gothic/Zaccaria/2425_venice2024_sanzaccaria_img_004.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Gothic/Zaccaria/2425_venice2024_sanzaccaria_img_009.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Gothic/Zaccaria/2425_venice2024_sanzaccaria_img_010.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Gothic/Zaccaria/2425_venice2024_sanzaccaria_img_024.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Gothic/Zaccaria/2425_venice2024_sanzaccaria_img_026.jpg"
+        ]
+    },
+    {
+        "style": "venetian_gothic",
+        "style_pretty": "Venetian Gothic",
+        "building_name": "carmini",
+        "building_name_pretty": "Carmini",
+        "building_images": [
+            "2023_photocoll_0332_0106.jpg",
+            "2425_venice2024_santamariadeicarmini_img_007.jpg",
+            "2425_venice2024_santamariadeicarmini_img_014.jpg",
+            "2425_venice2024_santamariadeicarmini_img_016.jpg",
+            "2425_venice2024_santamariadeicarmini_img_028.jpg",
+            "2425_venice2024_santamariadeicarmini_img_032.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Gothic/Carmini/2023_photocoll_0332_0106.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Gothic/Carmini/2425_venice2024_santamariadeicarmini_img_007.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Gothic/Carmini/2425_venice2024_santamariadeicarmini_img_014.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Gothic/Carmini/2425_venice2024_santamariadeicarmini_img_016.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Gothic/Carmini/2425_venice2024_santamariadeicarmini_img_028.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Gothic/Carmini/2425_venice2024_santamariadeicarmini_img_032.jpg"
+        ]
+    },
+    {
+        "style": "venetian_renaissance",
+        "style_pretty": "Venetian Renaissance",
+        "building_name": "formosa",
+        "building_name_pretty": "Formosa",
+        "building_images": [
+            "2023_photocoll_0332_0113.jpg",
+            "2425_venice2024_santamariaformosa_img_004.jpg",
+            "2425_venice2024_santamariaformosa_img_022.jpg",
+            "ven_san_maria_formosa_3664.jpg",
+            "ven_san_maria_formosa_3684.jpg",
+            "ven_san_maria_formosa_3688.jpg",
+            "ven_san_maria_formosa_3701.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Renaissance/Formosa/2023_photocoll_0332_0113.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Renaissance/Formosa/2425_venice2024_santamariaformosa_img_004.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Renaissance/Formosa/2425_venice2024_santamariaformosa_img_022.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Renaissance/Formosa/ven_san_maria_formosa_3664.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Renaissance/Formosa/ven_san_maria_formosa_3684.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Renaissance/Formosa/ven_san_maria_formosa_3688.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Renaissance/Formosa/ven_san_maria_formosa_3701.jpg"
+        ]
+    },
+    {
+        "style": "venetian_renaissance",
+        "style_pretty": "Venetian Renaissance",
+        "building_name": "miracoli",
+        "building_name_pretty": "Miracoli",
+        "building_images": [
+            "2425_venice2024_santamariadeimiracoli_img_003_0.jpg",
+            "2425_venice2024_santamariadeimiracoli_img_011_0.jpg",
+            "2425_venice2024_santamariadeimiracoli_img_015_0.jpg",
+            "2425_venice2024_santamariadeimiracoli_img_018_0.jpg",
+            "ven_san_maria_miracoli_3565.jpg",
+            "ven_san_maria_miracoli_3569.jpg"
+        ],
+        "building_image_urls": [
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Renaissance/Miracoli/2425_venice2024_santamariadeimiracoli_img_003_0.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Renaissance/Miracoli/2425_venice2024_santamariadeimiracoli_img_011_0.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Renaissance/Miracoli/2425_venice2024_santamariadeimiracoli_img_015_0.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Renaissance/Miracoli/2425_venice2024_santamariadeimiracoli_img_018_0.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Renaissance/Miracoli/ven_san_maria_miracoli_3565.jpg",
+            "https://storage.googleapis.com/metrics_annotation_images/architecture/Venetian%20Renaissance/Miracoli/ven_san_maria_miracoli_3569.jpg"
+        ]
+    }
+]
