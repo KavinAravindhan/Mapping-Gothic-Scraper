@@ -26,6 +26,7 @@ def download_and_stitch_tiles(dzi_url, output_path):
     height = int(content.split('Height="')[1].split('"')[0])
     width = int(content.split('Width="')[1].split('"')[0])
     tile_size = int(content.split('TileSize="')[1].split('"')[0])
+    overlap = int(content.split('Overlap="')[1].split('"')[0])
     
     print(f"Image size: {width}x{height}")
     print(f"Tile size: {tile_size}")
@@ -56,9 +57,14 @@ def download_and_stitch_tiles(dzi_url, output_path):
                     # Open tile image
                     tile_image = Image.open(BytesIO(tile_response.content))
                     
-                    # Calculate position
-                    x = col * tile_size
-                    y = row * tile_size
+                    # # Calculate position
+                    # x = col * tile_size
+                    # y = row * tile_size
+
+                    # Calculate position accounting for overlap
+                    # Tiles overlap, so each tile starts (tile_size - overlap) pixels from the previous
+                    x = col * (tile_size - overlap)
+                    y = row * (tile_size - overlap)
                     
                     # Paste tile
                     final_image.paste(tile_image, (x, y))
@@ -70,6 +76,13 @@ def download_and_stitch_tiles(dzi_url, output_path):
                 print(f"\n✗ Error downloading tile {col}_{row}: {str(e)}")
     
     print(f"\n\nSuccessfully downloaded {success_count}/{cols*rows} tiles")
+
+    print(f"Stitched image size before crop: {final_image.size}")
+    print(f"Target size from DZI: {width}x{height}")
+    
+    # Crop to exact dimensions from DZI (tiles might create slightly larger image)
+    print(f"Cropping to exact size: {width}x{height}")
+    final_image = final_image.crop((0, 0, width, height))
     
     # Save final image
     final_image.save(output_path, 'JPEG', quality=95)
