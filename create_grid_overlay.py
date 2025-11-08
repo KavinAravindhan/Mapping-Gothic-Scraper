@@ -1,256 +1,194 @@
 # Standard library imports
 import os
-import string
 from pathlib import Path
 
 # Third-party imports
 from PIL import Image, ImageDraw, ImageFont
 
 
-def create_grid_overlay(floor_plan_path, output_path, grid_cols=10, grid_rows=8, 
-                        line_color=(255, 0, 0), line_width=2, label_size=80):
-    """
-    Create a grid overlay on a floor plan image with letter columns (A, B, C...) 
-    and number rows (1, 2, 3...)
-    
-    Args:
-        floor_plan_path: Path to the input floor plan image
-        output_path: Path where the gridded image will be saved
-        grid_cols: Number of vertical grid lines (columns)
-        grid_rows: Number of horizontal grid lines (rows)
-        line_color: RGB tuple for grid line color
-        line_width: Width of grid lines in pixels
-        label_size: Font size for grid labels
-    """
-    
-    # Load the floor plan image
-    print(f"Loading floor plan: {floor_plan_path}")
-    image = Image.open(floor_plan_path)
-    original_width, original_height = image.size
-    print(f"Original image size: {original_width}x{original_height}")
-    
-    # Create padding for labels - scale with label size
-    padding = max(100, label_size + 40)
-    
-    # Create new image with padding
-    new_width = original_width + padding * 2
-    new_height = original_height + padding * 2
-    padded_image = Image.new('RGB', (new_width, new_height), 'white')
-    
-    # Paste original image in the center
-    padded_image.paste(image, (padding, padding))
-    
-    # Create drawing context
-    draw = ImageDraw.Draw(padded_image)
-    
-    # Try multiple font options
-    font = None
+def load_font(label_size=80):
     font_paths = [
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
         "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
         "/System/Library/Fonts/Helvetica.ttc",
-        "C:\\Windows\\Fonts\\ariblk.ttf",  # Windows
-        "arial.ttf",
+        "C:\\Windows\\Fonts\\ariblk.ttf",
     ]
     
     for font_path in font_paths:
         try:
             font = ImageFont.truetype(font_path, label_size)
-            print(f"✓ Loaded font: {font_path} at size {label_size}")
-            break
+            print(f"Loaded font: {font_path}")
+            return font
         except:
             continue
     
-    # If no TrueType font found, create a workaround
-    if font is None:
-        print(f"⚠ Warning: Could not load TrueType font. Using alternative method.")
-        # We'll use a larger default and draw multiple times for thickness
-        font = ImageFont.load_default()
+    print("Using default font")
+    return ImageFont.load_default()
+
+
+def get_text_dimensions(draw, text, font):
+    """Get text width and height in a compatible way"""
+    try:
+        bbox = draw.textbbox((0, 0), text, font=font)
+        return bbox[2] - bbox[0], bbox[3] - bbox[1]
+    except:
+        # Fallback estimate
+        return len(text) * 40, 60
+
+
+def create_grid_overlay_consistent(image_path, output_path, reference_size,
+                                   grid_cols=10, grid_rows=10,
+                                   line_color=(255, 0, 0), line_width=3,
+                                   label_size=80):
+
+    print(f"\nProcessing: {os.path.basename(image_path)}")
     
-    # Calculate grid spacing
-    col_spacing = original_width / grid_cols
-    row_spacing = original_height / grid_rows
+    # Load image
+    image = Image.open(image_path)
+    img_width, img_height = image.size
+    print(f"  Image size: {img_width}x{img_height}")
+    print(f"  Reference size: {reference_size[0]}x{reference_size[1]}")
     
-    print(f"Grid: {grid_cols} columns x {grid_rows} rows")
-    print(f"Cell size: {col_spacing:.1f}px x {row_spacing:.1f}px")
-    print(f"Label size: {label_size}, Padding: {padding}")
+    # Calculate grid spacing based on reference dimensions
+    ref_width, ref_height = reference_size
+    col_spacing = ref_width / grid_cols
+    row_spacing = ref_height / grid_rows
     
-    # Draw vertical lines and column labels (A, B, C...)
-    letters = string.ascii_uppercase
+    # Calculate scaling factor if image differs from reference
+    scale_x = img_width / ref_width
+    scale_y = img_height / ref_height
+    
+    # Adjust spacing for this image
+    actual_col_spacing = col_spacing * scale_x
+    actual_row_spacing = row_spacing * scale_y
+    
+    print(f"  Grid spacing: {actual_col_spacing:.1f}px x {actual_row_spacing:.1f}px")
+    
+    # Create padding for labels
+    padding = max(120, label_size + 40)
+    
+    # Create new image with padding
+    new_width = img_width + padding * 2
+    new_height = img_height + padding * 2
+    padded_image = Image.new('RGB', (new_width, new_height), 'white')
+    padded_image.paste(image, (padding, padding))
+    
+    # Create drawing context and load font
+    draw = ImageDraw.Draw(padded_image)
+    font = load_font(label_size)
+    
+    # Draw vertical lines and column labels (A-J)
+    columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
     for i in range(grid_cols + 1):
-        x = padding + i * col_spacing
+        x = padding + i * actual_col_spacing
         
         # Draw vertical line
-        draw.line([(x, padding), (x, padding + original_height)], 
+        draw.line([(x, padding), (x, padding + img_height)],
                  fill=line_color, width=line_width)
         
-        # Add letter labels at top and bottom
+        # Add column labels
         if i < grid_cols:
-            letter = letters[i] if i < len(letters) else f"{letters[i // 26 - 1]}{letters[i % 26]}"
-            
-            # Calculate center position for the label
-            label_x = x + col_spacing / 2
-            
-            if font is not None and hasattr(font, 'getbbox'):
-                # Modern PIL version
-                bbox = font.getbbox(letter)
-                text_width = bbox[2] - bbox[0]
-                text_height = bbox[3] - bbox[1]
-            else:
-                # Fallback for older versions or default font
-                try:
-                    bbox = draw.textbbox((0, 0), letter, font=font)
-                    text_width = bbox[2] - bbox[0]
-                    text_height = bbox[3] - bbox[1]
-                except:
-                    # Rough estimate
-                    text_width = label_size * 0.6
-                    text_height = label_size
+            letter = columns[i]
+            label_x = x + actual_col_spacing / 2
+            text_width, text_height = get_text_dimensions(draw, letter, font)
             
             # Top label
-            top_y = padding/2 - text_height/2
-            draw.text((label_x - text_width/2, top_y), 
+            draw.text((label_x - text_width/2, padding/2 - text_height/2),
                      letter, fill='black', font=font)
-            
-            # If using default font, draw multiple times for visibility
-            if font == ImageFont.load_default():
-                for offset_x in range(-2, 3):
-                    for offset_y in range(-2, 3):
-                        draw.text((label_x - text_width/2 + offset_x, top_y + offset_y), 
-                                letter, fill='black', font=font)
             
             # Bottom label
-            bottom_y = padding + original_height + padding/2 - text_height/2
-            draw.text((label_x - text_width/2, bottom_y), 
+            draw.text((label_x - text_width/2, padding + img_height + padding/2 - text_height/2),
                      letter, fill='black', font=font)
-            
-            # If using default font, draw multiple times for visibility
-            if font == ImageFont.load_default():
-                for offset_x in range(-2, 3):
-                    for offset_y in range(-2, 3):
-                        draw.text((label_x - text_width/2 + offset_x, bottom_y + offset_y), 
-                                letter, fill='black', font=font)
     
-    # Draw horizontal lines and row labels (1, 2, 3...)
+    # Draw horizontal lines and row labels (1-10)
     for i in range(grid_rows + 1):
-        y = padding + i * row_spacing
+        y = padding + i * actual_row_spacing
         
         # Draw horizontal line
-        draw.line([(padding, y), (padding + original_width, y)], 
+        draw.line([(padding, y), (padding + img_width, y)],
                  fill=line_color, width=line_width)
         
-        # Add number labels at left and right
+        # Add row labels
         if i < grid_rows:
             number = str(i + 1)
-            
-            # Calculate center position for the label
-            label_y = y + row_spacing / 2
-            
-            if font is not None and hasattr(font, 'getbbox'):
-                bbox = font.getbbox(number)
-                text_width = bbox[2] - bbox[0]
-                text_height = bbox[3] - bbox[1]
-            else:
-                try:
-                    bbox = draw.textbbox((0, 0), number, font=font)
-                    text_width = bbox[2] - bbox[0]
-                    text_height = bbox[3] - bbox[1]
-                except:
-                    text_width = label_size * 0.6
-                    text_height = label_size
+            label_y = y + actual_row_spacing / 2
+            text_width, text_height = get_text_dimensions(draw, number, font)
             
             # Left label
-            left_x = padding/2 - text_width/2
-            draw.text((left_x, label_y - text_height/2), 
+            draw.text((padding/2 - text_width/2, label_y - text_height/2),
                      number, fill='black', font=font)
-            
-            # If using default font, draw multiple times for visibility
-            if font == ImageFont.load_default():
-                for offset_x in range(-2, 3):
-                    for offset_y in range(-2, 3):
-                        draw.text((left_x + offset_x, label_y - text_height/2 + offset_y), 
-                                number, fill='black', font=font)
             
             # Right label
-            right_x = padding + original_width + padding/2 - text_width/2
-            draw.text((right_x, label_y - text_height/2), 
+            draw.text((padding + img_width + padding/2 - text_width/2, label_y - text_height/2),
                      number, fill='black', font=font)
-            
-            # If using default font, draw multiple times for visibility
-            if font == ImageFont.load_default():
-                for offset_x in range(-2, 3):
-                    for offset_y in range(-2, 3):
-                        draw.text((right_x + offset_x, label_y - text_height/2 + offset_y), 
-                                number, fill='black', font=font)
     
-    # Save the result
-    os.makedirs(os.path.dirname(output_path) if os.path.dirname(output_path) else '.', exist_ok=True)
+    # Save result
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     padded_image.save(output_path, 'JPEG', quality=95)
-    print(f"✓ Saved gridded floor plan to: {output_path}")
+    print(f"Saved: {os.path.basename(output_path)}")
     
     return output_path
 
 
-def process_all_floorplans(base_dir='maps_output', grid_cols=10, grid_rows=8, label_size=80):
-    """
-    Process all floor plans in the maps_output directory
+def process_floor_plans_with_consistent_grid(base_floorplan_path, arrows_floorplan_path,
+                                             base_output_path, arrows_output_path,
+                                             grid_cols=10, grid_rows=10,
+                                             line_width=3, label_size=80):
+
+    print("Processing Floor Plans With Consistent Grid")
+
+    # Load base floor plan to get reference dimensions
+    base_image = Image.open(base_floorplan_path)
+    reference_size = base_image.size
+    print(f"\nUsing reference dimensions: {reference_size[0]}x{reference_size[1]}")
+    print(f"Grid configuration: {grid_cols} columns x {grid_rows} rows")
     
-    Args:
-        base_dir: Base directory containing building folders
-        grid_cols: Number of columns in the grid
-        grid_rows: Number of rows in the grid
-        label_size: Size of grid labels
-    """
-    base_path = Path(base_dir)
+    # Process base floor plan
+    create_grid_overlay_consistent(
+        base_floorplan_path,
+        base_output_path,
+        reference_size,
+        grid_cols=grid_cols,
+        grid_rows=grid_rows,
+        line_width=line_width,
+        label_size=label_size
+    )
     
-    if not base_path.exists():
-        print(f"Error: Directory {base_dir} not found")
-        return
+    # Process arrows floor plan with same reference
+    create_grid_overlay_consistent(
+        arrows_floorplan_path,
+        arrows_output_path,
+        reference_size,
+        grid_cols=grid_cols,
+        grid_rows=grid_rows,
+        line_width=line_width,
+        label_size=label_size
+    )
     
-    processed_count = 0
-    
-    # Iterate through all building directories
-    for building_dir in base_path.iterdir():
-        if building_dir.is_dir():
-            # Look for the floorplan file
-            floorplan_path = building_dir / f"{building_dir.name}_floorplan.jpg"
-            
-            if floorplan_path.exists():
-                print(f"\n{'='*60}")
-                print(f"Processing: {building_dir.name}")
-                
-                # Output path for gridded version
-                output_path = building_dir / f"{building_dir.name}_floorplan_gridded.jpg"
-                
-                try:
-                    create_grid_overlay(
-                        str(floorplan_path),
-                        str(output_path),
-                        grid_cols=grid_cols,
-                        grid_rows=grid_rows,
-                        label_size=label_size
-                    )
-                    processed_count += 1
-                except Exception as e:
-                    print(f"✗ Error processing {building_dir.name}: {str(e)}")
-            else:
-                print(f"✗ Floorplan not found for {building_dir.name}")
-    
-    print(f"\n{'='*60}")
-    print(f"COMPLETE: Processed {processed_count} floor plans")
-    print(f"{'='*60}")
+    print("Both floor plans processed with consistent 10x10 grid")
 
 
 if __name__ == "__main__":
-    # Example 1: Process a single floor plan with LARGE labels
-    create_grid_overlay(
-        "maps_output/Beaumont-sur-Oise-Eglise-Saint-Leonor/Beaumont-sur-Oise-Eglise-Saint-Leonor_floorplan.jpg",
-        "maps_output/Beaumont-sur-Oise-Eglise-Saint-Leonor/Beaumont-sur-Oise-Eglise-Saint-Leonor_floorplan_gridded.jpg",
-        grid_cols=10,
-        grid_rows=8,
-        line_width=3,
-        label_size=80  # Large labels!
-    )
+
+    building_name = "Beaumont-sur-Oise-Eglise-Saint-Leonor"
     
-    # Example 2: Process all floor plans in the maps_output directory
-    # process_all_floorplans(base_dir='maps_output', grid_cols=10, grid_rows=8, label_size=80)
+    # Define paths using building name
+    base_dir = f"maps_output/{building_name}"
+    
+    base_floorplan = f"{base_dir}/{building_name}_floorplan.jpg"
+    arrows_floorplan = f"{base_dir}/{building_name}_arrows_visualization.jpg"
+    
+    base_output = f"{base_dir}/{building_name}_floorplan_gridded.jpg"
+    arrows_output = f"{base_dir}/{building_name}_floorplan_arrows_gridded.jpg"
+    
+    # Process both with consistent 10x10 grid
+    process_floor_plans_with_consistent_grid(
+        base_floorplan_path=base_floorplan,
+        arrows_floorplan_path=arrows_floorplan,
+        base_output_path=base_output,
+        arrows_output_path=arrows_output,
+        grid_cols=10,
+        grid_rows=10,
+        line_width=3,
+        label_size=80
+    )
