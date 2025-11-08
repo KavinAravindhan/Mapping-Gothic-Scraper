@@ -140,7 +140,7 @@ def visualize_floor_plan(building_name, output_path=None, padding=100, y_offset=
     
     # Save result
     if output_path is None:
-        output_path = f"maps_output/{building_name}/{building_name}_visualization.jpg"
+        output_path = f"maps_output/{building_name}/{building_name}arrows_visualization_v1.jpg"
     
     # Draw coordinate labels for debugging
     from PIL import ImageFont
