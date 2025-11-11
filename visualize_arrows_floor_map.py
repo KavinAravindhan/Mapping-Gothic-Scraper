@@ -7,7 +7,7 @@ building_name = "Beaumont-sur-Oise-Eglise-Saint-Leonor"
 base_path = f"maps_output/{building_name}"
 floor_plan_path = f"{base_path}/{building_name}_floorplan.jpg"
 csv_path = f"{base_path}/coordinates.csv"
-output_path = f"{base_path}/{building_name}_visualization.jpg"
+output_path = f"{base_path}/{building_name}_arrows_visualization.jpg"
 
 # Arrow parameters
 arrow_length = 40  # pixels
@@ -19,8 +19,7 @@ arrow_color = (255, 100, 0)  # BGR format - blue arrows
 x_offset = 0
 y_offset = 170
 
-# Scale adjustment (if the coordinate system is slightly different)
-# 1.0 means no scaling
+# Scale adjustment - 1.0 means no scaling
 x_scale = 1.0
 y_scale = 1.0
 
