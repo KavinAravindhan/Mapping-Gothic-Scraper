@@ -1,0 +1,48 @@
+{
+  "model": "qwen2-vl-7b",
+  "building": "Beaumont-sur-Oise-Eglise-Saint-Leonor",
+  "floorplan_type": "arrows",
+  "timestamp": "2025-11-11T12:10:16.682661",
+  "predictions": [
+    {
+      "photo_id": "1065_00010",
+      "photo_path": "maps_output/Beaumont-sur-Oise-Eglise-Saint-Leonor/images/1065_00010.jpg",
+      "raw_response": "system\nYou are a helpful assistant.\nuser\nYou are analyzing architectural photographs to determine their location on a floor plan.\n\nI will show you:\n1. A gridded floor plan with a 10x10 grid overlay (columns A-J, rows 1-10)\n2. A photograph taken inside this building\n\nYour task is to identify:\n1. The grid cell where the photo was taken (format: [Letter][Number], e.g., C5)\n2. The camera direction when the photo was taken (N, NE, E, SE, S, SW, W, NW)\n\nAnalyze the architectural features, spatial layout, and visual cues carefully.\n\nProvide your answer in EXACTLY this format:\nGRID_CELL: [Your answer]\nDIRECTION: [Your answer]\nREASONING: [Brief explanation of your reasoning]\n\nFloor plan image is provided first, followed by the interior photograph.\nassistant\nGRID_CELL: H5\nDIRECTION: NE\nREASONING: The architectural features in the photograph, such as the vaulted ceiling, the altar, and the stained glass window, align with the grid cell H5 on the floor plan. The camera direction is NE because the altar is positioned towards the northeast corner of the church, which corresponds to the direction of the camera in the photograph.",
+      "predicted_grid_cell": "H5",
+      "predicted_direction": "NE",
+      "reasoning": "The architectural features in the photograph, such as the vaulted ceiling, the altar, and the stained glass window, align with the grid cell H5 on the floor plan. The camera direction is NE because the altar is positioned towards the northeast corner of the church, which corresponds to the direction of the camera in the photograph."
+    },
+    {
+      "photo_id": "1065_00011",
+      "photo_path": "maps_output/Beaumont-sur-Oise-Eglise-Saint-Leonor/images/1065_00011.jpg",
+      "raw_response": "system\nYou are a helpful assistant.\nuser\nYou are analyzing architectural photographs to determine their location on a floor plan.\n\nI will show you:\n1. A gridded floor plan with a 10x10 grid overlay (columns A-J, rows 1-10)\n2. A photograph taken inside this building\n\nYour task is to identify:\n1. The grid cell where the photo was taken (format: [Letter][Number], e.g., C5)\n2. The camera direction when the photo was taken (N, NE, E, SE, S, SW, W, NW)\n\nAnalyze the architectural features, spatial layout, and visual cues carefully.\n\nProvide your answer in EXACTLY this format:\nGRID_CELL: [Your answer]\nDIRECTION: [Your answer]\nREASONING: [Brief explanation of your reasoning]\n\nFloor plan image is provided first, followed by the interior photograph.\nassistant\nGRID_CELL: H5\nDIRECTION: NE\nREASONING: The architectural features in the photograph, such as the large window and the tower, align with the grid cell H5 on the floor plan. The camera direction is NE because the view is looking towards the northeast corner of the building.",
+      "predicted_grid_cell": "H5",
+      "predicted_direction": "NE",
+      "reasoning": "The architectural features in the photograph, such as the large window and the tower, align with the grid cell H5 on the floor plan. The camera direction is NE because the view is looking towards the northeast corner of the building."
+    },
+    {
+      "photo_id": "1065_00028",
+      "photo_path": "maps_output/Beaumont-sur-Oise-Eglise-Saint-Leonor/images/1065_00028.jpg",
+      "raw_response": "system\nYou are a helpful assistant.\nuser\nYou are analyzing architectural photographs to determine their location on a floor plan.\n\nI will show you:\n1. A gridded floor plan with a 10x10 grid overlay (columns A-J, rows 1-10)\n2. A photograph taken inside this building\n\nYour task is to identify:\n1. The grid cell where the photo was taken (format: [Letter][Number], e.g., C5)\n2. The camera direction when the photo was taken (N, NE, E, SE, S, SW, W, NW)\n\nAnalyze the architectural features, spatial layout, and visual cues carefully.\n\nProvide your answer in EXACTLY this format:\nGRID_CELL: [Your answer]\nDIRECTION: [Your answer]\nREASONING: [Brief explanation of your reasoning]\n\nFloor plan image is provided first, followed by the interior photograph.\nassistant\nGRID_CELL: H5\nDIRECTION: NE\nREASONING: The architectural features in the photograph, such as the stained glass window and the vaulted ceiling, are consistent with the layout and design elements shown in the floor plan. The stained glass window is located in the upper right corner of the grid, which corresponds to the H5 cell. The camera direction is NE, as the window is facing towards the northeast direction, which aligns with the orientation of the building in the floor plan.",
+      "predicted_grid_cell": "H5",
+      "predicted_direction": "NE",
+      "reasoning": "The architectural features in the photograph, such as the stained glass window and the vaulted ceiling, are consistent with the layout and design elements shown in the floor plan. The stained glass window is located in the upper right corner of the grid, which corresponds to the H5 cell. The camera direction is NE, as the window is facing towards the northeast direction, which aligns with the orientation of the building in the floor plan."
+    },
+    {
+      "photo_id": "1065_00044",
+      "photo_path": "maps_output/Beaumont-sur-Oise-Eglise-Saint-Leonor/images/1065_00044.jpg",
+      "raw_response": "system\nYou are a helpful assistant.\nuser\nYou are analyzing architectural photographs to determine their location on a floor plan.\n\nI will show you:\n1. A gridded floor plan with a 10x10 grid overlay (columns A-J, rows 1-10)\n2. A photograph taken inside this building\n\nYour task is to identify:\n1. The grid cell where the photo was taken (format: [Letter][Number], e.g., C5)\n2. The camera direction when the photo was taken (N, NE, E, SE, S, SW, W, NW)\n\nAnalyze the architectural features, spatial layout, and visual cues carefully.\n\nProvide your answer in EXACTLY this format:\nGRID_CELL: [Your answer]\nDIRECTION: [Your answer]\nREASONING: [Brief explanation of your reasoning]\n\nFloor plan image is provided first, followed by the interior photograph.\nassistant\nGRID_CELL: H5\nDIRECTION: NE\nREASONING: The architectural features in the photograph, such as the vaulted ceiling, arches, and the overall layout, match the grid cell H5 on the floor plan. The camera appears to be facing northeast, as indicated by the orientation of the arches and the perspective of the space.",
+      "predicted_grid_cell": "H5",
+      "predicted_direction": "NE",
+      "reasoning": "The architectural features in the photograph, such as the vaulted ceiling, arches, and the overall layout, match the grid cell H5 on the floor plan. The camera appears to be facing northeast, as indicated by the orientation of the arches and the perspective of the space."
+    },
+    {
+      "photo_id": "1065_00033",
+      "photo_path": "maps_output/Beaumont-sur-Oise-Eglise-Saint-Leonor/images/1065_00033.jpg",
+      "raw_response": "system\nYou are a helpful assistant.\nuser\nYou are analyzing architectural photographs to determine their location on a floor plan.\n\nI will show you:\n1. A gridded floor plan with a 10x10 grid overlay (columns A-J, rows 1-10)\n2. A photograph taken inside this building\n\nYour task is to identify:\n1. The grid cell where the photo was taken (format: [Letter][Number], e.g., C5)\n2. The camera direction when the photo was taken (N, NE, E, SE, S, SW, W, NW)\n\nAnalyze the architectural features, spatial layout, and visual cues carefully.\n\nProvide your answer in EXACTLY this format:\nGRID_CELL: [Your answer]\nDIRECTION: [Your answer]\nREASONING: [Brief explanation of your reasoning]\n\nFloor plan image is provided first, followed by the interior photograph.\nassistant\nGRID_CELL: H5\nDIRECTION: NE\nREASONING: The architectural features in the photograph, such as the column capitals and the ribbed vaults, are consistent with the interior of the Basilica of Saint-Denis. The column capitals are located in the northeast corner of the grid, which corresponds to the H5 grid cell. The camera direction is northeast (NE) as the photograph captures the column capitals and the ribbed vaults from that direction.",
+      "predicted_grid_cell": "H5",
+      "predicted_direction": "NE",
+      "reasoning": "The architectural features in the photograph, such as the column capitals and the ribbed vaults, are consistent with the interior of the Basilica of Saint-Denis. The column capitals are located in the northeast corner of the grid, which corresponds to the H5 grid cell. The camera direction is northeast (NE) as the photograph captures the column capitals and the ribbed vaults from that direction."
+    }
+  ]
+}

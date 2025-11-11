@@ -1,0 +1,48 @@
+{
+  "model": "llava-next-7b",
+  "building": "Beaumont-sur-Oise-Eglise-Saint-Leonor",
+  "floorplan_type": "arrows",
+  "timestamp": "2025-11-11T13:00:26.087128",
+  "predictions": [
+    {
+      "photo_id": "1065_00010",
+      "photo_path": "maps_output/Beaumont-sur-Oise-Eglise-Saint-Leonor/images/1065_00010.jpg",
+      "raw_response": "GRID_CELL: C5\nDIRECTION: N\n\nREASONING:\nThe photograph shows a view from the front of the building, looking towards the back. The camera is positioned at the front of the building, facing the altar. The altar is located in the center of the floor plan, which corresponds to the grid cell C5. The direction of the camera is towards the back of the building, which is the direction of the altar, indicating that the camera is facing north. ",
+      "predicted_grid_cell": "C5",
+      "predicted_direction": "N",
+      "reasoning": ""
+    },
+    {
+      "photo_id": "1065_00011",
+      "photo_path": "maps_output/Beaumont-sur-Oise-Eglise-Saint-Leonor/images/1065_00011.jpg",
+      "raw_response": "GRID_CELL: C5\nDIRECTION: N\n\nREASONING:\nThe photograph shows a view from the front of the building, looking towards the back. The camera is positioned at the front of the building, facing the back. This direction is consistent with the North direction on the floor plan. The grid cell where the photo was taken is C5, as it is the only cell that aligns with the front of the building. ",
+      "predicted_grid_cell": "C5",
+      "predicted_direction": "N",
+      "reasoning": ""
+    },
+    {
+      "photo_id": "1065_00028",
+      "photo_path": "maps_output/Beaumont-sur-Oise-Eglise-Saint-Leonor/images/1065_00028.jpg",
+      "raw_response": "GRID_CELL: C5\nDIRECTION: N\n\nREASONING:\nThe photograph shows a view from the front of the building, looking towards the back. The grid cell C5 is the most central location on the floor plan, which aligns with the perspective of the photograph. The camera direction is North, as indicated by the direction of the main entrance and the orientation of the architectural features visible in the photograph. ",
+      "predicted_grid_cell": "C5",
+      "predicted_direction": "N",
+      "reasoning": ""
+    },
+    {
+      "photo_id": "1065_00044",
+      "photo_path": "maps_output/Beaumont-sur-Oise-Eglise-Saint-Leonor/images/1065_00044.jpg",
+      "raw_response": "GRID_CELL: C5\nDIRECTION: N\n\nREASONING:\nThe photograph shows a view from the front of the building, looking towards the back. The grid cell C5 is the most central location on the floor plan, which aligns with the perspective of the photograph. The camera direction is North, as indicated by the direction of the main aisle and the orientation of the architectural features such as the arches and columns. ",
+      "predicted_grid_cell": "C5",
+      "predicted_direction": "N",
+      "reasoning": ""
+    },
+    {
+      "photo_id": "1065_00033",
+      "photo_path": "maps_output/Beaumont-sur-Oise-Eglise-Saint-Leonor/images/1065_00033.jpg",
+      "raw_response": "GRID_CELL: C5\nDIRECTION: N\n\nREASONING:\nThe photograph shows a view from the center of the building, looking towards the front. The camera is positioned at the intersection of the central aisle and the first side aisle. This is the point where the central aisle meets the first side aisle, which is the grid cell C5 on the floor plan. The direction of the camera is towards the front of the building, which is the direction of the central aisle. ",
+      "predicted_grid_cell": "C5",
+      "predicted_direction": "N",
+      "reasoning": ""
+    }
+  ]
+}

@@ -1,14 +1,3 @@
-"""
-zero_shot_vlm_evaluation.py
-
-This script evaluates vision-language models on spatial localization tasks.
-Given a gridded floor plan and interior photos, models predict:
-1. Grid cell location (A-J, 1-10)
-2. Camera direction (N, NE, E, SE, S, SW, W, NW)
-
-Supports multiple VLMs with easy model swapping.
-"""
-
 import torch
 from PIL import Image
 import json
@@ -20,15 +9,16 @@ from typing import Dict, List, Tuple
 # Import model-specific libraries
 from transformers import (
     Qwen2VLForConditionalGeneration, 
+    LlavaNextForConditionalGeneration,
     AutoProcessor,
     AutoModelForCausalLM,
     AutoTokenizer
 )
 
-# ==============================================================================
-# MODEL CONFIGURATIONS
-# ==============================================================================
+# Set device configuration
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # Use GPU 0
 
+# Model Configurations
 MODEL_CONFIGS = {
     "qwen2-vl-7b": {
         "model_id": "Qwen/Qwen2-VL-7B-Instruct",
@@ -55,17 +45,15 @@ MODEL_CONFIGS = {
         "processor_id": "THUDM/cogvlm2-llama3-chinese-chat-19B",
         "type": "cogvlm"
     },
-    "deepseek-vl-7b": {
-        "model_id": "deepseek-ai/deepseek-vl-7b-chat",
-        "processor_id": "deepseek-ai/deepseek-vl-7b-chat",
+    "deepseek-vl2-8b": {
+        "model_id": "deepseek-ai/deepseek-vl2",
+        "processor_id": "deepseek-ai/deepseek-vl2",
         "type": "deepseek"
     }
 }
 
-# ==============================================================================
-# PROMPT TEMPLATE
-# ==============================================================================
 
+# Prompt Template
 ZERO_SHOT_PROMPT = """You are analyzing architectural photographs to determine their location on a floor plan.
 
 I will show you:
@@ -84,10 +72,6 @@ DIRECTION: [Your answer]
 REASONING: [Brief explanation of your reasoning]
 
 Floor plan image is provided first, followed by the interior photograph."""
-
-# ==============================================================================
-# MODEL HANDLER CLASS
-# ==============================================================================
 
 class VLMHandler:
     """Handles loading and inference for different vision-language models."""
@@ -115,7 +99,7 @@ class VLMHandler:
         if model_type == "qwen2vl":
             self.model = Qwen2VLForConditionalGeneration.from_pretrained(
                 self.config["model_id"],
-                torch_dtype=torch.bfloat16,
+                dtype=torch.bfloat16,
                 device_map="auto"
             )
             self.processor = AutoProcessor.from_pretrained(self.config["processor_id"])
@@ -127,28 +111,42 @@ class VLMHandler:
             )
             self.model = AutoModelForCausalLM.from_pretrained(
                 self.config["model_id"],
-                torch_dtype=torch.bfloat16,
+                dtype=torch.bfloat16,
                 device_map="auto",
                 trust_remote_code=True
             )
             
+        # elif model_type == "internvl":
+        #     self.model = AutoModelForCausalLM.from_pretrained(
+        #         self.config["model_id"],
+        #         dtype=torch.bfloat16,
+        #         device_map="auto",
+        #         trust_remote_code=True
+        #     )
+        #     self.processor = AutoProcessor.from_pretrained(
+        #         self.config["processor_id"],
+        #         trust_remote_code=True
+        #     )
+
         elif model_type == "internvl":
-            self.model = AutoModelForCausalLM.from_pretrained(
+            from transformers import AutoModel  # Use AutoModel instead
+            self.model = AutoModel.from_pretrained(
                 self.config["model_id"],
-                torch_dtype=torch.bfloat16,
+                dtype=torch.bfloat16,
                 device_map="auto",
                 trust_remote_code=True
             )
-            self.processor = AutoProcessor.from_pretrained(
+            self.tokenizer = AutoTokenizer.from_pretrained(
                 self.config["processor_id"],
                 trust_remote_code=True
             )
-            
+            self.processor = self.tokenizer  # Keep for compatibility
+                
         elif model_type == "llava":
             self.processor = AutoProcessor.from_pretrained(self.config["processor_id"])
-            self.model = AutoModelForCausalLM.from_pretrained(
+            self.model = LlavaNextForConditionalGeneration.from_pretrained(
                 self.config["model_id"],
-                torch_dtype=torch.float16,
+                dtype=torch.float16,
                 device_map="auto"
             )
             
@@ -159,21 +157,24 @@ class VLMHandler:
             )
             self.model = AutoModelForCausalLM.from_pretrained(
                 self.config["model_id"],
-                torch_dtype=torch.bfloat16,
+                dtype=torch.bfloat16,
                 device_map="auto",
                 trust_remote_code=True
             )
             
         elif model_type == "deepseek":
-            self.processor = AutoProcessor.from_pretrained(self.config["processor_id"])
+            self.processor = AutoProcessor.from_pretrained(
+                self.config["processor_id"],
+                trust_remote_code=True  # Add this
+            )
             self.model = AutoModelForCausalLM.from_pretrained(
                 self.config["model_id"],
-                torch_dtype=torch.bfloat16,
+                dtype=torch.bfloat16,
                 device_map="auto",
                 trust_remote_code=True
             )
         
-        print(f"✓ {self.model_name} loaded successfully")
+        print(f"{self.model_name} loaded successfully")
         
     def generate_response(self, floorplan_path: str, photo_path: str) -> str:
         """
@@ -228,27 +229,65 @@ class VLMHandler:
             response = self.processor.tokenizer.decode(output_ids[0], skip_special_tokens=True)
             
         elif model_type == "internvl":
-            pixel_values = self.processor(images=[floorplan_img, photo_img], return_tensors="pt").pixel_values
-            pixel_values = pixel_values.to(self.device)
+            # Load and prepare images as PIL
+            from torchvision import transforms
+            from torchvision.transforms.functional import InterpolationMode
+            
+            IMAGENET_MEAN = (0.485, 0.456, 0.406)
+            IMAGENET_STD = (0.229, 0.224, 0.229)
+            
+            def build_transform(input_size):
+                return transforms.Compose([
+                    transforms.Lambda(lambda img: img.convert('RGB') if img.mode != 'RGB' else img),
+                    transforms.Resize((input_size, input_size), interpolation=InterpolationMode.BICUBIC),
+                    transforms.ToTensor(),
+                    transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD)
+                ])
+            
+            input_size = 448  # InternVL2 default
+            transform = build_transform(input_size)
+            
+            pixel_values = torch.stack([
+                transform(floorplan_img), 
+                transform(photo_img)
+            ]).to(self.device).to(torch.bfloat16)
             
             prompt = f"<image>\n<image>\n{ZERO_SHOT_PROMPT}"
             
             with torch.no_grad():
                 response = self.model.chat(
-                    self.processor.tokenizer,
+                    self.tokenizer,
                     pixel_values=pixel_values,
                     question=prompt,
-                    generation_config={"max_new_tokens": 512}
+                    generation_config={"max_new_tokens": 512, "do_sample": False}
                 )
                 
         elif model_type == "llava":
-            prompt = f"USER: <image>\n<image>\n{ZERO_SHOT_PROMPT}\nASSISTANT:"
-            inputs = self.processor(text=prompt, images=[floorplan_img, photo_img], return_tensors="pt")
-            inputs = inputs.to(self.device)
+            # LLaVA-NeXT requires specific formatting for multiple images
+            # Use separate image tokens for each image
+            prompt = f"[INST] <image>\n<image>\n{ZERO_SHOT_PROMPT} [/INST]"
+            
+            inputs = self.processor(
+                text=prompt, 
+                images=[floorplan_img, photo_img], 
+                return_tensors="pt",
+                padding=True
+            )
+            
+            # Move all inputs to device
+            inputs = {k: v.to(self.device) if isinstance(v, torch.Tensor) else v 
+                    for k, v in inputs.items()}
             
             with torch.no_grad():
-                output_ids = self.model.generate(**inputs, max_new_tokens=512)
-            response = self.processor.decode(output_ids[0], skip_special_tokens=True)
+                output_ids = self.model.generate(
+                    **inputs, 
+                    max_new_tokens=512,
+                    do_sample=False
+                )
+            
+            # Decode only the generated part (excluding the prompt)
+            generated_ids = output_ids[0][inputs['input_ids'].shape[1]:]
+            response = self.processor.decode(generated_ids, skip_special_tokens=True)
             
         elif model_type == "cogvlm":
             inputs = self.model.build_conversation_input_ids(
@@ -278,9 +317,6 @@ class VLMHandler:
         
         return response
 
-# ==============================================================================
-# RESULT PARSING
-# ==============================================================================
 
 def parse_model_output(response: str) -> Dict[str, str]:
     """
@@ -299,20 +335,24 @@ def parse_model_output(response: str) -> Dict[str, str]:
     }
     
     lines = response.split('\n')
-    for line in lines:
+    for i, line in enumerate(lines):
         line = line.strip()
         if line.startswith("GRID_CELL:"):
             result["grid_cell"] = line.split("GRID_CELL:")[1].strip()
         elif line.startswith("DIRECTION:"):
             result["direction"] = line.split("DIRECTION:")[1].strip()
         elif line.startswith("REASONING:"):
-            result["reasoning"] = line.split("REASONING:")[1].strip()
+            # Capture everything after REASONING: including subsequent lines
+            reasoning_parts = [line.split("REASONING:")[1].strip()]
+            # Get remaining lines as reasoning
+            for j in range(i+1, len(lines)):
+                if lines[j].strip():
+                    reasoning_parts.append(lines[j].strip())
+            result["reasoning"] = " ".join(reasoning_parts)
+            break
     
     return result
 
-# ==============================================================================
-# MAIN EVALUATION PIPELINE
-# ==============================================================================
 
 def evaluate_model_on_building(
     model_name: str,
@@ -339,10 +379,10 @@ def evaluate_model_on_building(
     base_dir = f"maps_output/{building_name}"
     
     if use_arrows:
-        floorplan_path = f"{base_dir}/{building_name}_arrows_visualization.jpg"
+        floorplan_path = f"{base_dir}/{building_name}_floorplan_arrows_gridded.jpg"
         plan_type = "arrows"
     else:
-        floorplan_path = f"{base_dir}/{building_name}_floorplan.jpg"
+        floorplan_path = f"{base_dir}/{building_name}_floorplan_gridded.jpg"
         plan_type = "base"
     
     # Check if floorplan exists
@@ -361,7 +401,7 @@ def evaluate_model_on_building(
     
     # Evaluate each photo
     for photo_id in photo_ids:
-        photo_path = f"{base_dir}/images/{building_name}_{photo_id}.jpg"
+        photo_path = f"{base_dir}/images/{photo_id}.jpg"
         
         if not os.path.exists(photo_path):
             print(f"Warning: Photo not found at {photo_path}, skipping...")
@@ -404,27 +444,22 @@ def evaluate_model_on_building(
     with open(output_file, 'w') as f:
         json.dump(results, f, indent=2)
     
-    print(f"\n✓ Results saved to {output_file}")
-    print(f"✓ Processed {len(results['predictions'])} photos")
-
-# ==============================================================================
-# EXAMPLE USAGE
-# ==============================================================================
+    print(f"\nResults saved to {output_file}")
+    print(f"Processed {len(results['predictions'])} photos")
 
 if __name__ == "__main__":
-    # Configuration
+
     building_name = "Beaumont-sur-Oise-Eglise-Saint-Leonor"
+    photo_ids = ["1065_00010", "1065_00011", "1065_00028", "1065_00044", "1065_00033"]
     
-    # List your photo IDs (the numbers/identifiers after the building name)
-    # Example: if you have Beaumont-sur-Oise-Eglise-Saint-Leonor_001.jpg, 
-    # Beaumont-sur-Oise-Eglise-Saint-Leonor_002.jpg, etc.
-    photo_ids = ["001", "002", "003", "004", "005"]  # MODIFY THIS
-    
-    # Choose which model to evaluate
-    model_to_test = "qwen2-vl-7b"  # Change this to test different models
-    
-    # Choose whether to use arrows visualization or base floorplan
-    use_arrows_plan = False  # Set to True to use arrows visualization
+    # model_to_test = "qwen2-vl-7b"
+    model_to_test = "molmo-7b"
+    # model_to_test = "internvl2-8b" # Need to test this
+    # model_to_test = "llava-next-7b"
+    # model_to_test = "cogvlm2-19b"
+    # model_to_test = "deepseek-vl2-8b"
+
+    use_arrows_plan = True  # Set to True to use arrows visualization
     
     # Run evaluation
     evaluate_model_on_building(
@@ -434,10 +469,3 @@ if __name__ == "__main__":
         use_arrows=use_arrows_plan,
         output_dir="evaluation_results"
     )
-    
-    print("\n" + "="*80)
-    print("EVALUATION COMPLETE!")
-    print("="*80)
-    print("\nTo test another model, change 'model_to_test' to one of:")
-    for model_key in MODEL_CONFIGS.keys():
-        print(f"  - {model_key}")
