@@ -1,0 +1,48 @@
+{
+  "model": "internvl3.5-8b",
+  "building": "Beaumont-sur-Oise-Eglise-Saint-Leonor",
+  "floorplan_type": "arrows",
+  "timestamp": "2025-11-11T18:23:16.010546",
+  "predictions": [
+    {
+      "photo_id": "1065_00010",
+      "photo_path": "maps_output/Beaumont-sur-Oise-Eglise-Saint-Leonor/images/1065_00010.jpg",
+      "raw_response": "GRID_CELL: D5\nDIRECTION: N\n\nREASONING: The photograph shows an interior view of a church with a high vaulted ceiling and a stained glass window at the far end. The altar is centered in the view, suggesting the camera is facing the main altar area. In the floor plan, the stained glass window and altar area are located around column D, row 5, which aligns with the central focus of the photograph. The camera direction is northward, as indicated by the alignment of the architectural features with the grid.",
+      "predicted_grid_cell": "D5",
+      "predicted_direction": "N",
+      "reasoning": "The photograph shows an interior view of a church with a high vaulted ceiling and a stained glass window at the far end. The altar is centered in the view, suggesting the camera is facing the main altar area. In the floor plan, the stained glass window and altar area are located around column D, row 5, which aligns with the central focus of the photograph. The camera direction is northward, as indicated by the alignment of the architectural features with the grid."
+    },
+    {
+      "photo_id": "1065_00011",
+      "photo_path": "maps_output/Beaumont-sur-Oise-Eglise-Saint-Leonor/images/1065_00011.jpg",
+      "raw_response": "GRID_CELL: D5\nDIRECTION: N\nREASONING: The photograph shows the front facade of a church with a prominent tower and a large window. In the floor plan, this view aligns with the central part of the building, specifically around column D and row 5. The direction appears to be north due to the orientation of the church's entrance and the tower, which typically face the main direction of the building.",
+      "predicted_grid_cell": "D5",
+      "predicted_direction": "N",
+      "reasoning": "The photograph shows the front facade of a church with a prominent tower and a large window. In the floor plan, this view aligns with the central part of the building, specifically around column D and row 5. The direction appears to be north due to the orientation of the church's entrance and the tower, which typically face the main direction of the building."
+    },
+    {
+      "photo_id": "1065_00028",
+      "photo_path": "maps_output/Beaumont-sur-Oise-Eglise-Saint-Leonor/images/1065_00028.jpg",
+      "raw_response": "GRID_CELL: D5\nDIRECTION: S\nREASONING: The photograph shows a stained glass window with a scene that appears to be from a church or cathedral. The floor plan indicates that the stained glass window is located in the central area, specifically in column D and row 5. The camera is likely facing south, as the light and perspective suggest looking towards the altar or main feature of the window.",
+      "predicted_grid_cell": "D5",
+      "predicted_direction": "S",
+      "reasoning": "The photograph shows a stained glass window with a scene that appears to be from a church or cathedral. The floor plan indicates that the stained glass window is located in the central area, specifically in column D and row 5. The camera is likely facing south, as the light and perspective suggest looking towards the altar or main feature of the window."
+    },
+    {
+      "photo_id": "1065_00044",
+      "photo_path": "maps_output/Beaumont-sur-Oise-Eglise-Saint-Leonor/images/1065_00044.jpg",
+      "raw_response": "GRID_CELL: D5\nDIRECTION: S\nREASONING: The photograph shows a view of a series of arches and columns, suggesting a nave or central aisle. In the floor plan, this layout corresponds to the area around D5, which is centrally located and aligns with the structural elements visible in the photo. The camera direction appears to be facing south, as indicated by the orientation of the arches and the light coming from the windows.",
+      "predicted_grid_cell": "D5",
+      "predicted_direction": "S",
+      "reasoning": "The photograph shows a view of a series of arches and columns, suggesting a nave or central aisle. In the floor plan, this layout corresponds to the area around D5, which is centrally located and aligns with the structural elements visible in the photo. The camera direction appears to be facing south, as indicated by the orientation of the arches and the light coming from the windows."
+    },
+    {
+      "photo_id": "1065_00033",
+      "photo_path": "maps_output/Beaumont-sur-Oise-Eglise-Saint-Leonor/images/1065_00033.jpg",
+      "raw_response": "GRID_CELL: D5\nDIRECTION: S\nREASONING: The photograph shows a column with a detailed capital, typical of a Gothic or Romanesque style. In the floor plan, the area around D5 has similar architectural features, such as columns and arches, indicating it is likely a central or significant part of the building. The camera direction is south, as the photograph captures the column from a slightly upward angle, consistent with looking north from D5.",
+      "predicted_grid_cell": "D5",
+      "predicted_direction": "S",
+      "reasoning": "The photograph shows a column with a detailed capital, typical of a Gothic or Romanesque style. In the floor plan, the area around D5 has similar architectural features, such as columns and arches, indicating it is likely a central or significant part of the building. The camera direction is south, as the photograph captures the column from a slightly upward angle, consistent with looking north from D5."
+    }
+  ]
+}

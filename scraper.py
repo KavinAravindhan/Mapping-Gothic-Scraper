@@ -4,7 +4,7 @@ import json
 import os
 import re
 import time
-from urllib.parse import urljoin
+from urllib.parse import urljoin, unquote
 
 # Local application imports
 from download_floorplan_tiles import download_and_stitch_tiles
@@ -48,7 +48,8 @@ def extract_building_data(building_url):
     
     data = {
         'building_url': building_url,
-        'building_name': building_url.rstrip('/').split('/')[-1],
+        # 'building_name': building_url.rstrip('/').split('/')[-1],
+        'building_name': unquote(building_url.rstrip('/').split('/')[-1]),  # Decode URL
         'floor_plan_image': None,
         'overlays': []
     }
@@ -127,8 +128,9 @@ def download_arrow_images(data, output_dir='output'):
     os.makedirs(output_dir, exist_ok=True)
     
     building_name = data['building_name']
-    base_url = data['building_url']
-    
+    # base_url = data['building_url']
+    base_url = unquote(data['building_url'])
+
     downloaded_images = []
     
     for overlay in data['overlays']:
@@ -138,6 +140,9 @@ def download_arrow_images(data, output_dir='output'):
         # The full-size image usually has the same ID as the thumbnail
         # image_url = urljoin(base_url, f"images/{image_id}.jpg")
         image_url = urljoin(base_url, f"imgs/{image_id}.jpg")
+
+        if len(downloaded_images) == 0:
+            print(f"DEBUG: First image URL: {image_url}")
         
         filename = f"{image_id}.jpg"
         filepath = os.path.join(output_dir, filename)
@@ -156,12 +161,12 @@ def download_arrow_images(data, output_dir='output'):
                     'x': overlay['x'],
                     'y': overlay['y']
                 })
-                print(f"  ✓ Saved: {filepath}")
+                print(f"  Saved: {filepath}")
             else:
-                print(f"  ✗ Failed: {response.status_code}")
+                print(f"  Failed: {response.status_code}")
         
         except Exception as e:
-            print(f"  ✗ Error: {str(e)}")
+            print(f"  Error: {str(e)}")
     
     return downloaded_images
 
@@ -189,7 +194,7 @@ def save_coordinates_csv(data, output_path):
     print(f"Saved coordinates to: {output_path}")
 
 # Complete Pipeline (Putting it all together)
-def scrape_single_building(building_url, output_base_dir='maps_output'):
+def scrape_single_building(building_url, output_base_dir='/mnt/swordfish-pool2/kavin/maps_output'):
     """Complete pipeline for a single building"""
     print(f"\n{'='*60}")
     print(f"Processing: {building_url}")
@@ -205,7 +210,7 @@ def scrape_single_building(building_url, output_base_dir='maps_output'):
     os.makedirs(images_dir, exist_ok=True)
     
     # Download floor plan
-    download_floor_plan(data, output_dir)
+    floor_plan_success = download_floor_plan(data, output_dir)
     
     # Download all arrow images
     download_arrow_images(data, images_dir)
@@ -214,11 +219,11 @@ def scrape_single_building(building_url, output_base_dir='maps_output'):
     save_coordinates_json(data, os.path.join(output_dir, 'data.json'))
     save_coordinates_csv(data, os.path.join(output_dir, 'coordinates.csv'))
     
-    print(f"\n✓ Completed: {building_name}")
+    print(f"\nCompleted: {building_name}")
     print(f"  - Floor plan: {output_dir}")
     print(f"  - {len(data['overlays'])} images downloaded")
     
-    return data
+    return data, 1 if floor_plan_success else 0
 
 def scrape_all_buildings():
     """Scrape all buildings from the site"""
@@ -226,25 +231,36 @@ def scrape_all_buildings():
     print(f"Found {len(directories)} buildings to process\n")
     
     results = []
+    total_images = 0
+    total_floor_plans = 0
+    
     for i, directory in enumerate(directories, 1):
         print(f"\n[{i}/{len(directories)}]")
         try:
-            result = scrape_single_building(directory['url'])
+            result, floor_plan_count = scrape_single_building(directory['url'])
             results.append(result)
+            total_images += len(result['overlays'])
+            total_floor_plans += floor_plan_count
             time.sleep(1)  # Be polite, wait 1 second between requests
         except Exception as e:
             print(f"✗ Error processing {directory['name']}: {str(e)}")
     
     print(f"\n{'='*60}")
-    print(f"COMPLETE: Processed {len(results)} buildings")
+    print(f"SCRAPING COMPLETE")
+    print(f"{'='*60}")
+    print(f"Buildings processed: {len(results)}")
+    print(f"Total floor plans downloaded: {total_floor_plans}")
+    print(f"Total interior images downloaded: {total_images}")
     print(f"{'='*60}")
     
     return results
 
 if __name__ == "__main__":
     # Test with ONE building first:
-    scrape_single_building("https://mcid.mcah.columbia.edu/media/plotted-images/maps/Beaumont-sur-Oise-Eglise-Saint-Leonor/")
+    # scrape_single_building("https://mcid.mcah.columbia.edu/media/plotted-images/maps/Beaumont-sur-Oise-Eglise-Saint-Leonor/")
     # scrape_single_building("https://mcid.mcah.columbia.edu/media/plotted-images/maps/Albi-Cathedrale-Sainte-Cecile/")
+
+    scrape_single_building("https://mcid.mcah.columbia.edu/media/plotted-images/maps/Amiens%2C%20Cath%C3%A9drale%20Notre-Dame/")
     
-    # Once that works, comment out the line above and uncomment this to do all:
+    # Scrape all buildings:
     # scrape_all_buildings()

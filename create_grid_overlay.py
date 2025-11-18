@@ -10,8 +10,6 @@ def load_font(label_size=80):
     font_paths = [
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
         "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
-        "/System/Library/Fonts/Helvetica.ttc",
-        "C:\\Windows\\Fonts\\ariblk.ttf",
     ]
     
     for font_path in font_paths:
@@ -34,6 +32,24 @@ def get_text_dimensions(draw, text, font):
     except:
         # Fallback estimate
         return len(text) * 40, 60
+
+
+def generate_column_labels(num_columns):
+    """
+    Generate column labels dynamically (A, B, C, ..., Z, AA, AB, ...)
+    """
+    labels = []
+    for i in range(num_columns):
+        label = ""
+        num = i
+        while True:
+            label = chr(65 + (num % 26)) + label
+            num = num // 26
+            if num == 0:
+                break
+            num -= 1
+        labels.append(label)
+    return labels
 
 
 def create_grid_overlay_consistent(image_path, output_path, reference_size,
@@ -63,6 +79,7 @@ def create_grid_overlay_consistent(image_path, output_path, reference_size,
     actual_row_spacing = row_spacing * scale_y
     
     print(f"  Grid spacing: {actual_col_spacing:.1f}px x {actual_row_spacing:.1f}px")
+    print(f"  Grid configuration: {grid_cols} columns x {grid_rows} rows")
     
     # Create padding for labels
     padding = max(120, label_size + 40)
@@ -77,8 +94,10 @@ def create_grid_overlay_consistent(image_path, output_path, reference_size,
     draw = ImageDraw.Draw(padded_image)
     font = load_font(label_size)
     
-    # Draw vertical lines and column labels (A-J)
-    columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+    # Generate dynamic column labels
+    columns = generate_column_labels(grid_cols)
+    
+    # Draw vertical lines and column labels
     for i in range(grid_cols + 1):
         x = padding + i * actual_col_spacing
         
@@ -100,7 +119,7 @@ def create_grid_overlay_consistent(image_path, output_path, reference_size,
             draw.text((label_x - text_width/2, padding + img_height + padding/2 - text_height/2),
                      letter, fill='black', font=font)
     
-    # Draw horizontal lines and row labels (1-10)
+    # Draw horizontal lines and row labels
     for i in range(grid_rows + 1):
         y = padding + i * actual_row_spacing
         
@@ -165,11 +184,17 @@ def process_floor_plans_with_consistent_grid(base_floorplan_path, arrows_floorpl
         label_size=label_size
     )
     
-    print("Both floor plans processed with consistent 10x10 grid")
+    print(f"Both floor plans processed with consistent {grid_cols}x{grid_rows} grid")
 
 
 if __name__ == "__main__":
-
+    
+    # Hyperparameters
+    GRID_COLS = 10  # Number of columns (A, B, C, ..., Z, AA, AB, ...)
+    GRID_ROWS = 10  # Number of rows (1, 2, 3, ...)
+    LINE_WIDTH = 3
+    LABEL_SIZE = 80
+    
     building_name = "Beaumont-sur-Oise-Eglise-Saint-Leonor"
     
     # Define paths using building name
@@ -181,14 +206,14 @@ if __name__ == "__main__":
     base_output = f"{base_dir}/{building_name}_floorplan_gridded.jpg"
     arrows_output = f"{base_dir}/{building_name}_floorplan_arrows_gridded.jpg"
     
-    # Process both with consistent 10x10 grid
+    # Process both with consistent grid
     process_floor_plans_with_consistent_grid(
         base_floorplan_path=base_floorplan,
         arrows_floorplan_path=arrows_floorplan,
         base_output_path=base_output,
         arrows_output_path=arrows_output,
-        grid_cols=10,
-        grid_rows=10,
-        line_width=3,
-        label_size=80
+        grid_cols=GRID_COLS,
+        grid_rows=GRID_ROWS,
+        line_width=LINE_WIDTH,
+        label_size=LABEL_SIZE
     )
