@@ -9,8 +9,6 @@ import random
 import time
 from datetime import datetime
 
-# ==================== CONFIGURATION ====================
-
 class Config:
     # Building and paths
     BUILDING_NAME = "Beaumont-sur-Oise-Eglise-Saint-Leonor"
@@ -22,8 +20,8 @@ class Config:
     # Prompt type: "zero_shot" or "few_shot"
     PROMPT_TYPE = "zero_shot"
     
-    # Model - can be changed to other GPT-5 family models
-    MODEL = "gpt-5.1"  # Options: "gpt-5.1", "gpt-5", "gpt-5-mini", "gpt-5-nano"
+    # Model Options: "gpt-5.1", "gpt-5", "gpt-5-mini", "gpt-5-nano"
+    MODEL = "gpt-5.1"
     
     # Reasoning effort: "none", "low", "medium", "high"
     # "none" for fastest responses, "high" for complex reasoning
@@ -55,8 +53,6 @@ class Config:
         cls.OUTPUT_DIR = f"{cls.get_building_dir()}/evaluation_results"
         os.makedirs(cls.OUTPUT_DIR, exist_ok=True)
         return cls.OUTPUT_DIR
-
-# ==================== HELPER FUNCTIONS ====================
 
 def encode_image_to_base64(image_path):
     """Encode image to base64 string for API"""
@@ -108,8 +104,6 @@ def calculate_direction_distance(pred_dir, true_dir):
     angle_diff = abs(direction_angles[pred_dir] - direction_angles[true_dir])
     # Take the shorter angular distance
     return min(angle_diff, 360 - angle_diff)
-
-# ==================== PROMPT GENERATION ====================
 
 def get_zero_shot_prompt(task_variant):
     """Generate zero-shot prompt"""
@@ -191,92 +185,6 @@ Think through your reasoning step by step, then provide your answer in this exac
 REASONING: [Your detailed step-by-step analysis]
 ARROW_LABEL: [Letter]"""
 
-# ==================== VARIANT B: LABELED ARROWS ====================
-
-def create_labeled_arrows_floor_plan(coordinates_df, base_floor_map_path, output_path, num_samples=15):
-    """
-    Create a floor plan with randomly sampled and labeled arrows
-    Returns: dict mapping label -> (image_id, grid_cell, direction)
-    """
-    random.seed(Config.RANDOM_SEED)
-    
-    # Sample arrows ensuring they're well-distributed
-    sampled_rows = coordinates_df.sample(n=min(num_samples, len(coordinates_df)), random_state=Config.RANDOM_SEED)
-    
-    # Load floor plan
-    floor_plan = Image.open(base_floor_map_path)
-    draw = ImageDraw.Draw(floor_plan)
-    
-    # Load font for labels
-    try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 60)
-    except:
-        font = ImageFont.load_default()
-    
-    # Arrow parameters
-    direction_angles = {
-        'E': 0, 'NE': 45, 'N': 90, 'NW': 135,
-        'W': 180, 'SW': 225, 'S': 270, 'SE': 315
-    }
-    arrow_length = 60
-    
-    # Create mapping
-    label_mapping = {}
-    
-    # Get floor plan dimensions (assuming padding from grid creation)
-    plan_width, plan_height = floor_plan.size
-    # Account for padding added by grid overlay (120 pixels on each side)
-    padding = 120
-    inner_width = plan_width - 2 * padding
-    inner_height = plan_height - 2 * padding
-    
-    for idx, (label_char, row) in enumerate(zip('ABCDEFGHIJKLMNOPQRSTUVWXYZ', sampled_rows.itertuples())):
-        # Convert normalized coordinates to pixel coordinates
-        x = int(row.x * inner_width) + padding
-        y = int(row.y * inner_height) + padding
-        
-        # Draw arrow
-        direction = row.direction
-        if direction in direction_angles:
-            angle_rad = np.radians(direction_angles[direction])
-            dx = int(arrow_length * np.cos(angle_rad))
-            dy = int(-arrow_length * np.sin(angle_rad))
-            
-            # Draw thicker arrow line
-            draw.line([(x, y), (x + dx, y + dy)], fill='blue', width=5)
-            
-            # Draw arrow head (simple triangle)
-            head_size = 15
-            angle1 = angle_rad + np.radians(150)
-            angle2 = angle_rad - np.radians(150)
-            head_x1 = x + dx + int(head_size * np.cos(angle1))
-            head_y1 = y + dy - int(head_size * np.sin(angle1))
-            head_x2 = x + dx + int(head_size * np.cos(angle2))
-            head_y2 = y + dy - int(head_size * np.sin(angle2))
-            draw.polygon([(x + dx, y + dy), (head_x1, head_y1), (head_x2, head_y2)], fill='blue')
-        
-        # Add label near arrow base
-        label_offset = 25
-        draw.text((x + label_offset, y - label_offset), label_char, fill='red', font=font)
-        
-        # Store mapping
-        label_mapping[label_char] = {
-            'image_id': row.image_id,
-            'grid_cell': row.grid_cell,
-            'direction': row.direction,
-            'x': row.x,
-            'y': row.y
-        }
-    
-    # Save modified floor plan
-    floor_plan.save(output_path, 'JPEG', quality=95)
-    print(f"Created labeled arrows floor plan: {output_path}")
-    print(f"Labeled {len(label_mapping)} arrows: {list(label_mapping.keys())}")
-    
-    return label_mapping
-
-# ==================== BATCH API PREPARATION ====================
-
 def prepare_batch_requests(ground_truth_df, task_variant, prompt_type):
     """Prepare batch API requests for GPT-5.1 Responses API"""
     
@@ -288,15 +196,9 @@ def prepare_batch_requests(ground_truth_df, task_variant, prompt_type):
         label_mapping = None
     else:  # labeled_arrows
         # Create labeled arrows version
-        base_map = f"{building_dir}/{Config.BUILDING_NAME}_floorplan_arrows_gridded.jpg"
-        floor_map_path = f"{building_dir}/{Config.BUILDING_NAME}_floorplan_labeled_arrows.jpg"
-        label_mapping = create_labeled_arrows_floor_plan(
-            ground_truth_df, 
-            base_map, 
-            floor_map_path, 
-            num_samples=Config.NUM_ARROW_SAMPLES
-        )
-    
+        base_map = f"{building_dir}/{Config.BUILDING_NAME}_arrows_visualization.jpg"
+        floor_map_path = f"{building_dir}/{Config.BUILDING_NAME}_floorplan_arrows_gridded.jpg"
+
     if not os.path.exists(floor_map_path):
         raise FileNotFoundError(f"Floor map not found: {floor_map_path}")
     
@@ -385,8 +287,6 @@ def save_batch_file(requests, filename):
     
     print(f"Saved {len(requests)} requests to {filepath}")
     return filepath
-
-# ==================== METRICS CALCULATION ====================
 
 def parse_response(response_text, task_variant):
     """Parse model response to extract predictions"""
@@ -543,8 +443,6 @@ def save_results(metrics, predictions_df, label_mapping=None):
     print(f"  Median Direction Distance: {metrics.get('median_direction_distance', 0):.2f}°")
     print("="*60)
 
-# ==================== BATCH RESULTS PROCESSING ====================
-
 def process_batch_results(batch_results_file, ground_truth_df, task_variant, label_mapping=None):
     """Process results from OpenAI Batch API"""
     
@@ -588,8 +486,6 @@ def process_batch_results(batch_results_file, ground_truth_df, task_variant, lab
     
     return metrics, predictions_df
 
-# ==================== AUTOMATED BATCH SUBMISSION ====================
-
 def submit_batch(batch_filepath):
     """Submit batch file to OpenAI API"""
     from openai import OpenAI
@@ -608,7 +504,7 @@ def submit_batch(batch_filepath):
             purpose='batch'
         )
     
-    print(f"✓ Uploaded file ID: {batch_file.id}")
+    print(f"Uploaded file ID: {batch_file.id}")
     
     # Create batch
     print(f"Creating batch job...")
@@ -618,7 +514,7 @@ def submit_batch(batch_filepath):
         completion_window='24h'
     )
     
-    print(f"✓ Batch created successfully!")
+    print(f"Batch created successfully!")
     print(f"  Batch ID: {batch.id}")
     print(f"  Status: {batch.status}")
     print(f"  Created at: {batch.created_at}")
@@ -644,7 +540,7 @@ def submit_batch(batch_filepath):
     with open(batch_info_file, 'w') as f:
         json.dump(batch_info, f, indent=2)
     
-    print(f"✓ Batch info saved to: {batch_info_file}")
+    print(f"Batch info saved to: {batch_info_file}")
     
     return batch.id, batch_info_file
 
@@ -657,7 +553,6 @@ def check_batch_status(batch_id):
     batch = client.batches.retrieve(batch_id)
     
     print(f"\nBatch Status Report")
-    print(f"{'='*60}")
     print(f"Batch ID: {batch.id}")
     print(f"Status: {batch.status}")
     print(f"Created: {batch.created_at}")
@@ -670,18 +565,16 @@ def check_batch_status(batch_id):
         print(f"  Failed: {counts.failed}")
     
     if batch.status == 'completed':
-        print(f"\n✓ Batch completed!")
+        print(f"\nBatch completed!")
         print(f"  Output file ID: {batch.output_file_id}")
         if batch.error_file_id:
             print(f"  Error file ID: {batch.error_file_id}")
     elif batch.status == 'failed':
-        print(f"\n✗ Batch failed!")
+        print(f"\nBatch failed!")
         if hasattr(batch, 'errors'):
             print(f"  Errors: {batch.errors}")
     elif batch.status in ['validating', 'in_progress', 'finalizing']:
-        print(f"\n⏳ Batch is still processing...")
-    
-    print(f"{'='*60}")
+        print(f"\nBatch is still processing...")
     
     return batch
 
@@ -695,7 +588,7 @@ def download_batch_results(batch_id, output_filename=None):
     batch = client.batches.retrieve(batch_id)
     
     if batch.status != 'completed':
-        print(f"✗ Batch not completed yet. Current status: {batch.status}")
+        print(f"Batch not completed yet. Current status: {batch.status}")
         return None
     
     print(f"\nDownloading batch results...")
@@ -714,7 +607,7 @@ def download_batch_results(batch_id, output_filename=None):
     with open(output_path, 'wb') as f:
         f.write(result_content.content)
     
-    print(f"✓ Results saved to: {output_path}")
+    print(f"Results saved to: {output_path}")
     
     # Download errors if any
     if batch.error_file_id:
@@ -725,7 +618,7 @@ def download_batch_results(batch_id, output_filename=None):
         with open(error_path, 'wb') as f:
             f.write(error_content.content)
         
-        print(f"✓ Errors saved to: {error_path}")
+        print(f"Errors saved to: {error_path}")
     
     return output_path
 
@@ -754,13 +647,13 @@ def monitor_batch(batch_id, check_interval=60):
             print(f"[{timestamp}] Status: {status}")
         
         if status == 'completed':
-            print(f"\n✓ Batch completed successfully!")
+            print(f"\nBatch completed successfully!")
             return batch
         elif status == 'failed':
-            print(f"\n✗ Batch failed!")
+            print(f"\nBatch failed!")
             return batch
         elif status in ['expired', 'cancelled']:
-            print(f"\n✗ Batch {status}!")
+            print(f"\nBatch {status}!")
             return batch
         
         time.sleep(check_interval)
@@ -776,69 +669,64 @@ def run_complete_evaluation(auto_submit=False, monitor=True):
     4. Download and process results
     """
     
-    print("="*60)
-    print("COMPLETE EVALUATION WORKFLOW")
-    print("="*60)
-    
     # Step 1: Prepare batch
-    print("\n[STEP 1/4] Preparing batch requests...")
+    print("\n[1/4] Preparing batch requests...")
     
     try:
         ground_truth_df = load_ground_truth(Config.BUILDING_NAME)
-        print(f"✓ Loaded {len(ground_truth_df)} images")
+        print(f"Loaded {len(ground_truth_df)} images")
         
         batch_requests, label_mapping = prepare_batch_requests(
             ground_truth_df, 
             Config.TASK_VARIANT, 
             Config.PROMPT_TYPE
         )
-        print(f"✓ Prepared {len(batch_requests)} requests")
+        print(f"Prepared {len(batch_requests)} requests")
         
         batch_filename = f"batch_requests_{Config.TASK_VARIANT}_{Config.PROMPT_TYPE}_{Config.TIMESTAMP}.jsonl"
         batch_filepath = save_batch_file(batch_requests, batch_filename)
         
     except Exception as e:
-        print(f"✗ Error preparing batch: {e}")
+        print(f"Error preparing batch: {e}")
         return
     
     # Step 2: Submit batch
     if not auto_submit:
-        print(f"\n[INFO] Batch file ready at: {batch_filepath}")
-        print(f"[INFO] Set auto_submit=True to automatically submit, or submit manually")
+        print(f"\nBatch file ready at: {batch_filepath}")
         return batch_filepath, label_mapping
     
-    print("\n[STEP 2/4] Submitting batch to OpenAI...")
+    print("\n[2/4] Submitting batch to OpenAI...")
     
     try:
         batch_id, batch_info_file = submit_batch(batch_filepath)
     except Exception as e:
-        print(f"✗ Error submitting batch: {e}")
+        print(f"Error submitting batch: {e}")
         return
     
     # Step 3: Monitor batch
     if not monitor:
-        print(f"\n[INFO] Batch submitted. Check status with:")
+        print(f"\nBatch submitted. Check status with:")
         print(f"  check_batch_status('{batch_id}')")
         return batch_id, label_mapping
     
-    print("\n[STEP 3/4] Monitoring batch progress...")
+    print("\n[3/4] Monitoring batch progress...")
     
     try:
         final_batch = monitor_batch(batch_id, check_interval=60)
     except KeyboardInterrupt:
-        print(f"\n\n[INFO] Monitoring interrupted. Batch is still running.")
-        print(f"[INFO] Check status later with: check_batch_status('{batch_id}')")
+        print(f"\n\nMonitoring interrupted. Batch is still running.")
+        print(f"Check status later with: check_batch_status('{batch_id}')")
         return batch_id, label_mapping
     except Exception as e:
-        print(f"✗ Error monitoring batch: {e}")
+        print(f"Error monitoring batch: {e}")
         return batch_id, label_mapping
     
     if final_batch.status != 'completed':
-        print(f"✗ Batch did not complete successfully")
+        print(f"Batch did not complete successfully")
         return batch_id, label_mapping
     
     # Step 4: Download and process results
-    print("\n[STEP 4/4] Processing results...")
+    print("\n[4/4] Processing results...")
     
     try:
         results_file = download_batch_results(batch_id)
@@ -852,17 +740,13 @@ def run_complete_evaluation(auto_submit=False, monitor=True):
                 label_mapping
             )
             
-            print(f"\n{'='*60}")
-            print("✓ EVALUATION COMPLETE!")
-            print(f"{'='*60}")
+            print("EVALUATION COMPLETE!")
             
             return metrics, predictions_df
         
     except Exception as e:
-        print(f"✗ Error processing results: {e}")
+        print(f"Error processing results: {e}")
         return batch_id, label_mapping
-
-# ==================== HELPER SCRIPT FOR EXISTING BATCHES ====================
 
 def process_existing_batch(batch_id):
     """Process results from an already submitted batch"""
@@ -909,8 +793,6 @@ def process_existing_batch(batch_id):
     
     return metrics, predictions_df
 
-# ==================== MAIN ====================
-
 def main(auto_submit=False, monitor=False):
     """
     Main function with optional auto-submission
@@ -923,9 +805,6 @@ def main(auto_submit=False, monitor=False):
     if auto_submit or monitor:
         return run_complete_evaluation(auto_submit=auto_submit, monitor=monitor)
     
-    print("="*60)
-    print("GPT-5.1 SPATIAL LOCALIZATION EVALUATION")
-    print("="*60)
     print(f"Building: {Config.BUILDING_NAME}")
     print(f"Base Directory: {Config.BASE_MAPS_DIR}")
     print(f"Task Variant: {Config.TASK_VARIANT}")
@@ -933,16 +812,14 @@ def main(auto_submit=False, monitor=False):
     print(f"Model: {Config.MODEL}")
     print(f"Reasoning Effort: {Config.REASONING_EFFORT}")
     print(f"Verbosity: {Config.VERBOSITY}")
-    print("="*60)
-    print()
     
     # Load ground truth
     print("Loading ground truth...")
     try:
         ground_truth_df = load_ground_truth(Config.BUILDING_NAME)
-        print(f"✓ Loaded {len(ground_truth_df)} images with coordinates")
+        print(f"Loaded {len(ground_truth_df)} images with coordinates")
     except FileNotFoundError as e:
-        print(f"✗ Error: {e}")
+        print(f"Error: {e}")
         return
     
     # Prepare batch requests
@@ -953,24 +830,17 @@ def main(auto_submit=False, monitor=False):
             Config.TASK_VARIANT, 
             Config.PROMPT_TYPE
         )
-        print(f"✓ Prepared {len(batch_requests)} batch requests")
+        print(f"Prepared {len(batch_requests)} batch requests")
     except FileNotFoundError as e:
-        print(f"✗ Error: {e}")
+        print(f"Error: {e}")
         return
     
     # Save batch file
     batch_filename = f"batch_requests_{Config.TASK_VARIANT}_{Config.PROMPT_TYPE}_{Config.TIMESTAMP}.jsonl"
     batch_filepath = save_batch_file(batch_requests, batch_filename)
     
-    print(f"\n{'='*60}")
-    print("BATCH FILE READY - MANUAL SUBMISSION")
-    print(f"{'='*60}")
-    print(f"File: {batch_filepath}")
+    print(f"Batch File: {batch_filepath}")
     print(f"Requests: {len(batch_requests)}")
-    print(f"\nTo auto-submit, run:")
-    print(f"  python evaluate_gpt5_spatial_localization.py --auto-submit")
-    print(f"\nOr submit manually with OpenAI API")
-    print(f"{'='*60}")
 
 if __name__ == "__main__":
     import sys
