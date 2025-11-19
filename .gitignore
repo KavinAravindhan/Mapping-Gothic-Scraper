@@ -210,4 +210,8 @@ __marimo__/
 maps_output/
 maps_output_Oct23/
 *.zip
-benchmarking/
+
+# benchmarking files
+benchmarking/export_197277_project-197277-at-2025-11-17-18-59-c7e831d2.json
+benchmarking/architecture_annotations_hf_dataset/
+benchmarking/architecture_annotations.csv
