@@ -13,7 +13,12 @@ from tqdm import tqdm
 class Config:
     # Building and paths
     BUILDING_NAME = "Beaumont-sur-Oise-Eglise-Saint-Leonor"
-    BASE_MAPS_DIR = "/mnt/swordfish-pool2/kavin/maps_output"
+    # BASE_MAPS_DIR = "/mnt/swordfish-pool2/kavin/maps_output"
+    BASE_MAPS_DIR = "/home/kr3131/Mapping-Gothic-Scraper/maps_output"
+    
+    # Grid configuration - MUST match create_grid_overlay.py
+    GRID_COLS = 10  # Number of columns (A, B, C, ..., Z, AA, AB, ...)
+    GRID_ROWS = 10  # Number of rows (1, 2, 3, ...)
     
     # Task variant: "grid_direction" or "labeled_arrows"
     TASK_VARIANT = "grid_direction"
@@ -39,13 +44,19 @@ class Config:
     }
     
     # Generation settings
-    MAX_NEW_TOKENS = 1024
-    TEMPERATURE = 0.7
-    TOP_P = 0.95
+    # MAX_NEW_TOKENS = 1024
+    # TEMPERATURE = 0.7
+    # TOP_P = 0.95
+
+    # Generation settings - OPTIMIZED FOR SPEED
+    MAX_NEW_TOKENS = 256  # Reduced from 1024
+    USE_GREEDY = True     # Use greedy decoding for speed
+    TEMPERATURE = 0.1     # Only used if USE_GREEDY=False
+    TOP_P = 0.95          # Only used if USE_GREEDY=False
     
     # Environment setup
     HF_CACHE_DIR = "/mnt/swordfish-pool2/kavin/cache"
-    CUDA_DEVICE = "0"
+    CUDA_DEVICE = "7"
     
     # For labeled_arrows variant
     NUM_ARROW_SAMPLES = 15
@@ -73,6 +84,26 @@ class Config:
 os.environ['HF_HOME'] = Config.HF_CACHE_DIR
 os.environ["CUDA_VISIBLE_DEVICES"] = Config.CUDA_DEVICE
 
+# Add this after the Config class definition
+
+def generate_column_label(col_index, num_cols):
+    """
+    Generate column label for a given index (A, B, C, ..., Z, AA, AB, ...)
+    Matches the logic in create_grid_overlay.py
+    """
+    if col_index >= num_cols:
+        col_index = num_cols - 1
+    
+    label = ""
+    num = col_index
+    while True:
+        label = chr(65 + (num % 26)) + label
+        num = num // 26
+        if num == 0:
+            break
+        num -= 1
+    return label
+
 def load_ground_truth(building_name):
     """Load coordinates CSV with ground truth"""
     building_dir = Config.get_building_dir()
@@ -83,9 +114,16 @@ def load_ground_truth(building_name):
     
     df = pd.read_csv(csv_path)
     
-    # Convert normalized coordinates to grid cells (10x10 grid: A-J, 1-10)
-    df['grid_col'] = df['x'].apply(lambda x: chr(65 + min(int(x * 10), 9)))  # A-J
-    df['grid_row'] = df['y'].apply(lambda y: min(int(y * 10) + 1, 10))  # 1-10
+    # Convert normalized coordinates to grid cells using Config parameters
+    def get_grid_col(x):
+        col_index = min(int(x * Config.GRID_COLS), Config.GRID_COLS - 1)
+        return generate_column_label(col_index, Config.GRID_COLS)
+    
+    def get_grid_row(y):
+        return min(int(y * Config.GRID_ROWS) + 1, Config.GRID_ROWS)
+    
+    df['grid_col'] = df['x'].apply(get_grid_col)
+    df['grid_row'] = df['y'].apply(get_grid_row)
     df['grid_cell'] = df['grid_col'] + df['grid_row'].astype(str)
     
     return df
@@ -121,8 +159,13 @@ def calculate_direction_distance(pred_dir, true_dir):
 def get_zero_shot_prompt(task_variant):
     """Generate zero-shot prompt"""
     if task_variant == "grid_direction":
-        return """Given a gridded floor plan and a photograph taken inside or near the building, identify:
+        # Generate column range dynamically
+        last_col = generate_column_label(Config.GRID_COLS - 1, Config.GRID_COLS)
+        
+        return f"""Given a gridded floor plan ({Config.GRID_COLS}×{Config.GRID_ROWS} grid) and a photograph taken inside or near the building, identify:
 1. The grid cell where the photo was taken (format: [Letter][Number], e.g., C5)
+   - Columns range from A to {last_col}
+   - Rows range from 1 to {Config.GRID_ROWS}
 2. The camera direction (N, NE, E, SE, S, SW, W, NW)
 
 Analyze the architectural features, columns, windows, and spatial relationships carefully.
@@ -253,15 +296,24 @@ def run_inference(model, processor, floor_plan_path, photo_path, prompt_text):
     )
     inputs = inputs.to(model.device)
     
-    # Generate
+    # Generate with optimized settings
     with torch.no_grad():
-        generated_ids = model.generate(
-            **inputs,
-            max_new_tokens=Config.MAX_NEW_TOKENS,
-            temperature=Config.TEMPERATURE,
-            top_p=Config.TOP_P,
-            do_sample=True
-        )
+        if Config.USE_GREEDY:
+            # Greedy decoding - faster and deterministic
+            generated_ids = model.generate(
+                **inputs,
+                max_new_tokens=Config.MAX_NEW_TOKENS,
+                do_sample=False,
+            )
+        else:
+            # Sampling - slower but more diverse
+            generated_ids = model.generate(
+                **inputs,
+                max_new_tokens=Config.MAX_NEW_TOKENS,
+                temperature=Config.TEMPERATURE,
+                top_p=Config.TOP_P,
+                do_sample=True
+            )
     
     # Decode
     generated_ids_trimmed = [
@@ -275,16 +327,51 @@ def run_inference(model, processor, floor_plan_path, photo_path, prompt_text):
     
     return output_text
 
+def load_arrow_label_mapping(building_dir):
+    """Load the pre-created arrow label mapping"""
+    mapping_path = f"{building_dir}/arrow_label_mapping.json"
+    
+    if not os.path.exists(mapping_path):
+        raise FileNotFoundError(
+            f"Arrow label mapping not found: {mapping_path}\n"
+            f"Please run visualize_arrows_floor_map_sampled.py first to create it."
+        )
+    
+    with open(mapping_path, 'r') as f:
+        label_mapping = json.load(f)
+    
+    # Add grid_cell computation for each arrow using Config parameters
+    for label, info in label_mapping.items():
+        x = info['x']
+        y = info['y']
+        
+        # Calculate grid position using Config.GRID_COLS and Config.GRID_ROWS
+        col_index = min(int(x * Config.GRID_COLS), Config.GRID_COLS - 1)
+        grid_col = generate_column_label(col_index, Config.GRID_COLS)
+        grid_row = min(int(y * Config.GRID_ROWS) + 1, Config.GRID_ROWS)
+        
+        info['grid_cell'] = f"{grid_col}{grid_row}"
+    
+    print(f"✓ Loaded arrow label mapping with {len(label_mapping)} arrows")
+    print(f"  Grid configuration: {Config.GRID_COLS} columns × {Config.GRID_ROWS} rows")
+    return label_mapping
+
 def evaluate_all_images(ground_truth_df, task_variant, prompt_type, label_mapping=None):
     """Evaluate all images with the model"""
     
     building_dir = Config.get_building_dir()
     
-    # Get appropriate floor map
-    if task_variant == "grid_direction":
-        floor_map_path = f"{building_dir}/{Config.BUILDING_NAME}_floorplan_gridded.jpg"
-    else:  # labeled_arrows
+    # Handle labeled arrows variant
+    if Config.TASK_VARIANT == "labeled_arrows":
+        print("\nLoading pre-created labeled arrows floor plan...")
+        
+        # Load the mapping created by visualize_arrows_floor_map_sampled.py
+        label_mapping = load_arrow_label_mapping(building_dir)
+        
+        # Use the gridded arrows visualization
         floor_map_path = f"{building_dir}/{Config.BUILDING_NAME}_floorplan_arrows_gridded.jpg"
+    else:
+        floor_map_path = f"{building_dir}/{Config.BUILDING_NAME}_floorplan_gridded.jpg"
     
     if not os.path.exists(floor_map_path):
         raise FileNotFoundError(f"Floor map not found: {floor_map_path}")
@@ -529,6 +616,12 @@ def main():
     print(f"Prompt Type: {Config.PROMPT_TYPE}")
     print(f"Cache Directory: {Config.HF_CACHE_DIR}")
     print(f"CUDA Device: {Config.CUDA_DEVICE}")
+
+    # Validation warning
+    print("\n⚠️  IMPORTANT: Ensure grid configuration matches create_grid_overlay.py:")
+    print(f"   - GRID_COLS = {Config.GRID_COLS}")
+    print(f"   - GRID_ROWS = {Config.GRID_ROWS}")
+    print()
     
     # Load ground truth
     print("Loading ground truth...")
@@ -539,13 +632,8 @@ def main():
         print(f"Error: {e}")
         return
     
-    # Handle labeled arrows variant
+    # Handle labeled arrows variant - JUST SET TO NONE, loading happens in evaluate_all_images
     label_mapping = None
-    if Config.TASK_VARIANT == "labeled_arrows":
-        print("\nCreating labeled arrows floor plan...")
-        building_dir = Config.get_building_dir()
-        base_map = f"{building_dir}/{Config.BUILDING_NAME}_arrows_visualization.jpg"
-        output_map = f"{building_dir}/{Config.BUILDING_NAME}_floorplan_arrows_gridded.jpg"
     
     # Run evaluation
     try:
@@ -593,3 +681,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# nohup python3 evaluate_qwen3.py > z_evaluate_qwen.log 2>&1 &

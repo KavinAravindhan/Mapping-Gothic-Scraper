@@ -2,6 +2,7 @@ import cv2
 import pandas as pd
 import numpy as np
 import string
+import json
 
 # Configuration
 building_name = "Beaumont-sur-Oise-Eglise-Saint-Leonor"
@@ -9,9 +10,10 @@ base_path = f"maps_output/{building_name}"
 floor_plan_path = f"{base_path}/{building_name}_floorplan.jpg"
 csv_path = f"{base_path}/coordinates.csv"
 output_path = f"{base_path}/{building_name}_arrows_visualization.jpg"
+mapping_output_path = f"{base_path}/arrow_label_mapping.json"
 
 # Hyperparameters
-num_arrows_to_sample = 10  # Number of arrows to randomly sample
+num_arrows_to_sample = 15  # Number of arrows to randomly sample (match Config.NUM_ARROW_SAMPLES in evaluate_qwen3.py)
 min_distance_pixels = 80    # Minimum distance between arrows in pixels
 random_seed = 42            # Set to None for different random selection each time
 
@@ -141,6 +143,9 @@ if len(sampled_df) > 26:
     # If more than 26 arrows, use AA, AB, AC, etc.
     letters = letters + [a+b for a in string.ascii_uppercase for b in string.ascii_uppercase]
 
+# Create mapping dictionary for evaluation
+mapping = {}
+
 # Draw arrows and labels for sampled coordinates
 for idx, row in sampled_df.iterrows():
     # Convert normalized coordinates to pixel coordinates
@@ -150,6 +155,14 @@ for idx, row in sampled_df.iterrows():
     direction = row['direction']
     image_id = row['image_id']
     label = letters[idx]
+    
+    # Add to mapping
+    mapping[label] = {
+        'image_id': image_id,
+        'x': float(row['x']),
+        'y': float(row['y']),
+        'direction': direction
+    }
     
     if direction in direction_angles:
         # Calculate arrow end point based on direction
@@ -187,7 +200,14 @@ for idx, row in sampled_df.iterrows():
         
         print(f"Arrow {label} ({image_id}): coord=({row['x']:.3f}, {row['y']:.3f}) -> pixel=({x}, {y}) dir={direction}")
 
-# Save output
+# Save visualization
 cv2.imwrite(output_path, canvas)
 print(f"\nVisualization saved to: {output_path}")
 print(f"Canvas size: {canvas_width} x {canvas_height}")
+
+# Save mapping to JSON
+with open(mapping_output_path, 'w') as f:
+    json.dump(mapping, f, indent=2)
+
+print(f"\n✓ Label mapping saved to: {mapping_output_path}")
+print(f"✓ Mapping contains {len(mapping)} labeled arrows: {list(mapping.keys())}")

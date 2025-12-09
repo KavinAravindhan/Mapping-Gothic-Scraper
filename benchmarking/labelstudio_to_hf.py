@@ -40,8 +40,6 @@ def parse_label_studio_annotations(json_data: List[Dict[str, Any]]) -> Dataset:
         building_notes = task['data'].get('notes', None)
         
         # Process each annotation
-   
-
         for annotation in task['annotations']:
 
             annotation_id = annotation['id']
@@ -51,11 +49,11 @@ def parse_label_studio_annotations(json_data: List[Dict[str, Any]]) -> Dataset:
             
             # Group results by image index
             image_annotations = {}
-            c = 0
+            # c = 0
             for result in annotation['result']:
-                c += 1
-                if c >= 2:
-                    break
+                # c += 1
+                # if c >= 2:
+                #     break
                 # Skip if missing required keys
                 if 'to_name' not in result or 'from_name' not in result:
                     continue
@@ -346,13 +344,13 @@ def main():
     print(df['data_type'].value_counts())
     
     # Save dataset locally first
-    output_dir = 'benchmarking/architecture_annotations_hf_dataset'
+    output_dir = 'benchmarking/v4/architecture_annotations_hf_dataset'
     print(f"\nSaving dataset to '{output_dir}'...")
     dataset.save_to_disk(output_dir)
     print(f"Dataset saved!")
     
     # Export to CSV (without images)
-    csv_file = 'benchmarking/architecture_annotations.csv'
+    csv_file = 'benchmarking/v4/architecture_annotations.csv'
     print(f"\nExporting to CSV '{csv_file}'...")
     df_no_images = df.drop(columns=['image'])
     df_no_images.to_csv(csv_file, index=False)

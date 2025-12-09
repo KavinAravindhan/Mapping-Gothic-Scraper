@@ -211,9 +211,11 @@ maps_output/
 maps_output_Oct23/
 *.zip
 
-# benchmarking files
+# <changes: KAR> benchmarking files
 benchmarking/export_197277_project-197277-at-2025-11-17-18-59-c7e831d2.json
 benchmarking/architecture_annotations_hf_dataset/
 benchmarking/architecture_annotations.csv
 benchmarking/v1
 benchmarking/v2
+benchmarking/v3_17_images_testing
+benchmarking/v4
