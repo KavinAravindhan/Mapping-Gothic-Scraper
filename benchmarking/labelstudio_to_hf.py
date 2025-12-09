@@ -314,7 +314,8 @@ def parse_label_studio_annotations(json_data: List[Dict[str, Any]]) -> Dataset:
 
 
 def main():    
-    input_file = '/home/kr3131/Mapping-Gothic-Scraper/benchmarking/export_197277_project-197277-at-2025-11-17-18-59-c7e831d2.json'
+    # input_file = '/home/kr3131/Mapping-Gothic-Scraper/benchmarking/1_export_197277_project-197277-at-2025-11-17-18-59-c7e831d2.json'
+    input_file = '/home/kr3131/Mapping-Gothic-Scraper/benchmarking/2_export_197277_project-197277-at-2025-12-08-13-27-56f90eae.json'
     
     print(f"Loading Label Studio annotations from {input_file}...")
     with open(input_file, 'r', encoding='utf-8') as f:
@@ -344,20 +345,21 @@ def main():
     print(df['data_type'].value_counts())
     
     # Save dataset locally first
-    output_dir = 'benchmarking/v4/architecture_annotations_hf_dataset'
+    # output_dir = 'benchmarking/v5/architecture_annotations_hf_dataset'
+    output_dir = '/mnt/swordfish-pool2/kavin/benchmarking/v5/architecture_annotations_to_hf'
     print(f"\nSaving dataset to '{output_dir}'...")
     dataset.save_to_disk(output_dir)
     print(f"Dataset saved!")
     
     # Export to CSV (without images)
-    csv_file = 'benchmarking/v4/architecture_annotations.csv'
+    csv_file = 'benchmarking/v5/architecture_annotations.csv'
     print(f"\nExporting to CSV '{csv_file}'...")
     df_no_images = df.drop(columns=['image'])
     df_no_images.to_csv(csv_file, index=False)
     print(f"CSV saved!")
     
     # Push to Hugging Face Hub
-    hub_repo = "kr3131/architecture-annotations"
+    hub_repo = "kr3131/architecture-annotations-v2"
     print(f"\n{'='*60}")
     print(f"Pushing to Hugging Face Hub: {hub_repo}")
     print(f"This may take several minutes due to image uploads...")

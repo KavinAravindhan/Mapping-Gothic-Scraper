@@ -1,0 +1,253 @@
+(mapping_gothic_scraper) kr3131@seahorse:~/Mapping-Gothic-Scraper$ python3 benchmarking/analyze_annotations.py
+
+Loading data from: /home/kr3131/Mapping-Gothic-Scraper/benchmarking/v5/architecture_annotations.csv
+Loaded 736 rows
+
+Bounding Box Category Analysis
+
+Total bounding boxes annotated: 630
+
+Visual Element Type Distribution:
+bbox_category
+other                    124
+ornament                 111
+arches                   102
+support members           99
+windows                   49
+construction material     45
+massing of space          33
+exterior                  33
+capital                   26
+plan                       6
+Name: count, dtype: int64
+
+Saved: bbox_category_distribution.png
+
+Subcategory Breakdown by Category:
+
+ornament (111 total):
+  - other: 73
+  - mosaic: 14
+  - inscription: 6
+  - tracery: 5
+  - minbar: 5
+  - mural: 2
+  - chandelier: 1
+
+arches (102 total):
+  - rounded: 74
+  - pointed: 17
+  - other: 10
+
+support members (99 total):
+  - dome: 24
+  - other: 22
+  - pier: 15
+  - buttresses: 15
+  - pendentive: 14
+  - column: 9
+
+windows (49 total):
+  - other: 15
+  - stained glass: 11
+  - mullioned: 11
+  - rounded: 11
+
+construction material (45 total):
+  - masonry: 21
+  - brickwork: 15
+  - other: 8
+  - spolia: 1
+
+massing of space (33 total):
+  - triforium: 12
+  - other: 9
+  - crossing: 4
+  - narthex: 2
+  - apse: 2
+  - choir: 2
+  - side aisles: 1
+  - nave: 1
+
+exterior (33 total):
+  - other: 20
+  - tower: 8
+  - spire: 2
+  - portals: 2
+
+capital (26 total):
+  - other: 19
+  - byzantine: 7
+
+plan (6 total):
+  - cruciform: 5
+  - other: 1
+
+Bounding Box Subcategory Analysis
+
+Subcategory Distribution (top 20):
+bbox_subcategory
+other            177
+rounded           85
+dome              24
+masonry           21
+pointed           17
+pier              15
+brickwork         15
+buttresses        15
+pendentive        14
+mosaic            14
+triforium         12
+stained glass     11
+mullioned         11
+column             9
+tower              8
+byzantine          7
+inscription        6
+cruciform          5
+tracery            5
+minbar             5
+Name: count, dtype: int64
+
+Saved: bbox_subcategory_distribution.png
+
+Architectural Style Analysis
+
+Number of unique buildings: 43
+
+Architectural Style Distribution:
+architectural_style_pretty
+English Gothic                 19
+Istanbul Byzantine             16
+Norman - English Romanesque     5
+Italianate Byzantine            1
+Venetian Renaissance            1
+Venetian Gothic                 1
+Name: count, dtype: int64
+
+Saved: architectural_style_distribution.png
+
+Bounding Box Size Analysis
+
+Bounding Box Size Statistics (% of image area):
+  Mean area: 448.26%
+  Median area: 125.90%
+  Min area: 0.48%
+  Max area: 9939.76%
+
+Saved: bbox_size_analysis.png
+
+Repeated Visual Elements Analysis
+
+Repeated Element Distribution:
+bbox_is_repeated
+Y    475
+N    139
+Name: count, dtype: int64
+
+Saved: repeated_elements_distribution.png
+
+Annotations per Building Analysis
+
+Bounding Boxes per Building:
+  Mean: 14.65
+  Median: 12.00
+  Min: 7
+  Max: 48
+
+Top 10 Buildings by Number of Annotations:
+building_name_pretty
+Southwell Minster    48
+Durham               34
+Hadleigh             30
+Miracoli             30
+Peterborough         28
+Winchester           25
+Norwich              22
+Wells                21
+Hagia Sophia         19
+Fethiye              18
+dtype: int64
+
+Saved: annotations_per_building.png
+
+Bounding Boxes per Image Analysis
+
+Bounding Boxes per Image Statistics:
+  Mean: 4.32
+  Median: 4.00
+  Min: 1
+  Max: 14
+
+Saved: bboxes_per_image.png
+
+Image Properties Analysis
+
+Total images: 251
+
+Images with Text:
+image_has_text
+N    197
+Y     49
+Name: count, dtype: int64
+
+Images Unique for Architectural Style:
+image_unique_for_style
+N    155
+Y     65
+Name: count, dtype: int64
+
+Saved: image_properties.png
+
+Summary Statistics Report
+DATASET SUMMARY REPORT
+============================================================
+
+OVERALL STATISTICS:
+  Total rows in dataset: 736
+  Data type breakdown:
+    - bbox: 630
+    - image: 106
+
+BUILDING-LEVEL STATISTICS:
+  Number of unique buildings: 43
+
+IMAGE-LEVEL STATISTICS:
+  Total images: 251
+  Average images per building: 5.84
+
+BOUNDING BOX STATISTICS:
+  Total bounding boxes: 630
+  Average bboxes per building: 14.65
+  Average bboxes per image: 2.51
+
+VISUAL ELEMENT CATEGORIES:
+  other: 124 (19.7%)
+  ornament: 111 (17.6%)
+  arches: 102 (16.2%)
+  support members: 99 (15.7%)
+  windows: 49 (7.8%)
+  construction material: 45 (7.1%)
+  massing of space: 33 (5.2%)
+  exterior: 33 (5.2%)
+  capital: 26 (4.1%)
+  plan: 6 (1.0%)
+
+============================================================
+Report generated on: 2025-12-09 17:50:17
+
+Saved: summary_report.txt
+
+All results saved to: /mnt/swordfish-pool2/kavin/benchmarking/v5/analysis/
+
+Generated files:
+  - annotations_per_building.png
+  - architectural_style_distribution.png
+  - bbox_category_distribution.png
+  - bbox_size_analysis.png
+  - bbox_subcategory_distribution.png
+  - bboxes_per_image.png
+  - image_properties.png
+  - repeated_elements_distribution.png
+  - summary_report.txt
+(mapping_gothic_scraper) kr3131@seahorse:~/Mapping-Gothic-Scraper$ 
