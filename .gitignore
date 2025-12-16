@@ -210,6 +210,7 @@ __marimo__/
 maps_output/
 maps_output_Oct23/
 *.zip
+terminal_outputs/
 
 # <changes: KAR> benchmarking files
 benchmarking/export_197277_project-197277-at-2025-11-17-18-59-c7e831d2.json

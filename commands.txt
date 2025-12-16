@@ -1,0 +1,3 @@
+watch -n 1 nvidia-smi
+
+nohup python3 evaluate_qwen3.py > z_evaluate_qwen.log 2>&1 &

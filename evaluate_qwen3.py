@@ -49,18 +49,18 @@ class Config:
     # TOP_P = 0.95
 
     # Generation settings - OPTIMIZED FOR SPEED
-    MAX_NEW_TOKENS = 256  # Reduced from 1024
+    # MAX_NEW_TOKENS = 256  # Reduced from 1024
+    MAX_NEW_TOKENS = 1024
     USE_GREEDY = True     # Use greedy decoding for speed
     TEMPERATURE = 0.1     # Only used if USE_GREEDY=False
     TOP_P = 0.95          # Only used if USE_GREEDY=False
     
     # Environment setup
     HF_CACHE_DIR = "/mnt/swordfish-pool2/kavin/cache"
-    CUDA_DEVICE = "7"
+    CUDA_DEVICE = "2"
     
     # For labeled_arrows variant
     NUM_ARROW_SAMPLES = 15
-    RANDOM_SEED = 42
     
     # Output
     OUTPUT_DIR = None
@@ -618,7 +618,7 @@ def main():
     print(f"CUDA Device: {Config.CUDA_DEVICE}")
 
     # Validation warning
-    print("\n⚠️  IMPORTANT: Ensure grid configuration matches create_grid_overlay.py:")
+    print("\nIMPORTANT: Ensure grid configuration matches create_grid_overlay.py:")
     print(f"   - GRID_COLS = {Config.GRID_COLS}")
     print(f"   - GRID_ROWS = {Config.GRID_ROWS}")
     print()
@@ -681,5 +681,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# nohup python3 evaluate_qwen3.py > z_evaluate_qwen.log 2>&1 &
