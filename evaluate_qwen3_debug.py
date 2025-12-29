@@ -1,17 +1,19 @@
-# evaluate_gpt5.py
+# evaluate_qwen3_debug.py
 
 import os
 import sys
 import functools
 import json
-import base64
 import pandas as pd
 import numpy as np
 from pathlib import Path
+from PIL import Image, ImageDraw, ImageFont
+import random
+import torch
 from datetime import datetime
+from transformers import Qwen3VLForConditionalGeneration, Qwen3VLMoeForConditionalGeneration, AutoProcessor
 from tqdm import tqdm
-import time
-import argparse
+import re
 
 class Config:
     
@@ -20,14 +22,13 @@ class Config:
     SINGLE_BUILDING_NAME = "Beaumont-sur-Oise-Eglise-Saint-Leonor"
     
     # Debug settings
-    DEBUG_MODE = False  # Set to True to print batch info
-
-    DRY_RUN = False  # Set by command line
+    DEBUG_MODE = False  # Set to True to print first few responses
+    DEBUG_SAMPLES = 3   # Number of responses to print in debug mode
     
     # Paths
     SOURCE_BASE_PATH = "/mnt/swordfish-pool2/kavin/maps_output"  # Original building data
     GRIDDED_BASE_PATH = "/mnt/swordfish-pool2/kavin/maps_output_analysis/grids_floorplan"  # Gridded floorplans
-    OUTPUT_BASE_PATH = "/mnt/swordfish-pool2/kavin/maps_output_analysis/gpt_evaluation"  # Results
+    OUTPUT_BASE_PATH = "/mnt/swordfish-pool2/kavin/maps_output_analysis/qwen_evaluation"  # Results
     
     # Grid configuration
     GRID_SIZES = [10]  # List of grid sizes to evaluate: [10, 15, 20]
@@ -39,82 +40,75 @@ class Config:
     PROMPT_TYPE = "zero_shot"
     
     # Model Options
-    MODEL_VARIANT = "gpt-5-mini"  # Options: "gpt-5.1", "gpt-5", "gpt-5-mini", "gpt-5-nano"
+    MODEL_VARIANT = "qwen3-vl-8b-instruct"
     
     # Model configuration
     MODEL_CONFIGS = {
-        "gpt-5.1": {
-            "model_name": "gpt-5.1",
-            "display_name": "GPT-5.1",
-            "reasoning_effort": "low",
-            "verbosity": "medium"
+        "qwen3-vl-32b-thinking": {
+            "model_name": "Qwen/Qwen3-VL-32B-Thinking",
+            "model_class": Qwen3VLMoeForConditionalGeneration,
+            "display_name": "Qwen3-VL-32B-Thinking"
         },
-        "gpt-5": {
-            "model_name": "gpt-5",
-            "display_name": "GPT-5",
-            "reasoning_effort": "low",
-            "verbosity": "medium"
+        "qwen3-vl-8b-thinking": {
+            "model_name": "Qwen/Qwen3-VL-8B-Thinking",
+            "model_class": Qwen3VLForConditionalGeneration,
+            "display_name": "Qwen3-VL-8B-Thinking"
         },
-        "gpt-5-mini": {
-            "model_name": "gpt-5-mini",
-            "display_name": "GPT-5-Mini",
-            "reasoning_effort": "low",
-            "verbosity": "low"
+        "qwen3-vl-32b-instruct": {
+            "model_name": "Qwen/Qwen3-VL-32B-Instruct",
+            "model_class": Qwen3VLMoeForConditionalGeneration,
+            "display_name": "Qwen3-VL-32B-Instruct"
         },
-        "gpt-5-nano": {
-            "model_name": "gpt-5-nano",
-            "display_name": "GPT-5-Nano",
-            "reasoning_effort": "low",
-            "verbosity": "low"
+        "qwen3-vl-8b-instruct": {
+            "model_name": "Qwen/Qwen3-VL-8B-Instruct",
+            "model_class": Qwen3VLForConditionalGeneration,
+            "display_name": "Qwen3-VL-8B-Instruct"
         }
     }
     
-    # API settings
-    OPENAI_API_KEY = None  # Will be loaded from .env
-    MAX_OUTPUT_TOKENS = 512  # Matched to Qwen's MAX_NEW_TOKENS
+    # Generation settings - OPTIMIZED FOR BEST PERFORMANCE
+    MAX_NEW_TOKENS = 512  # Balanced for speed and completeness
+    USE_GREEDY = True     # Deterministic output
+    TEMPERATURE = 0.1     # Only used if USE_GREEDY=False
+    TOP_P = 0.95          # Only used if USE_GREEDY=False
     
-    # Batch settings
-    COMPLETION_WINDOW = "24h"
-    BATCH_CHECK_INTERVAL = 60  # seconds
+    # Environment setup
+    HF_CACHE_DIR = "/mnt/swordfish-pool2/kavin/cache"
+    CUDA_DEVICE = "7"
+    
+    # For labeled_arrows variant
+    NUM_ARROW_SAMPLES = 15
     
     # Runtime
     TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
-    
-    @classmethod
-    def load_env(cls):
-        """Load environment variables from .env file"""
-        env_path = Path(".env")
-        if env_path.exists():
-            with open(env_path) as f:
-                for line in f:
-                    line = line.strip()
-                    if line and not line.startswith('#') and '=' in line:
-                        key, value = line.split('=', 1)
-                        value = value.strip().strip('"').strip("'")  # Remove quotes
-                        os.environ[key.strip()] = value
-        
-        cls.OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-        if not cls.OPENAI_API_KEY:
-            raise ValueError("OPENAI_API_KEY not found in environment or .env file")
+    OUTPUT_DIR = None
     
     @classmethod
     def get_building_source_dir(cls, building_name):
         """Get source directory for building data"""
+        print(f"DEBUG: get_building_source_dir({building_name})")
+        sys.stdout.flush()
         return f"{cls.SOURCE_BASE_PATH}/{building_name}"
     
     @classmethod
     def get_gridded_floorplan_path(cls, building_name, grid_size):
         """Get path to gridded floorplan"""
+        print(f"DEBUG: get_gridded_floorplan_path({building_name}, {grid_size})")
+        sys.stdout.flush()
         return f"{cls.GRIDDED_BASE_PATH}/grid_size_{grid_size}/{building_name}_floorplan_gridded.jpg"
     
     @classmethod
     def get_ground_truth_csv_path(cls, building_name, grid_size):
         """Get path to pre-computed ground truth CSV"""
+        print(f"DEBUG: get_ground_truth_csv_path({building_name}, {grid_size})")
+        sys.stdout.flush()
         return f"{cls.GRIDDED_BASE_PATH}/grid_size_{grid_size}_ground_truth/{building_name}_ground_truth.csv"
     
     @classmethod
     def setup_output_dir(cls, grid_size=None, building_name=None):
         """Setup output directory structure"""
+        print(f"DEBUG: setup_output_dir(grid_size={grid_size}, building_name={building_name})")
+        sys.stdout.flush()
         base_dir = f"{cls.OUTPUT_BASE_PATH}/{cls.TIMESTAMP}"
         
         if grid_size is not None:
@@ -128,18 +122,21 @@ class Config:
     
     @classmethod
     def get_model_config(cls):
+        print(f"DEBUG: get_model_config()")
+        sys.stdout.flush()
         return cls.MODEL_CONFIGS[cls.MODEL_VARIANT]
 
-def parse_args():
-    parser = argparse.ArgumentParser(description="GPT-5 Spatial Localization Evaluation")
-    parser.add_argument('--dry-run', action='store_true', 
-                       help='Prepare batches but do not submit to API')
-    return parser.parse_args()
+# Set environment variables
+os.environ['HF_HOME'] = Config.HF_CACHE_DIR
+os.environ["CUDA_VISIBLE_DEVICES"] = Config.CUDA_DEVICE
 
-# ==================== HELPER FUNCTIONS ====================
 
 def generate_column_label(col_index, num_cols):
-    """Generate column label for a given index (A, B, C, ..., Z, AA, AB, ...)"""
+    """
+    Generate column label for a given index (A, B, C, ..., Z, AA, AB, ...)
+    Matches the logic in create_grid_overlay.py
+    """
+    # Note: Not adding debug here as this is called frequently
     if col_index >= num_cols:
         col_index = num_cols - 1
     
@@ -155,10 +152,17 @@ def generate_column_label(col_index, num_cols):
 
 
 def validate_building_folder(building_name):
-    """Validate that a building folder has all required files"""
+    """
+    Validate that a building folder has all required files
+    Returns (is_valid, missing_items)
+    """
+    print(f"DEBUG: validate_building_folder({building_name})")
+    sys.stdout.flush()
+    
     building_dir = Config.get_building_source_dir(building_name)
     missing_items = []
     
+    # Check for required items
     required_items = {
         'images': os.path.join(building_dir, 'images'),
         'floorplan': os.path.join(building_dir, f'{building_name}_floorplan.jpg'),
@@ -175,7 +179,13 @@ def validate_building_folder(building_name):
 
 
 def get_all_buildings():
-    """Get list of all building folders and validate them"""
+    """
+    Get list of all building folders and validate them
+    Returns (valid_buildings, invalid_buildings_info)
+    """
+    print(f"DEBUG: get_all_buildings()")
+    sys.stdout.flush()
+    
     if not os.path.exists(Config.SOURCE_BASE_PATH):
         print(f"ERROR: Source path does not exist: {Config.SOURCE_BASE_PATH}")
         sys.stdout.flush()
@@ -197,63 +207,79 @@ def get_all_buildings():
     
     return valid_buildings, invalid_buildings
 
-def validate_building_for_grid(building_name, grid_size):
-    """
-    Validate that a building has all required files for a specific grid size
-    Returns (is_valid, reason)
-    """
-    # Check gridded floorplan
-    floor_map_path = Config.get_gridded_floorplan_path(building_name, grid_size)
-    if not os.path.exists(floor_map_path):
-        return False, "missing_gridded_floorplan"
-    
-    # Check ground truth CSV
-    ground_truth_path = Config.get_ground_truth_csv_path(building_name, grid_size)
-    if not os.path.exists(ground_truth_path):
-        return False, "missing_ground_truth_csv"
-    
-    # Check images folder exists and is not empty
-    building_dir = Config.get_building_source_dir(building_name)
-    images_dir = os.path.join(building_dir, 'images')
-    
-    if not os.path.exists(images_dir):
-        return False, "missing_images_folder"
-    
-    image_files = [f for f in os.listdir(images_dir) if f.endswith(('.jpg', '.jpeg', '.png'))]
-    if len(image_files) == 0:
-        return False, "empty_images_folder"
-    
-    return True, None
-
 
 def load_ground_truth(building_name, grid_size):
     """Load pre-computed ground truth CSV for specific grid size"""
+    print(f"DEBUG: load_ground_truth({building_name}, {grid_size})")
+    sys.stdout.flush()
+    
     ground_truth_csv_path = Config.get_ground_truth_csv_path(building_name, grid_size)
+    
+    print(f"DEBUG: Checking if ground truth CSV exists: {ground_truth_csv_path}")
+    sys.stdout.flush()
     
     if not os.path.exists(ground_truth_csv_path):
         raise FileNotFoundError(f"Ground truth CSV not found: {ground_truth_csv_path}")
     
+    print(f"DEBUG: Reading ground truth CSV...")
+    sys.stdout.flush()
+    
+    # Load pre-computed ground truth
     df = pd.read_csv(ground_truth_csv_path)
     
+    print(f"DEBUG: Loaded {len(df)} rows from ground truth CSV")
+    sys.stdout.flush()
+    
+    # Validate required columns
     required_columns = ['image_id', 'grid_cell', 'direction']
     missing_columns = [col for col in required_columns if col not in df.columns]
     
     if missing_columns:
         raise ValueError(f"Ground truth CSV missing required columns: {missing_columns}")
     
+    print(f"DEBUG: Ground truth validation complete")
+    sys.stdout.flush()
+    
     return df
 
 
-def encode_image_to_base64(image_path):
-    """Encode image to base64 string for API"""
-    with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode('utf-8')
+def calculate_grid_distance(pred_cell, true_cell):
+    """Calculate Manhattan distance between two grid cells"""
+    # Note: Not adding debug here as this is called frequently
+    if not pred_cell or len(pred_cell) < 2:
+        return None
+    
+    try:
+        pred_col = ord(pred_cell[0].upper()) - 65
+        pred_row = int(pred_cell[1:]) - 1
+        true_col = ord(true_cell[0].upper()) - 65
+        true_row = int(true_cell[1:]) - 1
+        
+        return abs(pred_col - true_col) + abs(pred_row - true_row)
+    except:
+        return None
 
 
-# ==================== PROMPTS - MATCHING QWEN ====================
+def calculate_direction_distance(pred_dir, true_dir):
+    """Calculate angular distance between two directions (in degrees)"""
+    # Note: Not adding debug here as this is called frequently
+    direction_angles = {
+        'E': 0, 'NE': 45, 'N': 90, 'NW': 135,
+        'W': 180, 'SW': 225, 'S': 270, 'SE': 315
+    }
+    
+    if pred_dir not in direction_angles or true_dir not in direction_angles:
+        return None
+    
+    angle_diff = abs(direction_angles[pred_dir] - direction_angles[true_dir])
+    return min(angle_diff, 360 - angle_diff)
+
 
 def get_zero_shot_prompt(grid_size, task_variant):
-    """Generate zero-shot prompt with Gothic architecture context (matches Qwen)"""
+    """Generate zero-shot prompt with Gothic architecture context"""
+    print(f"DEBUG: get_zero_shot_prompt(grid_size={grid_size}, task_variant={task_variant})")
+    sys.stdout.flush()
+    
     if task_variant == "grid_direction":
         last_col = generate_column_label(grid_size - 1, grid_size)
         
@@ -354,7 +380,10 @@ Now analyze the images and provide your answer in the exact format above. You MU
 
 
 def get_few_shot_prompt(grid_size, task_variant):
-    """Generate few-shot prompt with Gothic architecture examples (matches Qwen)"""
+    """Generate few-shot prompt with Gothic architecture examples"""
+    print(f"DEBUG: get_few_shot_prompt(grid_size={grid_size}, task_variant={task_variant})")
+    sys.stdout.flush()
+    
     if task_variant == "grid_direction":
         last_col = generate_column_label(grid_size - 1, grid_size)
         
@@ -441,223 +470,130 @@ ARROW_LABEL: [Letter]
 You MUST provide both fields even if uncertain."""
 
 
-# ==================== BATCH API FUNCTIONS ====================
-
-def prepare_batch_requests_for_building(building_name, grid_size, ground_truth_df):
-    """Prepare batch requests for a single building"""
-    building_dir = Config.get_building_source_dir(building_name)
-    floor_map_path = Config.get_gridded_floorplan_path(building_name, grid_size)
-    
-    if not os.path.exists(floor_map_path):
-        raise FileNotFoundError(f"Gridded floorplan not found: {floor_map_path}")
-    
-    # Encode floor map once (shared across all images in this building)
-    floor_map_base64 = encode_image_to_base64(floor_map_path)
-    
-    # Get prompt
-    if Config.PROMPT_TYPE == "zero_shot":
-        prompt_text = get_zero_shot_prompt(grid_size, Config.TASK_VARIANT)
-    else:
-        prompt_text = get_few_shot_prompt(grid_size, Config.TASK_VARIANT)
-    
-    # Get model config
-    model_config = Config.get_model_config()
-    
-    # Prepare requests
-    batch_requests = []
-    images_dir = os.path.join(building_dir, 'images')
-    
-    for idx, row in ground_truth_df.iterrows():
-        image_path = os.path.join(images_dir, f"{row['image_id']}.jpg")
-        
-        if not os.path.exists(image_path):
-            print(f"Warning: Image not found: {image_path}")
-            sys.stdout.flush()
-            continue
-        
-        # Encode image
-        image_base64 = encode_image_to_base64(image_path)
-        
-        # Responses API format
-        request = {
-            "custom_id": f"{building_name}|{row['image_id']}",
-            "method": "POST",
-            "url": "/v1/responses",
-            "body": {
-                "model": model_config['model_name'],
-                "input": [
-                    {
-                        "type": "message",
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "input_text",
-                                "text": prompt_text
-                            },
-                            {
-                                "type": "input_image",
-                                "image_url": f"data:image/jpeg;base64,{floor_map_base64}"
-                            },
-                            {
-                                "type": "input_image",
-                                "image_url": f"data:image/jpeg;base64,{image_base64}"
-                            }
-                        ]
-                    }
-                ],
-                "reasoning": {
-                    "effort": model_config['reasoning_effort']
-                },
-                "text": {
-                    "verbosity": model_config['verbosity']
-                },
-                "max_output_tokens": Config.MAX_OUTPUT_TOKENS
-            }
-        }
-        
-        batch_requests.append(request)
-    
-    return batch_requests
-
-
-def save_batch_file(requests, output_dir, building_name, grid_size):
-    """Save batch requests to JSONL file"""
-    filename = f"batch_grid_size_{grid_size}.jsonl"
-    filepath = os.path.join(output_dir, filename)
-    
-    with open(filepath, 'w') as f:
-        for request in requests:
-            f.write(json.dumps(request) + '\n')
-    
-    if Config.DEBUG_MODE:
-        print(f"Saved {len(requests)} requests to {filepath}")
-        sys.stdout.flush()
-    
-    return filepath
-
-
-def submit_batch(batch_filepath, building_name, grid_size):
-    """Submit batch file to OpenAI API"""
-    from openai import OpenAI
-    
-    client = OpenAI(api_key=Config.OPENAI_API_KEY)
-    
-    print(f"Submitting batch for {building_name} (grid {grid_size}x{grid_size})...")
+def load_model_and_processor():
+    """Load Qwen3-VL model and processor"""
+    print(f"DEBUG: load_model_and_processor()")
     sys.stdout.flush()
     
-    # Upload file
-    with open(batch_filepath, 'rb') as f:
-        batch_file = client.files.create(
-            file=f,
-            purpose='batch'
-        )
+    model_config = Config.get_model_config()
+    model_name = model_config["model_name"]
+    model_class = model_config["model_class"]
     
-    # Create batch
-    batch = client.batches.create(
-        input_file_id=batch_file.id,
-        endpoint='/v1/responses',
-        completion_window=Config.COMPLETION_WINDOW
+    print(f"\nLoading {model_config['display_name']}...")
+    print(f"Model path: {model_name}")
+    print(f"Cache directory: {Config.HF_CACHE_DIR}")
+    sys.stdout.flush()
+    
+    print(f"DEBUG: Loading model from pretrained...")
+    sys.stdout.flush()
+    
+    # Load model
+    model = model_class.from_pretrained(
+        model_name,
+        dtype="auto",
+        device_map="auto",
+        cache_dir=Config.HF_CACHE_DIR
     )
     
-    print(f"Batch submitted: {batch.id}")
+    print(f"DEBUG: Loading processor...")
     sys.stdout.flush()
     
-    return batch.id
-
-
-def check_batch_status(batch_id):
-    """Check status of a batch job"""
-    from openai import OpenAI
+    # Load processor
+    processor = AutoProcessor.from_pretrained(
+        model_name,
+        cache_dir=Config.HF_CACHE_DIR
+    )
     
-    client = OpenAI(api_key=Config.OPENAI_API_KEY)
-    batch = client.batches.retrieve(batch_id)
-    return batch
-
-def get_batch_errors(batch_id):
-    """Get error details from a failed batch"""
-    from openai import OpenAI
-    client = OpenAI(api_key=Config.OPENAI_API_KEY)
-    batch = client.batches.retrieve(batch_id)
-    
-    if hasattr(batch, 'errors') and batch.errors:
-        print(f"Batch errors: {batch.errors}")
-    
-    return batch
-
-
-def wait_for_batch_completion(batch_id, building_name):
-    """Wait for batch to complete with progress updates"""
-    from openai import OpenAI
-    
-    client = OpenAI(api_key=Config.OPENAI_API_KEY)
-    
-    print(f"Waiting for batch {batch_id} ({building_name}) to complete...")
+    print(f"Model loaded successfully")
+    print(f"  Device: {model.device}")
+    print(f"  Dtype: {model.dtype}")
     sys.stdout.flush()
     
-    while True:
-        batch = client.batches.retrieve(batch_id)
-        
-        if batch.status == 'completed':
-            print(f"Batch {batch_id} completed")
-            sys.stdout.flush()
-            return batch
-        elif batch.status in ['failed', 'expired', 'cancelled']:
-            print(f"Batch {batch_id} {batch.status}")
-            get_batch_errors(batch_id)
-            sys.stdout.flush()
-            return None
-        
-        # Print progress if available
-        if hasattr(batch, 'request_counts'):
-            counts = batch.request_counts
-            print(f"Progress: {counts.completed}/{counts.total} completed")
-            sys.stdout.flush()
-        
-        time.sleep(Config.BATCH_CHECK_INTERVAL)
+    return model, processor
 
 
-def download_batch_results(batch_id, output_dir):
-    """Download results from a completed batch"""
-    from openai import OpenAI
-    
-    client = OpenAI(api_key=Config.OPENAI_API_KEY)
-    
-    batch = client.batches.retrieve(batch_id)
-    
-    if batch.status != 'completed':
-        print(f"Batch not completed. Status: {batch.status}")
-        sys.stdout.flush()
-        return None
-    
-    # Download results
-    result_file_id = batch.output_file_id
-    result_content = client.files.content(result_file_id)
-    
-    # Save to file
-    output_filename = f"batch_results_{batch_id}.jsonl"
-    output_path = os.path.join(output_dir, output_filename)
-    
-    with open(output_path, 'wb') as f:
-        f.write(result_content.content)
-    
-    print(f"Results downloaded: {output_path}")
+def run_inference(model, processor, floor_plan_path, photo_path, prompt_text):
+    """Run inference on a single image pair"""
+    print(f"DEBUG: run_inference(floor_plan={floor_plan_path}, photo={photo_path})")
     sys.stdout.flush()
     
-    return output_path
+    print(f"DEBUG: Preparing messages...")
+    sys.stdout.flush()
+    
+    # Prepare messages with two images
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": prompt_text},
+                {"type": "image", "image": floor_plan_path},
+                {"type": "image", "image": photo_path},
+            ],
+        }
+    ]
+    
+    print(f"DEBUG: Applying chat template...")
+    sys.stdout.flush()
+    
+    # Prepare inputs
+    inputs = processor.apply_chat_template(
+        messages,
+        tokenize=True,
+        add_generation_prompt=True,
+        return_dict=True,
+        return_tensors="pt"
+    )
+    inputs = inputs.to(model.device)
+    
+    print(f"DEBUG: Running model.generate()...")
+    sys.stdout.flush()
+    
+    # Generate with optimized settings
+    with torch.no_grad():
+        if Config.USE_GREEDY:
+            generated_ids = model.generate(
+                **inputs,
+                max_new_tokens=Config.MAX_NEW_TOKENS,
+                do_sample=False,
+            )
+        else:
+            generated_ids = model.generate(
+                **inputs,
+                max_new_tokens=Config.MAX_NEW_TOKENS,
+                temperature=Config.TEMPERATURE,
+                top_p=Config.TOP_P,
+                do_sample=True
+            )
+    
+    print(f"DEBUG: Decoding output...")
+    sys.stdout.flush()
+    
+    # Decode
+    generated_ids_trimmed = [
+        out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
+    ]
+    output_text = processor.batch_decode(
+        generated_ids_trimmed,
+        skip_special_tokens=True,
+        clean_up_tokenization_spaces=False
+    )[0]
+    
+    print(f"DEBUG: Inference complete, output length: {len(output_text)}")
+    sys.stdout.flush()
+    
+    return output_text
 
-
-# ==================== RESPONSE PARSING ====================
 
 def extract_structured_answer(response_text, task_variant):
-    """Extract answer using multiple strategies with robust parsing (matches Qwen)"""
-    import re
-    
+    """Extract answer using multiple strategies with robust parsing"""
+    # Note: Not adding debug here as this is called frequently
     result = {
         'reasoning': '',
         'grid_cell': None,
         'direction': None,
         'arrow_label': None,
-        'raw_response': response_text
+        'raw_response': response_text,
+        'thinking': ''
     }
     
     # Strategy 1: Look for exact format (case-insensitive)
@@ -696,7 +632,7 @@ def extract_structured_answer(response_text, task_variant):
             for col, row in reversed(matches):
                 try:
                     row_num = int(row)
-                    if row_num >= 1:
+                    if row_num >= 1:  # Valid row number
                         result['grid_cell'] = f"{col}{row}"
                         break
                 except ValueError:
@@ -742,91 +678,171 @@ def extract_structured_answer(response_text, task_variant):
     return result
 
 
-def process_batch_results(results_file, ground_truth_df):
-    """Process results from batch API"""
+def validate_extraction(result, task_variant):
+    """Validate that all required fields were extracted"""
+    # Note: Not adding debug here as this is called frequently
+    missing_fields = []
+    
+    if task_variant == "grid_direction":
+        if not result['grid_cell']:
+            missing_fields.append('GRID_CELL')
+        if not result['direction']:
+            missing_fields.append('DIRECTION')
+    elif task_variant == "labeled_arrows":
+        if not result['arrow_label']:
+            missing_fields.append('ARROW_LABEL')
+    
+    if not result['reasoning']:
+        missing_fields.append('REASONING')
+    
+    return missing_fields
+
+
+def parse_response(response_text, task_variant):
+    """Parse model response to extract predictions"""
+    # Note: Not adding debug here as this is called frequently
+    return extract_structured_answer(response_text, task_variant)
+
+
+def evaluate_building(building_name, grid_size, model, processor):
+    """
+    Evaluate a single building with a specific grid size
+    Returns (metrics, predictions_list) or (None, None) if error
+    """
+    print(f"DEBUG: evaluate_building({building_name}, {grid_size})")
+    sys.stdout.flush()
+    
+    print(f"\n{'='*60}")
+    print(f"Building: {building_name}")
+    print(f"Grid Size: {grid_size}x{grid_size}")
+    print(f"{'='*60}")
+    sys.stdout.flush()
+    
+    # Load ground truth
+    try:
+        print(f"DEBUG: Loading ground truth...")
+        sys.stdout.flush()
+        ground_truth_df = load_ground_truth(building_name, grid_size)
+        print(f"Loaded {len(ground_truth_df)} images with ground truth")
+        sys.stdout.flush()
+    except Exception as e:
+        print(f"ERROR loading ground truth: {e}")
+        sys.stdout.flush()
+        return None, None
+    
+    print(f"DEBUG: Getting gridded floorplan path...")
+    sys.stdout.flush()
+    
+    # Get gridded floorplan path
+    floor_map_path = Config.get_gridded_floorplan_path(building_name, grid_size)
+    
+    if not os.path.exists(floor_map_path):
+        print(f"ERROR: Gridded floorplan not found: {floor_map_path}")
+        sys.stdout.flush()
+        return None, None
+    
+    print(f"DEBUG: Getting prompt text...")
+    sys.stdout.flush()
+    
+    # Get prompt
+    if Config.PROMPT_TYPE == "zero_shot":
+        prompt_text = get_zero_shot_prompt(grid_size, Config.TASK_VARIANT)
+    else:
+        prompt_text = get_few_shot_prompt(grid_size, Config.TASK_VARIANT)
+    
+    print(f"DEBUG: Setting up images directory...")
+    sys.stdout.flush()
+    
+    # Get images directory
+    building_dir = Config.get_building_source_dir(building_name)
+    images_dir = os.path.join(building_dir, 'images')
+    
+    # Run inference
     predictions = []
     
-    with open(results_file, 'r') as f:
-        for line in f:
-            result = json.loads(line)
-            
-            # Extract custom_id: "building_name|image_id"
-            custom_id = result['custom_id']
-            parts = custom_id.split('|')
-            if len(parts) != 2:
-                continue
-            
-            building_name, image_id = parts
-            
-            # Extract response
-            if result['response']['status_code'] == 200:
-                body = result['response']['body']
-                
-                # Handle Responses API output format
-                response_text = ""
-                if 'output' in body:
-                    for output_item in body['output']:
-                        if output_item.get('type') == 'message':
-                            for content_item in output_item.get('content', []):
-                                if content_item.get('type') == 'output_text':
-                                    response_text += content_item.get('text', '')
-                elif 'choices' in body:
-                    response_text = body['choices'][0]['message']['content']
-                else:
-                    response_text = str(body)
-                
-                parsed = extract_structured_answer(response_text, Config.TASK_VARIANT)
-                parsed['image_id'] = image_id
-                parsed['custom_id'] = custom_id
-                
-                # Add ground truth
-                gt_row = ground_truth_df[ground_truth_df['image_id'] == image_id]
-                if not gt_row.empty:
-                    parsed['ground_truth_cell'] = gt_row.iloc[0]['grid_cell']
-                    parsed['ground_truth_direction'] = gt_row.iloc[0]['direction']
-                
-                predictions.append(parsed)
-            else:
-                print(f"Error for {custom_id}: {result['response']['status_code']}")
-                sys.stdout.flush()
+    # Disable tqdm progress bar for background execution
+    disable_tqdm = not sys.stdout.isatty()
     
-    return predictions
-
-
-# ==================== METRICS CALCULATION ====================
-
-def calculate_grid_distance(pred_cell, true_cell):
-    """Calculate Manhattan distance between two grid cells"""
-    if not pred_cell or len(pred_cell) < 2:
-        return None
+    print(f"Starting inference on {len(ground_truth_df)} images...")
+    sys.stdout.flush()
     
-    try:
-        pred_col = ord(pred_cell[0].upper()) - 65
-        pred_row = int(pred_cell[1:]) - 1
-        true_col = ord(true_cell[0].upper()) - 65
-        true_row = int(true_cell[1:]) - 1
+    for idx, row in tqdm(ground_truth_df.iterrows(), total=len(ground_truth_df), 
+                         desc=f"Processing {building_name}", leave=False, disable=disable_tqdm):
+        image_path = os.path.join(images_dir, f"{row['image_id']}.jpg")
         
-        return abs(pred_col - true_col) + abs(pred_row - true_row)
-    except:
-        return None
-
-
-def calculate_direction_distance(pred_dir, true_dir):
-    """Calculate angular distance between two directions (in degrees)"""
-    direction_angles = {
-        'E': 0, 'NE': 45, 'N': 90, 'NW': 135,
-        'W': 180, 'SW': 225, 'S': 270, 'SE': 315
-    }
+        if not os.path.exists(image_path):
+            print(f"Warning: Image not found: {image_path}")
+            sys.stdout.flush()
+            continue
+        
+        try:
+            # Run inference
+            output_text = run_inference(model, processor, floor_map_path, image_path, prompt_text)
+            
+            # Parse response
+            parsed = parse_response(output_text, Config.TASK_VARIANT)
+            
+            # Validate extraction
+            missing_fields = validate_extraction(parsed, Config.TASK_VARIANT)
+            if missing_fields and Config.DEBUG_MODE:
+                print(f"Image {row['image_id']}: Missing fields: {', '.join(missing_fields)}")
+                sys.stdout.flush()
+            
+            # Add debug output for first few samples
+            if Config.DEBUG_MODE and len(predictions) < Config.DEBUG_SAMPLES:
+                print(f"\n{'='*60}")
+                print(f"DEBUG - Image {row['image_id']}")
+                print(f"{'='*60}")
+                print(f"Raw Response:\n{output_text[:500]}...")
+                print(f"\nParsed:")
+                print(f"  GRID_CELL: {parsed.get('grid_cell')}")
+                print(f"  DIRECTION: {parsed.get('direction')}")
+                print(f"  REASONING: {parsed.get('reasoning')[:100]}...")
+                print(f"{'='*60}\n")
+                sys.stdout.flush()
+            
+            parsed['image_id'] = row['image_id']
+            parsed['ground_truth_cell'] = row['grid_cell']
+            parsed['ground_truth_direction'] = row['direction']
+            
+            predictions.append(parsed)
+            
+            # Print progress every 10 images when tqdm is disabled
+            if disable_tqdm and (len(predictions) % 10 == 0):
+                print(f"  Processed {len(predictions)}/{len(ground_truth_df)} images...")
+                sys.stdout.flush()
+            
+        except Exception as e:
+            print(f"\nError processing {row['image_id']}: {e}")
+            sys.stdout.flush()
+            predictions.append({
+                'image_id': row['image_id'],
+                'reasoning': '',
+                'grid_cell': None,
+                'direction': None,
+                'arrow_label': None,
+                'raw_response': f"ERROR: {str(e)}",
+                'ground_truth_cell': row['grid_cell'],
+                'ground_truth_direction': row['direction']
+            })
     
-    if pred_dir not in direction_angles or true_dir not in direction_angles:
-        return None
+    print(f"Completed inference on {len(predictions)} images")
+    sys.stdout.flush()
     
-    angle_diff = abs(direction_angles[pred_dir] - direction_angles[true_dir])
-    return min(angle_diff, 360 - angle_diff)
+    print(f"DEBUG: Calculating metrics...")
+    sys.stdout.flush()
+    
+    # Calculate metrics
+    metrics = calculate_metrics(predictions, Config.TASK_VARIANT)
+    
+    return metrics, predictions
 
 
-def calculate_metrics(predictions):
+def calculate_metrics(predictions, task_variant):
     """Calculate evaluation metrics from predictions"""
+    print(f"DEBUG: calculate_metrics(predictions_count={len(predictions)}, task_variant={task_variant})")
+    sys.stdout.flush()
+    
     metrics = {
         'total_samples': len(predictions),
         'grid_cell_accuracy': 0,
@@ -844,13 +860,10 @@ def calculate_metrics(predictions):
     direction_correct = 0
     
     for pred in predictions:
-        true_cell = pred.get('ground_truth_cell')
-        true_dir = pred.get('ground_truth_direction')
+        true_cell = pred['ground_truth_cell']
+        true_dir = pred['ground_truth_direction']
         pred_cell = pred.get('grid_cell')
         pred_dir = pred.get('direction')
-        
-        if not true_cell or not true_dir:
-            continue
         
         # Check if response is parseable
         if not pred_cell or not pred_dir:
@@ -894,11 +907,17 @@ def calculate_metrics(predictions):
         metrics['median_direction_distance'] = float(np.median(direction_distances))
         metrics['std_direction_distance'] = float(np.std(direction_distances))
     
+    print(f"DEBUG: Metrics calculation complete")
+    sys.stdout.flush()
+    
     return metrics
 
 
 def save_building_results(building_name, grid_size, metrics, predictions):
     """Save results for a single building"""
+    print(f"DEBUG: save_building_results({building_name}, {grid_size})")
+    sys.stdout.flush()
+    
     output_dir = Config.setup_output_dir(grid_size, building_name)
     
     model_config = Config.get_model_config()
@@ -917,16 +936,22 @@ def save_building_results(building_name, grid_size, metrics, predictions):
         'metrics': metrics
     }
     
+    print(f"DEBUG: Writing metrics to {metrics_file}")
+    sys.stdout.flush()
+    
     with open(metrics_file, 'w') as f:
         json.dump(full_metrics, f, indent=2)
     
     # Save predictions
     predictions_file = os.path.join(output_dir, 'predictions.json')
     
+    print(f"DEBUG: Writing predictions to {predictions_file}")
+    sys.stdout.flush()
+    
     with open(predictions_file, 'w') as f:
         json.dump(predictions, f, indent=2)
     
-    print(f"Results saved for {building_name} (grid {grid_size}x{grid_size})")
+    print(f"\nResults saved for {building_name} (grid {grid_size}x{grid_size}):")
     print(f"  Metrics: {metrics_file}")
     print(f"  Predictions: {predictions_file}")
     sys.stdout.flush()
@@ -935,11 +960,18 @@ def save_building_results(building_name, grid_size, metrics, predictions):
 
 
 def save_combined_results(all_results):
-    """Save combined results across all buildings and grid sizes"""
+    """
+    Save combined results across all buildings and grid sizes
+    all_results: dict[grid_size] -> list of (building_name, metrics)
+    """
+    print(f"DEBUG: save_combined_results(grid_sizes={list(all_results.keys())})")
+    sys.stdout.flush()
+    
     output_dir = Config.setup_output_dir()
     
     combined_file = os.path.join(output_dir, 'combined_results.json')
     
+    # Organize results
     combined_data = {
         'timestamp': Config.TIMESTAMP,
         'model_variant': Config.MODEL_VARIANT,
@@ -949,6 +981,7 @@ def save_combined_results(all_results):
         'summary': {}
     }
     
+    # Add results for each grid size
     for grid_size, building_results in all_results.items():
         grid_data = {
             'buildings': {},
@@ -970,6 +1003,7 @@ def save_combined_results(all_results):
         for building_name, metrics in building_results:
             grid_data['buildings'][building_name] = metrics
             
+            # Aggregate
             total_samples += metrics['total_samples']
             for key in all_metrics.keys():
                 if key in metrics:
@@ -989,10 +1023,14 @@ def save_combined_results(all_results):
         
         combined_data['grid_sizes'][f'grid_{grid_size}'] = grid_data
     
+    print(f"DEBUG: Writing combined results to {combined_file}")
+    sys.stdout.flush()
+    
+    # Save
     with open(combined_file, 'w') as f:
         json.dump(combined_data, f, indent=2)
     
-    print(f"Combined results saved: {combined_file}")
+    print(f"\nCombined results saved: {combined_file}")
     sys.stdout.flush()
     
     return combined_file
@@ -1000,6 +1038,9 @@ def save_combined_results(all_results):
 
 def print_summary(all_results):
     """Print summary of evaluation results"""
+    print(f"DEBUG: print_summary()")
+    sys.stdout.flush()
+    
     print(f"\n{'='*80}")
     print("EVALUATION SUMMARY")
     print(f"{'='*80}")
@@ -1009,6 +1050,7 @@ def print_summary(all_results):
         print(f"\nGrid Size: {grid_size}x{grid_size}")
         print(f"Buildings evaluated: {len(building_results)}")
         
+        # Aggregate metrics
         all_grid_acc = [m['grid_cell_accuracy'] for _, m in building_results]
         all_dir_acc = [m['direction_accuracy'] for _, m in building_results]
         all_exact_acc = [m['exact_match_accuracy'] for _, m in building_results]
@@ -1019,112 +1061,17 @@ def print_summary(all_results):
         sys.stdout.flush()
 
 
-# ==================== BUILDING EVALUATION ====================
-
-def evaluate_building(building_name, grid_size):
-    """Evaluate a single building with a specific grid size using batch API"""
-    print(f"\n{'='*60}")
-    print(f"Building: {building_name}")
-    print(f"Grid Size: {grid_size}x{grid_size}")
-    print(f"{'='*60}")
-    sys.stdout.flush()
-    
-    # Load ground truth
-    try:
-        ground_truth_df = load_ground_truth(building_name, grid_size)
-        print(f"Loaded {len(ground_truth_df)} images with ground truth")
-        sys.stdout.flush()
-    except Exception as e:
-        print(f"ERROR loading ground truth: {e}")
-        sys.stdout.flush()
-        return None, None
-    
-    # Setup output directory
-    output_dir = Config.setup_output_dir(grid_size, building_name)
-    
-    # Prepare batch requests
-    try:
-        batch_requests = prepare_batch_requests_for_building(
-            building_name, grid_size, ground_truth_df
-        )
-        print(f"Prepared {len(batch_requests)} batch requests")
-        sys.stdout.flush()
-    except Exception as e:
-        print(f"ERROR preparing batch: {e}")
-        sys.stdout.flush()
-        return None, None
-    
-    # Save batch file
-    batch_filepath = save_batch_file(batch_requests, output_dir, building_name, grid_size)
-    
-    # Submit batch (skip if dry-run)
-    if Config.DRY_RUN:
-        print(f"DRY-RUN: Would submit batch file: {batch_filepath}")
-        sys.stdout.flush()
-        return None, None
-
-    try:
-        batch_id = submit_batch(batch_filepath, building_name, grid_size)
-    except Exception as e:
-        print(f"ERROR submitting batch: {e}")
-        sys.stdout.flush()
-        return None, None
-    
-    # Wait for completion
-    batch = wait_for_batch_completion(batch_id, building_name)
-    
-    if batch is None:
-        print(f"ERROR: Batch did not complete successfully")
-        sys.stdout.flush()
-        return None, None
-    
-    # Download results
-    results_file = download_batch_results(batch_id, output_dir)
-    
-    if results_file is None:
-        return None, None
-    
-    # Process results
-    predictions = process_batch_results(results_file, ground_truth_df)
-    
-    print(f"Processed {len(predictions)} predictions")
-    sys.stdout.flush()
-    
-    # Calculate metrics
-    metrics = calculate_metrics(predictions)
-    
-    # Save results
-    save_building_results(building_name, grid_size, metrics, predictions)
-    
-    # Print summary
-    print(f"\n{building_name} Results:")
-    print(f"  Total Samples: {metrics['total_samples']}")
-    print(f"  Unparseable: {metrics['unparseable_responses']}")
-    print(f"  Grid Cell Accuracy: {metrics['grid_cell_accuracy']:.2%}")
-    print(f"  Direction Accuracy: {metrics['direction_accuracy']:.2%}")
-    print(f"  Exact Match Accuracy: {metrics['exact_match_accuracy']:.2%}")
-    sys.stdout.flush()
-    
-    return metrics, predictions
-
-
-# ==================== MAIN ====================
-
 def main():
-    # Parse arguments
-    args = parse_args()
-    Config.DRY_RUN = args.dry_run
-    
     # Override print with auto-flush version
     global print
     print = functools.partial(print, flush=True)
+
+    print(f"DEBUG: main() starting")
+    sys.stdout.flush()
     
     print(f"{'='*80}")
-    print("GPT-5 EVALUATION")
+    print("QWEN3-VL EVALUATION")
     print(f"{'='*80}")
-    
-    # Load environment
-    Config.load_env()
     
     model_config = Config.get_model_config()
     
@@ -1135,106 +1082,75 @@ def main():
     print(f"  Prompt Type: {Config.PROMPT_TYPE}")
     print(f"  Grid Sizes: {Config.GRID_SIZES}")
     print(f"  Timestamp: {Config.TIMESTAMP}")
-    sys.stdout.flush()
     
     # Get buildings to process
     if Config.SINGLE_BUILDING_MODE:
         buildings_to_process = [Config.SINGLE_BUILDING_NAME]
         print(f"\nProcessing single building: {Config.SINGLE_BUILDING_NAME}")
-        sys.stdout.flush()
     else:
+        print(f"DEBUG: Getting all buildings...")
         valid_buildings, invalid_buildings = get_all_buildings()
         buildings_to_process = valid_buildings
         
         print(f"\nBuilding validation:")
         print(f"  Valid buildings: {len(valid_buildings)}")
         print(f"  Invalid buildings: {len(invalid_buildings)}")
-        sys.stdout.flush()
+        
+        if invalid_buildings:
+            print(f"\nInvalid buildings (missing items):")
+            for building, missing in list(invalid_buildings.items())[:10]:
+                print(f"  - {building}: {', '.join(missing)}")
+            if len(invalid_buildings) > 10:
+                print(f"  ... and {len(invalid_buildings) - 10} more")
+    
+    # Load model once
+    print(f"\n{'='*80}")
+    print(f"DEBUG: Loading model and processor...")
+    model, processor = load_model_and_processor()
     
     # Process each grid size
     all_results = {}
-    skip_summary = {}  # Track skipped buildings per grid size
     
     for grid_size in Config.GRID_SIZES:
         print(f"\n{'='*80}")
         print(f"PROCESSING GRID SIZE: {grid_size}x{grid_size}")
         print(f"{'='*80}")
-        sys.stdout.flush()
         
-        # Validate buildings for this grid size
-        print(f"\nValidating buildings for grid size {grid_size}...")
-        valid_for_grid = []
-        skipped_reasons = {}
-        
-        for building_name in buildings_to_process:
-            is_valid, reason = validate_building_for_grid(building_name, grid_size)
-            
-            if is_valid:
-                valid_for_grid.append(building_name)
-            else:
-                skipped_reasons[building_name] = reason
-        
-        print(f"  Valid: {len(valid_for_grid)}")
-        print(f"  Skipped: {len(skipped_reasons)}")
-        sys.stdout.flush()
-        
-        if skipped_reasons:
-            # Count skip reasons
-            reason_counts = {}
-            for reason in skipped_reasons.values():
-                reason_counts[reason] = reason_counts.get(reason, 0) + 1
-            
-            print(f"\n  Skip reasons:")
-            for reason, count in reason_counts.items():
-                print(f"    {reason}: {count}")
-            sys.stdout.flush()
-            
-            # Store for final summary
-            skip_summary[grid_size] = skipped_reasons
-        
-        # Process valid buildings
         grid_results = []
         
-        for building_name in valid_for_grid:
-            metrics, predictions = evaluate_building(building_name, grid_size)
+        for building_name in buildings_to_process:
+            print(f"DEBUG: Processing building: {building_name}")
+            metrics, predictions = evaluate_building(building_name, grid_size, model, processor)
             
             if metrics is not None:
+                # Save individual building results
+                save_building_results(building_name, grid_size, metrics, predictions)
                 grid_results.append((building_name, metrics))
+                
+                # Print building summary
+                print(f"\n{building_name} Results:")
+                print(f"  Total Samples: {metrics['total_samples']}")
+                print(f"  Unparseable: {metrics['unparseable_responses']}")
+                print(f"  Grid Cell Accuracy: {metrics['grid_cell_accuracy']:.2%}")
+                print(f"  Direction Accuracy: {metrics['direction_accuracy']:.2%}")
+                print(f"  Exact Match Accuracy: {metrics['exact_match_accuracy']:.2%}")
         
         all_results[grid_size] = grid_results
     
     # Save combined results
     if not Config.SINGLE_BUILDING_MODE:
+        print(f"DEBUG: Saving combined results...")
         save_combined_results(all_results)
     
     # Print final summary
     print_summary(all_results)
     
-    # Print skip summary
-    if skip_summary:
-        print(f"\n{'='*80}")
-        print("SKIPPED BUILDINGS SUMMARY")
-        print(f"{'='*80}")
-        for grid_size, skipped in skip_summary.items():
-            print(f"\nGrid Size {grid_size}x{grid_size}: {len(skipped)} skipped")
-            
-            # Group by reason
-            by_reason = {}
-            for building, reason in skipped.items():
-                by_reason.setdefault(reason, []).append(building)
-            
-            for reason, buildings in by_reason.items():
-                print(f"  {reason}: {len(buildings)}")
-                if Config.DEBUG_MODE and len(buildings) <= 5:
-                    for b in buildings:
-                        print(f"    - {b}")
-        sys.stdout.flush()
-    
     print(f"\n{'='*80}")
     print("EVALUATION COMPLETE")
     print(f"{'='*80}")
     print(f"Results saved in: {Config.OUTPUT_BASE_PATH}/{Config.TIMESTAMP}")
-    sys.stdout.flush()
+    
+    print(f"DEBUG: main() complete")
 
 
 if __name__ == "__main__":

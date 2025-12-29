@@ -1,3 +1,26 @@
 watch -n 1 nvidia-smi
 
+# Create Grid on the Floorplan
+python3 create_grid_overlay.py
+
+# Create Arrows on the Floorplan
+python3 visualize_arrows_floor_map_sampled.py
+
 nohup python3 evaluate_qwen3.py > z_evaluate_qwen.log 2>&1 &
+
+# unbuffered mode
+nohup python3 -u evaluate_qwen3.py > z_evaluate_qwen.log 2>&1 &
+
+export OPENAI_API_KEY="your-key-here"
+
+# Test without submitting
+python3 evaluate_gpt5.py --dry-run
+
+# Actually run
+python3 evaluate_gpt5.py
+
+nohup python3 evaluate_gpt5.py > z_evaluate_gpt.log 2>&1 &
+
+(mapping_gothic_scraper) kr3131@seahorse:~/Mapping-Gothic-Scraper$ nohup python3 evaluate_gpt5.py > z_evaluate_gpt.log 2>&1 &
+[1] 51584
+(mapping_gothic_scraper) kr3131@seahorse:~/Mapping-Gothic-Scraper$ 
