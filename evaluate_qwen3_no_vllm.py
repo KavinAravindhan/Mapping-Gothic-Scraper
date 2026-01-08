@@ -7,23 +7,19 @@ import json
 import pandas as pd
 import numpy as np
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
+import random
 import torch
 from datetime import datetime
+from transformers import Qwen3VLForConditionalGeneration, Qwen3VLMoeForConditionalGeneration, AutoProcessor
 from tqdm import tqdm
 import re
-
-# vLLM imports
-from vllm import LLM, SamplingParams
-from transformers import AutoProcessor
 
 class Config:
     
     # Mode settings
     SINGLE_BUILDING_MODE = False  # True for single building, False for all buildings
     SINGLE_BUILDING_NAME = "Beaumont-sur-Oise-Eglise-Saint-Leonor"
-
-    SKIP_BUILDINGS = ["Lausanne-Cathedrale-Notre-Dame"]  # Buildings to skip
     
     # Debug settings
     DEBUG_MODE = False  # Set to True to print first few responses
@@ -36,7 +32,7 @@ class Config:
     OUTPUT_BASE_PATH = "/mnt/swordfish-pool2/kavin/maps_output_analysis/qwen_evaluation"  # Results
     
     # Grid configuration
-    GRID_SIZES = [10, 15, 20]  # List of grid sizes to evaluate: [10, 15, 20]
+    GRID_SIZES = [10]  # List of grid sizes to evaluate: [10, 15, 20]
     
     # Arrows configuration
     ARROW_COUNTS = [10, 15, 20]  # List of arrow counts to evaluate: [10, 15, 20]
@@ -54,18 +50,22 @@ class Config:
     MODEL_CONFIGS = {
         "qwen3-vl-32b-thinking": {
             "model_name": "Qwen/Qwen3-VL-32B-Thinking",
+            "model_class": Qwen3VLMoeForConditionalGeneration,
             "display_name": "Qwen3-VL-32B-Thinking"
         },
         "qwen3-vl-8b-thinking": {
             "model_name": "Qwen/Qwen3-VL-8B-Thinking",
+            "model_class": Qwen3VLForConditionalGeneration,
             "display_name": "Qwen3-VL-8B-Thinking"
         },
         "qwen3-vl-32b-instruct": {
             "model_name": "Qwen/Qwen3-VL-32B-Instruct",
+            "model_class": Qwen3VLMoeForConditionalGeneration,
             "display_name": "Qwen3-VL-32B-Instruct"
         },
         "qwen3-vl-8b-instruct": {
             "model_name": "Qwen/Qwen3-VL-8B-Instruct",
+            "model_class": Qwen3VLForConditionalGeneration,
             "display_name": "Qwen3-VL-8B-Instruct"
         }
     }
@@ -76,16 +76,9 @@ class Config:
     TEMPERATURE = 0.1     # Only used if USE_GREEDY=False
     TOP_P = 0.95          # Only used if USE_GREEDY=False
     
-    # vLLM specific settings
-    MAX_MODEL_LEN = 32768  # Context length for vLLM
-    TENSOR_PARALLEL_SIZE = 1  # Number of GPUs for tensor parallelism
-    
     # Environment setup
     HF_CACHE_DIR = "/mnt/swordfish-pool2/kavin/cache"
     CUDA_DEVICE = "7"
-    
-    # For labeled_arrows variant
-    NUM_ARROW_SAMPLES = 15
     
     # Runtime
     TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -566,56 +559,91 @@ ARROW_LABEL: [Letter from {label_range}]
 You MUST provide both fields even if uncertain."""
 
 
-def load_vllm_model(processor):
-    """Load Qwen3-VL model using vLLM"""
+def load_model_and_processor():
+    """Load Qwen3-VL model and processor"""
     model_config = Config.get_model_config()
     model_name = model_config["model_name"]
+    model_class = model_config["model_class"]
     
-    print(f"\nLoading {model_config['display_name']} with vLLM...")
+    print(f"\nLoading {model_config['display_name']}...")
     print(f"Model path: {model_name}")
     print(f"Cache directory: {Config.HF_CACHE_DIR}")
     sys.stdout.flush()
     
-    # Load model with vLLM
-    llm = LLM(
-        model=model_name,
-        tensor_parallel_size=Config.TENSOR_PARALLEL_SIZE,
-        trust_remote_code=True,
-        max_model_len=Config.MAX_MODEL_LEN,
-        limit_mm_per_prompt={"image": 2},  # 2 images: floor plan + photo
+    # Load model
+    model = model_class.from_pretrained(
+        model_name,
+        dtype="auto",
+        device_map="auto",
+        cache_dir=Config.HF_CACHE_DIR
     )
     
-    print(f"Model loaded successfully with vLLM")
+    # Load processor
+    processor = AutoProcessor.from_pretrained(
+        model_name,
+        cache_dir=Config.HF_CACHE_DIR
+    )
+    
+    print(f"Model loaded successfully")
+    print(f"  Device: {model.device}")
+    print(f"  Dtype: {model.dtype}")
     sys.stdout.flush()
     
-    return llm
+    return model, processor
 
 
-def prepare_vllm_request(processor, floor_plan_image, photo_image, prompt_text):
-    """Prepare a single request for vLLM batch inference"""
-    # Prepare messages with image placeholders
+def run_inference(model, processor, floor_plan_path, photo_path, prompt_text):
+    """Run inference on a single image pair"""
+    # Prepare messages with two images
     messages = [
         {
             "role": "user",
             "content": [
-                {"type": "image"},  # Placeholder for floor plan
-                {"type": "image"},  # Placeholder for photo
                 {"type": "text", "text": prompt_text},
+                {"type": "image", "image": floor_plan_path},
+                {"type": "image", "image": photo_path},
             ],
         }
     ]
     
-    # Apply chat template to get prompt
-    prompt = processor.apply_chat_template(
+    # Prepare inputs
+    inputs = processor.apply_chat_template(
         messages,
-        tokenize=False,
-        add_generation_prompt=True
+        tokenize=True,
+        add_generation_prompt=True,
+        return_dict=True,
+        return_tensors="pt"
     )
+    inputs = inputs.to(model.device)
     
-    return {
-        "prompt": prompt,
-        "multi_modal_data": {"image": [floor_plan_image, photo_image]},
-    }
+    # Generate with optimized settings
+    with torch.no_grad():
+        if Config.USE_GREEDY:
+            generated_ids = model.generate(
+                **inputs,
+                max_new_tokens=Config.MAX_NEW_TOKENS,
+                do_sample=False,
+            )
+        else:
+            generated_ids = model.generate(
+                **inputs,
+                max_new_tokens=Config.MAX_NEW_TOKENS,
+                temperature=Config.TEMPERATURE,
+                top_p=Config.TOP_P,
+                do_sample=True
+            )
+    
+    # Decode
+    generated_ids_trimmed = [
+        out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
+    ]
+    output_text = processor.batch_decode(
+        generated_ids_trimmed,
+        skip_special_tokens=True,
+        clean_up_tokenization_spaces=False
+    )[0]
+    
+    return output_text
 
 
 def extract_structured_answer(response_text, task_variant):
@@ -735,9 +763,9 @@ def parse_response(response_text, task_variant):
     return extract_structured_answer(response_text, task_variant)
 
 
-def evaluate_building(building_name, size_param, llm, processor):
+def evaluate_building(building_name, size_param, model, processor):
     """
-    Evaluate a single building with a specific size (grid or arrow) using vLLM batching
+    Evaluate a single building with a specific size (grid or arrow) using the model
     Returns (metrics, predictions_list) or (None, None) if error
     """
     print(f"\n{'='*60}")
@@ -774,9 +802,6 @@ def evaluate_building(building_name, size_param, llm, processor):
         sys.stdout.flush()
         return None, None
     
-    # Load floor plan image once
-    floor_plan_image = Image.open(floor_map_path).convert("RGB")
-    
     # Get prompt
     if Config.PROMPT_TYPE == "zero_shot":
         prompt_text = get_zero_shot_prompt(size_param, Config.TASK_VARIANT)
@@ -787,16 +812,21 @@ def evaluate_building(building_name, size_param, llm, processor):
     building_dir = Config.get_building_source_dir(building_name)
     images_dir = os.path.join(building_dir, 'images')
     
-    # Prepare all requests for batch inference
-    print(f"Preparing batch requests...")
-    sys.stdout.flush()
+    # Run inference - handle different ground truth formats
+    predictions = []
     
-    batch_requests = []
-    request_metadata = []  # Store metadata for each request
+    # Disable tqdm progress bar for background execution
+    # disable_tqdm = not sys.stdout.isatty()
+    disable_tqdm = False # Always show progress bars
     
     if Config.TASK_VARIANT == "grid_direction":
         # ground_truth_data is a DataFrame
-        for idx, row in ground_truth_data.iterrows():
+        total_images = len(ground_truth_data)
+        print(f"Starting inference on {total_images} images...")
+        sys.stdout.flush()
+        
+        for idx, row in tqdm(ground_truth_data.iterrows(), total=total_images, 
+                             desc=f"Processing {building_name}", leave=False, disable=disable_tqdm):
             image_path = os.path.join(images_dir, f"{row['image_id']}.jpg")
             
             if not os.path.exists(image_path):
@@ -805,28 +835,66 @@ def evaluate_building(building_name, size_param, llm, processor):
                 continue
             
             try:
-                # Load photo image
-                photo_image = Image.open(image_path).convert("RGB")
+                # Run inference
+                output_text = run_inference(model, processor, floor_map_path, image_path, prompt_text)
                 
-                # Prepare request
-                request = prepare_vllm_request(
-                    processor, floor_plan_image, photo_image, prompt_text
-                )
+                # Parse response
+                parsed = parse_response(output_text, Config.TASK_VARIANT)
                 
-                batch_requests.append(request)
-                request_metadata.append({
+                # Validate extraction
+                missing_fields = validate_extraction(parsed, Config.TASK_VARIANT)
+                if missing_fields and Config.DEBUG_MODE:
+                    print(f"Image {row['image_id']}: Missing fields: {', '.join(missing_fields)}")
+                    sys.stdout.flush()
+                
+                # Add debug output for first few samples
+                if Config.DEBUG_MODE and len(predictions) < Config.DEBUG_SAMPLES:
+                    print(f"\n{'='*60}")
+                    print(f"DEBUG - Image {row['image_id']}")
+                    print(f"{'='*60}")
+                    print(f"Raw Response:\n{output_text[:500]}...")
+                    print(f"\nParsed:")
+                    print(f"  GRID_CELL: {parsed.get('grid_cell')}")
+                    print(f"  DIRECTION: {parsed.get('direction')}")
+                    print(f"  REASONING: {parsed.get('reasoning')[:100]}...")
+                    print(f"{'='*60}\n")
+                    sys.stdout.flush()
+                
+                parsed['image_id'] = row['image_id']
+                parsed['ground_truth_cell'] = row['grid_cell']
+                parsed['ground_truth_direction'] = row['direction']
+                
+                predictions.append(parsed)
+                
+                # Print progress every 10 images when tqdm is disabled
+                if disable_tqdm and (len(predictions) % 10 == 0):
+                    print(f"  Processed {len(predictions)}/{total_images} images...")
+                    sys.stdout.flush()
+                
+            except Exception as e:
+                print(f"\nError processing {row['image_id']}: {e}")
+                sys.stdout.flush()
+                predictions.append({
                     'image_id': row['image_id'],
+                    'reasoning': '',
+                    'grid_cell': None,
+                    'direction': None,
+                    'arrow_label': None,
+                    'raw_response': f"ERROR: {str(e)}",
                     'ground_truth_cell': row['grid_cell'],
                     'ground_truth_direction': row['direction']
                 })
-                
-            except Exception as e:
-                print(f"Error preparing request for {row['image_id']}: {e}")
-                sys.stdout.flush()
     
     else:  # labeled_arrows
         # ground_truth_data is a dict (arrow_mapping)
-        for label, info in ground_truth_data.items():
+        total_images = len(ground_truth_data)
+        print(f"Starting inference on {total_images} images...")
+        sys.stdout.flush()
+        
+        arrow_items = list(ground_truth_data.items())
+        
+        for idx, (label, info) in enumerate(tqdm(arrow_items, desc=f"Processing {building_name}", 
+                                                   leave=False, disable=disable_tqdm)):
             image_path = os.path.join(images_dir, f"{info['image_id']}.jpg")
             
             if not os.path.exists(image_path):
@@ -835,105 +903,54 @@ def evaluate_building(building_name, size_param, llm, processor):
                 continue
             
             try:
-                # Load photo image
-                photo_image = Image.open(image_path).convert("RGB")
+                # Run inference
+                output_text = run_inference(model, processor, floor_map_path, image_path, prompt_text)
                 
-                # Prepare request
-                request = prepare_vllm_request(
-                    processor, floor_plan_image, photo_image, prompt_text
-                )
+                # Parse response
+                parsed = parse_response(output_text, Config.TASK_VARIANT)
                 
-                batch_requests.append(request)
-                request_metadata.append({
-                    'image_id': info['image_id'],
-                    'ground_truth_label': label
-                })
+                # Validate extraction
+                missing_fields = validate_extraction(parsed, Config.TASK_VARIANT)
+                if missing_fields and Config.DEBUG_MODE:
+                    print(f"Image {info['image_id']}: Missing fields: {', '.join(missing_fields)}")
+                    sys.stdout.flush()
+                
+                # Add debug output for first few samples
+                if Config.DEBUG_MODE and len(predictions) < Config.DEBUG_SAMPLES:
+                    print(f"\n{'='*60}")
+                    print(f"DEBUG - Image {info['image_id']} (Arrow {label})")
+                    print(f"{'='*60}")
+                    print(f"Raw Response:\n{output_text[:500]}...")
+                    print(f"\nParsed:")
+                    print(f"  ARROW_LABEL: {parsed.get('arrow_label')}")
+                    print(f"  REASONING: {parsed.get('reasoning')[:100]}...")
+                    print(f"{'='*60}\n")
+                    sys.stdout.flush()
+                
+                parsed['image_id'] = info['image_id']
+                parsed['ground_truth_label'] = label
+                
+                predictions.append(parsed)
+                
+                # Print progress every 10 images when tqdm is disabled
+                if disable_tqdm and (len(predictions) % 10 == 0):
+                    print(f"  Processed {len(predictions)}/{total_images} images...")
+                    sys.stdout.flush()
                 
             except Exception as e:
-                print(f"Error preparing request for {info['image_id']}: {e}")
+                print(f"\nError processing {info['image_id']}: {e}")
                 sys.stdout.flush()
+                predictions.append({
+                    'image_id': info['image_id'],
+                    'reasoning': '',
+                    'grid_cell': None,
+                    'direction': None,
+                    'arrow_label': None,
+                    'raw_response': f"ERROR: {str(e)}",
+                    'ground_truth_label': label
+                })
     
-    if not batch_requests:
-        print("ERROR: No valid requests prepared")
-        sys.stdout.flush()
-        return None, None
-    
-    print(f"Prepared {len(batch_requests)} requests for batch inference")
-    sys.stdout.flush()
-    
-    # Prepare sampling params
-    if Config.USE_GREEDY:
-        sampling_params = SamplingParams(
-            max_tokens=Config.MAX_NEW_TOKENS,
-            temperature=0.0,
-        )
-    else:
-        sampling_params = SamplingParams(
-            max_tokens=Config.MAX_NEW_TOKENS,
-            temperature=Config.TEMPERATURE,
-            top_p=Config.TOP_P,
-        )
-    
-    # Run batch inference
-    print(f"Running batch inference on {len(batch_requests)} images...")
-    sys.stdout.flush()
-    
-    try:
-        outputs = llm.generate(
-            batch_requests,
-            sampling_params=sampling_params,
-        )
-    except Exception as e:
-        print(f"ERROR during batch inference: {e}")
-        sys.stdout.flush()
-        return None, None
-    
-    print(f"Batch inference completed")
-    sys.stdout.flush()
-    
-    # Process outputs
-    predictions = []
-    
-    for output, metadata in zip(outputs, request_metadata):
-        output_text = output.outputs[0].text if output.outputs else ""
-        
-        # Parse response
-        parsed = parse_response(output_text, Config.TASK_VARIANT)
-        
-        # Validate extraction
-        missing_fields = validate_extraction(parsed, Config.TASK_VARIANT)
-        if missing_fields and Config.DEBUG_MODE:
-            print(f"Image {metadata['image_id']}: Missing fields: {', '.join(missing_fields)}")
-            sys.stdout.flush()
-        
-        # Add debug output for first few samples
-        if Config.DEBUG_MODE and len(predictions) < Config.DEBUG_SAMPLES:
-            print(f"\n{'='*60}")
-            print(f"DEBUG - Image {metadata['image_id']}")
-            print(f"{'='*60}")
-            print(f"Raw Response:\n{output_text[:500]}...")
-            print(f"\nParsed:")
-            if Config.TASK_VARIANT == "grid_direction":
-                print(f"  GRID_CELL: {parsed.get('grid_cell')}")
-                print(f"  DIRECTION: {parsed.get('direction')}")
-            else:
-                print(f"  ARROW_LABEL: {parsed.get('arrow_label')}")
-            print(f"  REASONING: {parsed.get('reasoning')[:100]}...")
-            print(f"{'='*60}\n")
-            sys.stdout.flush()
-        
-        # Add metadata to parsed result
-        parsed['image_id'] = metadata['image_id']
-        
-        if Config.TASK_VARIANT == "grid_direction":
-            parsed['ground_truth_cell'] = metadata['ground_truth_cell']
-            parsed['ground_truth_direction'] = metadata['ground_truth_direction']
-        else:
-            parsed['ground_truth_label'] = metadata['ground_truth_label']
-        
-        predictions.append(parsed)
-    
-    print(f"Completed processing {len(predictions)} predictions")
+    print(f"Completed inference on {len(predictions)} images")
     sys.stdout.flush()
     
     # Calculate metrics
@@ -1241,7 +1258,7 @@ def main():
     print = functools.partial(print, flush=True)
     
     print(f"{'='*80}")
-    print("QWEN3-VL EVALUATION (with vLLM)")
+    print("QWEN3-VL EVALUATION")
     print(f"{'='*80}")
     
     model_config = Config.get_model_config()
@@ -1258,7 +1275,6 @@ def main():
         print(f"  Arrow Counts: {Config.ARROW_COUNTS}")
     
     print(f"  Timestamp: {Config.TIMESTAMP}")
-    print(f"  Using vLLM with batch inference")
     
     # Get buildings to process
     if Config.SINGLE_BUILDING_MODE:
@@ -1267,13 +1283,9 @@ def main():
     else:
         valid_buildings, invalid_buildings = get_all_buildings()
         buildings_to_process = valid_buildings
-
-        # Filter out skip buildings
-        buildings_to_process = [b for b in buildings_to_process if b not in Config.SKIP_BUILDINGS]
         
         print(f"\nBuilding validation:")
         print(f"  Valid buildings: {len(valid_buildings)}")
-        print(f"  Skipped buildings: {len(Config.SKIP_BUILDINGS)}")
         print(f"  Invalid buildings: {len(invalid_buildings)}")
         
         if invalid_buildings:
@@ -1283,20 +1295,9 @@ def main():
             if len(invalid_buildings) > 10:
                 print(f"  ... and {len(invalid_buildings) - 10} more")
     
-    # Load processor (needed for prompt formatting)
+    # Load model once
     print(f"\n{'='*80}")
-    print("Loading processor...")
-    model_config = Config.get_model_config()
-    processor = AutoProcessor.from_pretrained(
-        model_config["model_name"],
-        trust_remote_code=True,
-        cache_dir=Config.HF_CACHE_DIR
-    )
-    print("Processor loaded")
-    
-    # Load vLLM model once
-    print(f"\n{'='*80}")
-    llm = load_vllm_model(processor)
+    model, processor = load_model_and_processor()
     
     # Process each size (grid or arrow)
     all_results = {}
@@ -1353,7 +1354,7 @@ def main():
         size_results = []
         
         for building_name in valid_for_size:
-            metrics, predictions = evaluate_building(building_name, size_param, llm, processor)
+            metrics, predictions = evaluate_building(building_name, size_param, model, processor)
             
             if metrics is not None:
                 # Save individual building results

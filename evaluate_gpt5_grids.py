@@ -27,18 +27,13 @@ class Config:
     # Paths
     SOURCE_BASE_PATH = "/mnt/swordfish-pool2/kavin/maps_output"  # Original building data
     GRIDDED_BASE_PATH = "/mnt/swordfish-pool2/kavin/maps_output_analysis/grids_floorplan"  # Gridded floorplans
-    ARROWS_BASE_PATH = "/mnt/swordfish-pool2/kavin/maps_output_analysis/arrows_floorplan"  # Arrows floorplans
     OUTPUT_BASE_PATH = "/mnt/swordfish-pool2/kavin/maps_output_analysis/gpt_evaluation"  # Results
     
     # Grid configuration
     GRID_SIZES = [10, 15, 20]  # List of grid sizes to evaluate: [10, 15, 20]
     
-    # Arrows configuration
-    ARROW_COUNTS = [10, 15, 20]  # List of arrow counts to evaluate: [10, 15, 20]
-    
     # Task variant: "grid_direction" or "labeled_arrows"
-    # TASK_VARIANT = "grid_direction"  # Change to "labeled_arrows" for arrows evaluation
-    TASK_VARIANT = "labeled_arrows"  # Change to "grid_direction" for grids evaluation
+    TASK_VARIANT = "grid_direction"
     
     # Prompt type: "zero_shot" or "few_shot"
     PROMPT_TYPE = "zero_shot"
@@ -118,25 +113,12 @@ class Config:
         return f"{cls.GRIDDED_BASE_PATH}/grid_size_{grid_size}_ground_truth/{building_name}_ground_truth.csv"
     
     @classmethod
-    def get_arrows_floorplan_path(cls, building_name, arrow_count):
-        """Get path to arrows floorplan"""
-        return f"{cls.ARROWS_BASE_PATH}/arrows_{arrow_count}/{building_name}/{building_name}_arrows_visualization.jpg"
-    
-    @classmethod
-    def get_arrow_mapping_path(cls, building_name, arrow_count):
-        """Get path to arrow label mapping JSON"""
-        return f"{cls.ARROWS_BASE_PATH}/arrows_{arrow_count}/{building_name}/arrow_label_mapping.json"
-    
-    @classmethod
-    def setup_output_dir(cls, size_param=None, building_name=None):
+    def setup_output_dir(cls, grid_size=None, building_name=None):
         """Setup output directory structure"""
         base_dir = f"{cls.OUTPUT_BASE_PATH}/{cls.TIMESTAMP}"
         
-        if size_param is not None:
-            if cls.TASK_VARIANT == "grid_direction":
-                base_dir = f"{base_dir}/grid_size_{size_param}"
-            else:  # labeled_arrows
-                base_dir = f"{base_dir}/arrows_{size_param}"
+        if grid_size is not None:
+            base_dir = f"{base_dir}/grid_size_{grid_size}"
         
         if building_name is not None:
             base_dir = f"{base_dir}/{building_name}"
@@ -170,12 +152,6 @@ def generate_column_label(col_index, num_cols):
             break
         num -= 1
     return label
-
-
-def get_arrow_label_range(arrow_count):
-    """Get the range of arrow labels (e.g., 'A to J' for 10 arrows)"""
-    last_label = chr(65 + arrow_count - 1)  # A=65, so for 10 arrows: chr(74)='J'
-    return f"A to {last_label}"
 
 
 def validate_building_folder(building_name):
@@ -250,35 +226,6 @@ def validate_building_for_grid(building_name, grid_size):
     return True, None
 
 
-def validate_building_for_arrows(building_name, arrow_count):
-    """
-    Validate that a building has all required files for arrows evaluation
-    Returns (is_valid, reason)
-    """
-    # Check arrows floorplan
-    arrows_floor_path = Config.get_arrows_floorplan_path(building_name, arrow_count)
-    if not os.path.exists(arrows_floor_path):
-        return False, "missing_arrows_floorplan"
-    
-    # Check arrow mapping JSON
-    arrow_mapping_path = Config.get_arrow_mapping_path(building_name, arrow_count)
-    if not os.path.exists(arrow_mapping_path):
-        return False, "missing_arrow_mapping_json"
-    
-    # Check images folder exists and is not empty
-    building_dir = Config.get_building_source_dir(building_name)
-    images_dir = os.path.join(building_dir, 'images')
-    
-    if not os.path.exists(images_dir):
-        return False, "missing_images_folder"
-    
-    image_files = [f for f in os.listdir(images_dir) if f.endswith(('.jpg', '.jpeg', '.png'))]
-    if len(image_files) == 0:
-        return False, "empty_images_folder"
-    
-    return True, None
-
-
 def load_ground_truth(building_name, grid_size):
     """Load pre-computed ground truth CSV for specific grid size"""
     ground_truth_csv_path = Config.get_ground_truth_csv_path(building_name, grid_size)
@@ -297,26 +244,6 @@ def load_ground_truth(building_name, grid_size):
     return df
 
 
-def load_arrow_mapping(building_name, arrow_count):
-    """Load arrow label mapping JSON for arrows evaluation"""
-    arrow_mapping_path = Config.get_arrow_mapping_path(building_name, arrow_count)
-    
-    if not os.path.exists(arrow_mapping_path):
-        raise FileNotFoundError(f"Arrow mapping JSON not found: {arrow_mapping_path}")
-    
-    with open(arrow_mapping_path, 'r') as f:
-        arrow_mapping = json.load(f)
-    
-    # Validate structure
-    for label, info in arrow_mapping.items():
-        required_keys = ['image_id', 'x', 'y', 'direction']
-        missing_keys = [key for key in required_keys if key not in info]
-        if missing_keys:
-            raise ValueError(f"Arrow mapping for label {label} missing keys: {missing_keys}")
-    
-    return arrow_mapping
-
-
 def encode_image_to_base64(image_path):
     """Encode image to base64 string for API"""
     with open(image_path, "rb") as image_file:
@@ -325,10 +252,9 @@ def encode_image_to_base64(image_path):
 
 # ==================== PROMPTS - MATCHING QWEN ====================
 
-def get_zero_shot_prompt(size_param, task_variant):
+def get_zero_shot_prompt(grid_size, task_variant):
     """Generate zero-shot prompt with Gothic architecture context (matches Qwen)"""
     if task_variant == "grid_direction":
-        grid_size = size_param
         last_col = generate_column_label(grid_size - 1, grid_size)
         
         return f"""You are analyzing a Gothic church floor plan and interior photograph from 12th-13th century France.
@@ -390,69 +316,47 @@ DIRECTION: E
 Now analyze the provided floor plan and photograph. You MUST provide all three fields (REASONING, GRID_CELL, DIRECTION) even if uncertain."""
     
     else:  # labeled_arrows
-        arrow_count = size_param
-        label_range = get_arrow_label_range(arrow_count)
-        
-        return f"""You are analyzing a Gothic church floor plan with labeled arrows and an interior photograph from 12th-13th century France.
+        return """You are analyzing a Gothic church floor plan with labeled arrows and an interior photograph from 12th-13th century France.
 
 ARCHITECTURAL CONTEXT:
-This is a Gothic church building with typical features including:
-- Nave (central space), side aisles, transept (crossing), choir, apse
-- Columns/pillars supporting pointed arches and ribbed vaults
-- Large windows (often with tracery), clerestory windows
-- Ambulatory (walkway around choir/apse in some churches)
-- Stone walls, vaulted ceilings, decorative capitals
+This is a Gothic church with typical features:
+- Nave, side aisles, transept, choir, apse
+- Columns supporting pointed arches and ribbed vaults
+- Gothic windows, stone walls, vaulted ceilings
 
-TASK: Identify which labeled arrow corresponds to the photograph's location and viewing direction.
-
-ARROW INFORMATION:
-- The floor plan contains {arrow_count} labeled arrows
-- Arrow labels range from {label_range}
-- Each arrow shows a specific position and viewing direction within the church
-- FLOOR PLAN ORIENTATION: North is at the top, South at the bottom, West on the left, East on the right
+TASK: Identify which labeled arrow (A, B, C, etc.) corresponds to the photograph's location and viewing direction.
 
 ANALYSIS STEPS:
 1. IDENTIFY visible Gothic architectural features in the photograph:
-   - Column/pillar positions and their spacing
-   - Pointed arches and vault configurations
-   - Window locations, sizes, and orientations
-   - Wall positions and openings
-   - Spatial arrangement (nave, aisle, transept, choir, etc.)
+   - Column positions and spacing
+   - Pointed arches and vault patterns
+   - Window locations and types
+   - Spatial section (nave, aisle, transept, choir, apse)
 
-2. LOCATE these features on the floor plan with arrows:
-   - Match column positions shown as dots/circles on plan
-   - Identify window locations along walls
-   - Find the corresponding section (nave, aisle, crossing, choir, apse)
-   - Match the spatial layout pattern
-
-3. MATCH to the correct arrow:
-   - Find the arrow that points from a position matching where the photo was taken
-   - Verify the arrow's direction matches what would be visible in the photograph
-   - Consider both the location AND the viewing direction
+2. MATCH these features to the arrows on the floor plan:
+   - Each arrow shows a position and viewing direction
+   - Find the arrow that matches both the location and orientation of the photo
 
 IMPORTANT CONSTRAINTS:
-- Only analyze architectural features CLEARLY VISIBLE in the photograph
-- Each arrow represents a specific viewpoint - both position and direction matter
-- Do not assume features not visible in the photo
-- Base your answer on concrete architectural elements you can identify
-- The answer must be one of the {arrow_count} labeled arrows ({label_range})
-- If uncertain, provide your best estimate but acknowledge this in reasoning
+- Only use architectural features CLEARLY VISIBLE in the photograph
+- Gothic churches typically have east-west orientation
+- Do not assume features not shown
+- Base your answer on concrete architectural matches
 
-OUTPUT FORMAT (MANDATORY - YOU MUST PROVIDE BOTH FIELDS):
+OUTPUT FORMAT (MANDATORY - YOU MUST PROVIDE ALL FIELDS):
 REASONING: [2-3 sentences identifying key Gothic features and matching them to an arrow]
-ARROW_LABEL: [Single letter from {label_range}]
+ARROW_LABEL: [Single letter A-Z]
 
 EXAMPLE OUTPUT:
-REASONING: The photograph shows three cylindrical columns on the left supporting pointed arches, with a large Gothic window with tracery visible on the right. Arrow C in the north aisle matches this exact column spacing and eastward viewing direction.
+REASONING: Photo shows three columns on left supporting pointed arches with a Gothic window on right. Arrow C in the north aisle has this exact column spacing and east-facing window orientation.
 ARROW_LABEL: C
 
-Now analyze the provided floor plan and photograph. You MUST provide both fields (REASONING, ARROW_LABEL) even if uncertain."""
+Now analyze the images and provide your answer in the exact format above. You MUST provide both fields (REASONING, ARROW_LABEL) even if uncertain."""
 
 
-def get_few_shot_prompt(size_param, task_variant):
+def get_few_shot_prompt(grid_size, task_variant):
     """Generate few-shot prompt with Gothic architecture examples (matches Qwen)"""
     if task_variant == "grid_direction":
-        grid_size = size_param
         last_col = generate_column_label(grid_size - 1, grid_size)
         
         return f"""You are analyzing a Gothic church floor plan and interior photograph from 12th-13th century France.
@@ -501,10 +405,7 @@ DIRECTION: [Direction]
 You MUST provide all three fields even if uncertain."""
     
     else:  # labeled_arrows
-        arrow_count = size_param
-        label_range = get_arrow_label_range(arrow_count)
-        
-        return f"""You are analyzing a Gothic church floor plan with labeled arrows and an interior photograph from 12th-13th century France.
+        return """You are analyzing a Gothic church floor plan with labeled arrows and an interior photograph from 12th-13th century France.
 
 ARCHITECTURAL CONTEXT:
 Gothic churches have: nave, aisles, transept, choir, apse, columns with pointed arches, ribbed vaults, windows.
@@ -527,12 +428,7 @@ ARROW_LABEL: H
 
 NOW YOUR TURN:
 
-ARROW INFORMATION:
-- The floor plan contains {arrow_count} labeled arrows ({label_range})
-- Each arrow shows position and viewing direction
-- Match the photo to the correct arrow
-
-TASK: Identify which arrow corresponds to the photo location and direction.
+TASK: Identify which arrow (A, B, C, etc.) corresponds to the photo location and direction.
 
 ANALYSIS STEPS:
 1. Identify visible Gothic features in photo
@@ -541,34 +437,29 @@ ANALYSIS STEPS:
 
 OUTPUT FORMAT (MANDATORY):
 REASONING: [2-3 sentences on Gothic features and arrow match]
-ARROW_LABEL: [Letter from {label_range}]
+ARROW_LABEL: [Letter]
 
 You MUST provide both fields even if uncertain."""
 
 
 # ==================== BATCH API FUNCTIONS ====================
 
-def prepare_batch_requests_for_building(building_name, size_param, ground_truth_data):
-    """Prepare batch requests for a single building (works for both grids and arrows)"""
+def prepare_batch_requests_for_building(building_name, grid_size, ground_truth_df):
+    """Prepare batch requests for a single building"""
     building_dir = Config.get_building_source_dir(building_name)
-    
-    # Get floorplan path based on task variant
-    if Config.TASK_VARIANT == "grid_direction":
-        floor_map_path = Config.get_gridded_floorplan_path(building_name, size_param)
-    else:  # labeled_arrows
-        floor_map_path = Config.get_arrows_floorplan_path(building_name, size_param)
+    floor_map_path = Config.get_gridded_floorplan_path(building_name, grid_size)
     
     if not os.path.exists(floor_map_path):
-        raise FileNotFoundError(f"Floorplan not found: {floor_map_path}")
+        raise FileNotFoundError(f"Gridded floorplan not found: {floor_map_path}")
     
     # Encode floor map once (shared across all images in this building)
     floor_map_base64 = encode_image_to_base64(floor_map_path)
     
     # Get prompt
     if Config.PROMPT_TYPE == "zero_shot":
-        prompt_text = get_zero_shot_prompt(size_param, Config.TASK_VARIANT)
+        prompt_text = get_zero_shot_prompt(grid_size, Config.TASK_VARIANT)
     else:
-        prompt_text = get_few_shot_prompt(size_param, Config.TASK_VARIANT)
+        prompt_text = get_few_shot_prompt(grid_size, Config.TASK_VARIANT)
     
     # Get model config
     model_config = Config.get_model_config()
@@ -577,123 +468,62 @@ def prepare_batch_requests_for_building(building_name, size_param, ground_truth_
     batch_requests = []
     images_dir = os.path.join(building_dir, 'images')
     
-    # Handle different ground truth formats
-    if Config.TASK_VARIANT == "grid_direction":
-        # ground_truth_data is a DataFrame
-        for idx, row in ground_truth_data.iterrows():
-            image_id = row['image_id']
-            image_path = os.path.join(images_dir, f"{image_id}.jpg")
-            
-            if not os.path.exists(image_path):
-                print(f"Warning: Image not found: {image_path}")
-                sys.stdout.flush()
-                continue
-            
-            # Encode image
-            image_base64 = encode_image_to_base64(image_path)
-            
-            # Responses API format
-            request = {
-                "custom_id": f"{building_name}|{image_id}",
-                "method": "POST",
-                "url": "/v1/responses",
-                "body": {
-                    "model": model_config['model_name'],
-                    "input": [
-                        {
-                            "type": "message",
-                            "role": "user",
-                            "content": [
-                                {
-                                    "type": "input_text",
-                                    "text": prompt_text
-                                },
-                                {
-                                    "type": "input_image",
-                                    "image_url": f"data:image/jpeg;base64,{floor_map_base64}"
-                                },
-                                {
-                                    "type": "input_image",
-                                    "image_url": f"data:image/jpeg;base64,{image_base64}"
-                                }
-                            ]
-                        }
-                    ],
-                    "reasoning": {
-                        "effort": model_config['reasoning_effort']
-                    },
-                    "text": {
-                        "verbosity": model_config['verbosity']
-                    },
-                    "max_output_tokens": Config.MAX_OUTPUT_TOKENS
-                }
+    for idx, row in ground_truth_df.iterrows():
+        image_path = os.path.join(images_dir, f"{row['image_id']}.jpg")
+        
+        if not os.path.exists(image_path):
+            print(f"Warning: Image not found: {image_path}")
+            sys.stdout.flush()
+            continue
+        
+        # Encode image
+        image_base64 = encode_image_to_base64(image_path)
+        
+        # Responses API format
+        request = {
+            "custom_id": f"{building_name}|{row['image_id']}",
+            "method": "POST",
+            "url": "/v1/responses",
+            "body": {
+                "model": model_config['model_name'],
+                "input": [
+                    {
+                        "type": "message",
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "input_text",
+                                "text": prompt_text
+                            },
+                            {
+                                "type": "input_image",
+                                "image_url": f"data:image/jpeg;base64,{floor_map_base64}"
+                            },
+                            {
+                                "type": "input_image",
+                                "image_url": f"data:image/jpeg;base64,{image_base64}"
+                            }
+                        ]
+                    }
+                ],
+                "reasoning": {
+                    "effort": model_config['reasoning_effort']
+                },
+                "text": {
+                    "verbosity": model_config['verbosity']
+                },
+                "max_output_tokens": Config.MAX_OUTPUT_TOKENS
             }
-            
-            batch_requests.append(request)
-    
-    else:  # labeled_arrows
-        # ground_truth_data is a dict (arrow_mapping)
-        for label, info in ground_truth_data.items():
-            image_id = info['image_id']
-            image_path = os.path.join(images_dir, f"{image_id}.jpg")
-            
-            if not os.path.exists(image_path):
-                print(f"Warning: Image not found: {image_path}")
-                sys.stdout.flush()
-                continue
-            
-            # Encode image
-            image_base64 = encode_image_to_base64(image_path)
-            
-            # Responses API format
-            request = {
-                "custom_id": f"{building_name}|{image_id}",
-                "method": "POST",
-                "url": "/v1/responses",
-                "body": {
-                    "model": model_config['model_name'],
-                    "input": [
-                        {
-                            "type": "message",
-                            "role": "user",
-                            "content": [
-                                {
-                                    "type": "input_text",
-                                    "text": prompt_text
-                                },
-                                {
-                                    "type": "input_image",
-                                    "image_url": f"data:image/jpeg;base64,{floor_map_base64}"
-                                },
-                                {
-                                    "type": "input_image",
-                                    "image_url": f"data:image/jpeg;base64,{image_base64}"
-                                }
-                            ]
-                        }
-                    ],
-                    "reasoning": {
-                        "effort": model_config['reasoning_effort']
-                    },
-                    "text": {
-                        "verbosity": model_config['verbosity']
-                    },
-                    "max_output_tokens": Config.MAX_OUTPUT_TOKENS
-                }
-            }
-            
-            batch_requests.append(request)
+        }
+        
+        batch_requests.append(request)
     
     return batch_requests
 
 
-def save_batch_file(requests, output_dir, building_name, size_param, chunk_idx=1):
+def save_batch_file(requests, output_dir, building_name, grid_size, chunk_idx=1):
     """Save batch requests to JSONL file"""
-    if Config.TASK_VARIANT == "grid_direction":
-        filename = f"batch_{building_name}_grid{size_param}_chunk{chunk_idx}.jsonl"
-    else:
-        filename = f"batch_{building_name}_arrows{size_param}_chunk{chunk_idx}.jsonl"
-    
+    filename = f"batch_{building_name}_grid{grid_size}_chunk{chunk_idx}.jsonl"
     filepath = os.path.join(output_dir, filename)
     
     with open(filepath, 'w') as f:
@@ -706,16 +536,13 @@ def save_batch_file(requests, output_dir, building_name, size_param, chunk_idx=1
     
     return filepath
 
-def submit_batch(batch_filepath, building_name, size_param):
+def submit_batch(batch_filepath, building_name, grid_size):
     """Submit batch file to OpenAI API"""
     from openai import OpenAI
     
     client = OpenAI(api_key=Config.OPENAI_API_KEY)
     
-    if Config.TASK_VARIANT == "grid_direction":
-        print(f"Submitting batch for {building_name} (grid {size_param}x{size_param})...")
-    else:
-        print(f"Submitting batch for {building_name} (arrows {size_param})...")
+    print(f"Submitting batch for {building_name} (grid {grid_size}x{grid_size})...")
     sys.stdout.flush()
     
     # Upload file
@@ -915,8 +742,8 @@ def extract_structured_answer(response_text, task_variant):
     return result
 
 
-def process_batch_results(results_file, ground_truth_data):
-    """Process results from batch API (works for both grids and arrows)"""
+def process_batch_results(results_file, ground_truth_df):
+    """Process results from batch API"""
     predictions = []
     
     with open(results_file, 'r') as f:
@@ -952,20 +779,11 @@ def process_batch_results(results_file, ground_truth_data):
                 parsed['image_id'] = image_id
                 parsed['custom_id'] = custom_id
                 
-                # Add ground truth based on task variant
-                if Config.TASK_VARIANT == "grid_direction":
-                    # ground_truth_data is a DataFrame
-                    gt_row = ground_truth_data[ground_truth_data['image_id'] == image_id]
-                    if not gt_row.empty:
-                        parsed['ground_truth_cell'] = gt_row.iloc[0]['grid_cell']
-                        parsed['ground_truth_direction'] = gt_row.iloc[0]['direction']
-                else:  # labeled_arrows
-                    # ground_truth_data is a dict (arrow_mapping)
-                    # Find the correct label for this image_id
-                    for label, info in ground_truth_data.items():
-                        if info['image_id'] == image_id:
-                            parsed['ground_truth_label'] = label
-                            break
+                # Add ground truth
+                gt_row = ground_truth_df[ground_truth_df['image_id'] == image_id]
+                if not gt_row.empty:
+                    parsed['ground_truth_cell'] = gt_row.iloc[0]['grid_cell']
+                    parsed['ground_truth_direction'] = gt_row.iloc[0]['direction']
                 
                 predictions.append(parsed)
             else:
@@ -1008,112 +826,80 @@ def calculate_direction_distance(pred_dir, true_dir):
 
 
 def calculate_metrics(predictions):
-    """Calculate evaluation metrics from predictions (works for both grids and arrows)"""
-    if Config.TASK_VARIANT == "grid_direction":
-        metrics = {
-            'total_samples': len(predictions),
-            'grid_cell_accuracy': 0,
-            'direction_accuracy': 0,
-            'exact_match_accuracy': 0,
-            'avg_grid_distance': 0,
-            'avg_direction_distance': 0,
-            'unparseable_responses': 0
-        }
-        
-        grid_distances = []
-        direction_distances = []
-        exact_matches = 0
-        grid_correct = 0
-        direction_correct = 0
-        
-        for pred in predictions:
-            true_cell = pred.get('ground_truth_cell')
-            true_dir = pred.get('ground_truth_direction')
-            pred_cell = pred.get('grid_cell')
-            pred_dir = pred.get('direction')
-            
-            if not true_cell or not true_dir:
-                continue
-            
-            # Check if response is parseable
-            if not pred_cell or not pred_dir:
-                metrics['unparseable_responses'] += 1
-                continue
-            
-            # Calculate metrics
-            if pred_cell == true_cell:
-                grid_correct += 1
-            
-            if pred_dir == true_dir:
-                direction_correct += 1
-            
-            if pred_cell == true_cell and pred_dir == true_dir:
-                exact_matches += 1
-            
-            # Distance metrics
-            grid_dist = calculate_grid_distance(pred_cell, true_cell)
-            if grid_dist is not None:
-                grid_distances.append(grid_dist)
-            
-            dir_dist = calculate_direction_distance(pred_dir, true_dir)
-            if dir_dist is not None:
-                direction_distances.append(dir_dist)
-        
-        # Calculate final metrics
-        valid_samples = len(predictions) - metrics['unparseable_responses']
-        
-        if valid_samples > 0:
-            metrics['grid_cell_accuracy'] = grid_correct / valid_samples
-            metrics['direction_accuracy'] = direction_correct / valid_samples
-            metrics['exact_match_accuracy'] = exact_matches / valid_samples
-        
-        if grid_distances:
-            metrics['avg_grid_distance'] = float(np.mean(grid_distances))
-            metrics['median_grid_distance'] = float(np.median(grid_distances))
-            metrics['std_grid_distance'] = float(np.std(grid_distances))
-        
-        if direction_distances:
-            metrics['avg_direction_distance'] = float(np.mean(direction_distances))
-            metrics['median_direction_distance'] = float(np.median(direction_distances))
-            metrics['std_direction_distance'] = float(np.std(direction_distances))
+    """Calculate evaluation metrics from predictions"""
+    metrics = {
+        'total_samples': len(predictions),
+        'grid_cell_accuracy': 0,
+        'direction_accuracy': 0,
+        'exact_match_accuracy': 0,
+        'avg_grid_distance': 0,
+        'avg_direction_distance': 0,
+        'unparseable_responses': 0
+    }
     
-    else:  # labeled_arrows
-        metrics = {
-            'total_samples': len(predictions),
-            'label_accuracy': 0,
-            'unparseable_responses': 0
-        }
+    grid_distances = []
+    direction_distances = []
+    exact_matches = 0
+    grid_correct = 0
+    direction_correct = 0
+    
+    for pred in predictions:
+        true_cell = pred.get('ground_truth_cell')
+        true_dir = pred.get('ground_truth_direction')
+        pred_cell = pred.get('grid_cell')
+        pred_dir = pred.get('direction')
         
-        label_correct = 0
+        if not true_cell or not true_dir:
+            continue
         
-        for pred in predictions:
-            true_label = pred.get('ground_truth_label')
-            pred_label = pred.get('arrow_label')
-            
-            if not true_label:
-                continue
-            
-            # Check if response is parseable
-            if not pred_label:
-                metrics['unparseable_responses'] += 1
-                continue
-            
-            # Calculate metrics
-            if pred_label == true_label:
-                label_correct += 1
+        # Check if response is parseable
+        if not pred_cell or not pred_dir:
+            metrics['unparseable_responses'] += 1
+            continue
         
-        # Calculate final metrics
-        valid_samples = len(predictions) - metrics['unparseable_responses']
+        # Calculate metrics
+        if pred_cell == true_cell:
+            grid_correct += 1
         
-        if valid_samples > 0:
-            metrics['label_accuracy'] = label_correct / valid_samples
+        if pred_dir == true_dir:
+            direction_correct += 1
+        
+        if pred_cell == true_cell and pred_dir == true_dir:
+            exact_matches += 1
+        
+        # Distance metrics
+        grid_dist = calculate_grid_distance(pred_cell, true_cell)
+        if grid_dist is not None:
+            grid_distances.append(grid_dist)
+        
+        dir_dist = calculate_direction_distance(pred_dir, true_dir)
+        if dir_dist is not None:
+            direction_distances.append(dir_dist)
+    
+    # Calculate final metrics
+    valid_samples = len(predictions) - metrics['unparseable_responses']
+    
+    if valid_samples > 0:
+        metrics['grid_cell_accuracy'] = grid_correct / valid_samples
+        metrics['direction_accuracy'] = direction_correct / valid_samples
+        metrics['exact_match_accuracy'] = exact_matches / valid_samples
+    
+    if grid_distances:
+        metrics['avg_grid_distance'] = float(np.mean(grid_distances))
+        metrics['median_grid_distance'] = float(np.median(grid_distances))
+        metrics['std_grid_distance'] = float(np.std(grid_distances))
+    
+    if direction_distances:
+        metrics['avg_direction_distance'] = float(np.mean(direction_distances))
+        metrics['median_direction_distance'] = float(np.median(direction_distances))
+        metrics['std_direction_distance'] = float(np.std(direction_distances))
     
     return metrics
 
 
-def save_building_results(building_name, size_param, metrics, predictions):
-    """Save results for a single building (works for both grids and arrows)"""
-    output_dir = Config.setup_output_dir(size_param, building_name)
+def save_building_results(building_name, grid_size, metrics, predictions):
+    """Save results for a single building"""
+    output_dir = Config.setup_output_dir(grid_size, building_name)
     
     model_config = Config.get_model_config()
     
@@ -1122,6 +908,7 @@ def save_building_results(building_name, size_param, metrics, predictions):
     
     full_metrics = {
         'building': building_name,
+        'grid_size': grid_size,
         'task_variant': Config.TASK_VARIANT,
         'prompt_type': Config.PROMPT_TYPE,
         'model_variant': Config.MODEL_VARIANT,
@@ -1129,11 +916,6 @@ def save_building_results(building_name, size_param, metrics, predictions):
         'timestamp': Config.TIMESTAMP,
         'metrics': metrics
     }
-    
-    if Config.TASK_VARIANT == "grid_direction":
-        full_metrics['grid_size'] = size_param
-    else:
-        full_metrics['arrow_count'] = size_param
     
     with open(metrics_file, 'w') as f:
         json.dump(full_metrics, f, indent=2)
@@ -1144,10 +926,7 @@ def save_building_results(building_name, size_param, metrics, predictions):
     with open(predictions_file, 'w') as f:
         json.dump(predictions, f, indent=2)
     
-    if Config.TASK_VARIANT == "grid_direction":
-        print(f"Results saved for {building_name} (grid {size_param}x{size_param})")
-    else:
-        print(f"Results saved for {building_name} (arrows {size_param})")
+    print(f"Results saved for {building_name} (grid {grid_size}x{grid_size})")
     print(f"  Metrics: {metrics_file}")
     print(f"  Predictions: {predictions_file}")
     sys.stdout.flush()
@@ -1156,7 +935,7 @@ def save_building_results(building_name, size_param, metrics, predictions):
 
 
 def save_combined_results(all_results):
-    """Save combined results across all buildings and sizes (works for both grids and arrows)"""
+    """Save combined results across all buildings and grid sizes"""
     output_dir = Config.setup_output_dir()
     
     combined_file = os.path.join(output_dir, 'combined_results.json')
@@ -1166,86 +945,49 @@ def save_combined_results(all_results):
         'model_variant': Config.MODEL_VARIANT,
         'task_variant': Config.TASK_VARIANT,
         'prompt_type': Config.PROMPT_TYPE,
+        'grid_sizes': {},
         'summary': {}
     }
     
-    if Config.TASK_VARIANT == "grid_direction":
-        combined_data['grid_sizes'] = {}
+    for grid_size, building_results in all_results.items():
+        grid_data = {
+            'buildings': {},
+            'aggregate_metrics': {}
+        }
         
-        for grid_size, building_results in all_results.items():
-            grid_data = {
-                'buildings': {},
-                'aggregate_metrics': {}
-            }
-            
-            # Collect metrics for aggregation
-            all_metrics = {
-                'grid_cell_accuracy': [],
-                'direction_accuracy': [],
-                'exact_match_accuracy': [],
-                'avg_grid_distance': [],
-                'avg_direction_distance': [],
-                'unparseable_responses': []
-            }
-            
-            total_samples = 0
-            
-            for building_name, metrics in building_results:
-                grid_data['buildings'][building_name] = metrics
-                
-                total_samples += metrics['total_samples']
-                for key in all_metrics.keys():
-                    if key in metrics:
-                        all_metrics[key].append(metrics[key])
-            
-            # Calculate aggregate statistics
-            grid_data['aggregate_metrics'] = {
-                'total_buildings': len(building_results),
-                'total_samples': total_samples,
-                'mean_grid_cell_accuracy': float(np.mean(all_metrics['grid_cell_accuracy'])) if all_metrics['grid_cell_accuracy'] else 0,
-                'mean_direction_accuracy': float(np.mean(all_metrics['direction_accuracy'])) if all_metrics['direction_accuracy'] else 0,
-                'mean_exact_match_accuracy': float(np.mean(all_metrics['exact_match_accuracy'])) if all_metrics['exact_match_accuracy'] else 0,
-                'mean_avg_grid_distance': float(np.mean(all_metrics['avg_grid_distance'])) if all_metrics['avg_grid_distance'] else 0,
-                'mean_avg_direction_distance': float(np.mean(all_metrics['avg_direction_distance'])) if all_metrics['avg_direction_distance'] else 0,
-                'total_unparseable_responses': sum(all_metrics['unparseable_responses'])
-            }
-            
-            combined_data['grid_sizes'][f'grid_{grid_size}'] = grid_data
-    
-    else:  # labeled_arrows
-        combined_data['arrow_counts'] = {}
+        # Collect metrics for aggregation
+        all_metrics = {
+            'grid_cell_accuracy': [],
+            'direction_accuracy': [],
+            'exact_match_accuracy': [],
+            'avg_grid_distance': [],
+            'avg_direction_distance': [],
+            'unparseable_responses': []
+        }
         
-        for arrow_count, building_results in all_results.items():
-            arrow_data = {
-                'buildings': {},
-                'aggregate_metrics': {}
-            }
+        total_samples = 0
+        
+        for building_name, metrics in building_results:
+            grid_data['buildings'][building_name] = metrics
             
-            # Collect metrics for aggregation
-            all_metrics = {
-                'label_accuracy': [],
-                'unparseable_responses': []
-            }
-            
-            total_samples = 0
-            
-            for building_name, metrics in building_results:
-                arrow_data['buildings'][building_name] = metrics
-                
-                total_samples += metrics['total_samples']
-                for key in all_metrics.keys():
-                    if key in metrics:
-                        all_metrics[key].append(metrics[key])
-            
-            # Calculate aggregate statistics
-            arrow_data['aggregate_metrics'] = {
-                'total_buildings': len(building_results),
-                'total_samples': total_samples,
-                'mean_label_accuracy': float(np.mean(all_metrics['label_accuracy'])) if all_metrics['label_accuracy'] else 0,
-                'total_unparseable_responses': sum(all_metrics['unparseable_responses'])
-            }
-            
-            combined_data['arrow_counts'][f'arrows_{arrow_count}'] = arrow_data
+            total_samples += metrics['total_samples']
+            for key in all_metrics.keys():
+                if key in metrics:
+                    all_metrics[key].append(metrics[key])
+        
+        # Calculate aggregate statistics
+        grid_data['aggregate_metrics'] = {
+            'total_buildings': len(building_results),
+            'total_samples': total_samples,
+            'mean_grid_cell_accuracy': float(np.mean(all_metrics['grid_cell_accuracy'])) if all_metrics['grid_cell_accuracy'] else 0,
+            'mean_direction_accuracy': float(np.mean(all_metrics['direction_accuracy'])) if all_metrics['direction_accuracy'] else 0,
+            'mean_exact_match_accuracy': float(np.mean(all_metrics['exact_match_accuracy'])) if all_metrics['exact_match_accuracy'] else 0,
+            'mean_avg_grid_distance': float(np.mean(all_metrics['avg_grid_distance'])) if all_metrics['avg_grid_distance'] else 0,
+            'mean_avg_direction_distance': float(np.mean(all_metrics['avg_direction_distance'])) if all_metrics['avg_direction_distance'] else 0,
+            'total_unparseable_responses': sum(all_metrics['unparseable_responses'])
+        }
+        
+        combined_data['grid_sizes'][f'grid_{grid_size}'] = grid_data
     
     with open(combined_file, 'w') as f:
         json.dump(combined_data, f, indent=2)
@@ -1257,63 +999,45 @@ def save_combined_results(all_results):
 
 
 def print_summary(all_results):
-    """Print summary of evaluation results (works for both grids and arrows)"""
+    """Print summary of evaluation results"""
     print(f"\n{'='*80}")
     print("EVALUATION SUMMARY")
     print(f"{'='*80}")
     sys.stdout.flush()
     
-    if Config.TASK_VARIANT == "grid_direction":
-        for grid_size, building_results in all_results.items():
-            print(f"\nGrid Size: {grid_size}x{grid_size}")
-            print(f"Buildings evaluated: {len(building_results)}")
-            
-            all_grid_acc = [m['grid_cell_accuracy'] for _, m in building_results]
-            all_dir_acc = [m['direction_accuracy'] for _, m in building_results]
-            all_exact_acc = [m['exact_match_accuracy'] for _, m in building_results]
-            
-            print(f"Mean Grid Cell Accuracy: {np.mean(all_grid_acc):.2%}")
-            print(f"Mean Direction Accuracy: {np.mean(all_dir_acc):.2%}")
-            print(f"Mean Exact Match Accuracy: {np.mean(all_exact_acc):.2%}")
-            sys.stdout.flush()
-    
-    else:  # labeled_arrows
-        for arrow_count, building_results in all_results.items():
-            print(f"\nArrow Count: {arrow_count}")
-            print(f"Buildings evaluated: {len(building_results)}")
-            
-            all_label_acc = [m['label_accuracy'] for _, m in building_results]
-            
-            print(f"Mean Label Accuracy: {np.mean(all_label_acc):.2%}")
-            sys.stdout.flush()
+    for grid_size, building_results in all_results.items():
+        print(f"\nGrid Size: {grid_size}x{grid_size}")
+        print(f"Buildings evaluated: {len(building_results)}")
+        
+        all_grid_acc = [m['grid_cell_accuracy'] for _, m in building_results]
+        all_dir_acc = [m['direction_accuracy'] for _, m in building_results]
+        all_exact_acc = [m['exact_match_accuracy'] for _, m in building_results]
+        
+        print(f"Mean Grid Cell Accuracy: {np.mean(all_grid_acc):.2%}")
+        print(f"Mean Direction Accuracy: {np.mean(all_dir_acc):.2%}")
+        print(f"Mean Exact Match Accuracy: {np.mean(all_exact_acc):.2%}")
+        sys.stdout.flush()
 
 
 # ==================== BUILDING EVALUATION ====================
 
-def split_into_chunks(items, chunk_size=50):
+def split_into_chunks(items, chunk_size=100):
     """Split list into chunks"""
     for i in range(0, len(items), chunk_size):
         yield items[i:i + chunk_size]
 
-def evaluate_building(building_name, size_param):
-    """Evaluate a single building with a specific size using batch API (works for both grids and arrows)"""
+def evaluate_building(building_name, grid_size):
+    """Evaluate a single building with a specific grid size using batch API"""
     print(f"\n{'='*60}")
     print(f"Building: {building_name}")
-    if Config.TASK_VARIANT == "grid_direction":
-        print(f"Grid Size: {size_param}x{size_param}")
-    else:
-        print(f"Arrow Count: {size_param}")
+    print(f"Grid Size: {grid_size}x{grid_size}")
     print(f"{'='*60}")
     sys.stdout.flush()
     
-    # Load ground truth based on task variant
+    # Load ground truth
     try:
-        if Config.TASK_VARIANT == "grid_direction":
-            ground_truth_data = load_ground_truth(building_name, size_param)
-            print(f"Loaded {len(ground_truth_data)} images with ground truth")
-        else:  # labeled_arrows
-            ground_truth_data = load_arrow_mapping(building_name, size_param)
-            print(f"Loaded {len(ground_truth_data)} arrow labels with ground truth")
+        ground_truth_df = load_ground_truth(building_name, grid_size)
+        print(f"Loaded {len(ground_truth_df)} images with ground truth")
         sys.stdout.flush()
     except Exception as e:
         print(f"ERROR loading ground truth: {e}")
@@ -1321,12 +1045,12 @@ def evaluate_building(building_name, size_param):
         return None, None
     
     # Setup output directory
-    output_dir = Config.setup_output_dir(size_param, building_name)
+    output_dir = Config.setup_output_dir(grid_size, building_name)
     
     # Prepare batch requests
     try:
         all_batch_requests = prepare_batch_requests_for_building(
-            building_name, size_param, ground_truth_data
+            building_name, grid_size, ground_truth_df
         )
         print(f"Prepared {len(all_batch_requests)} batch requests")
         sys.stdout.flush()
@@ -1336,9 +1060,9 @@ def evaluate_building(building_name, size_param):
         return None, None
     
     # Split into chunks if needed
-    CHUNK_SIZE = 50
+    CHUNK_SIZE = 100
     request_chunks = list(split_into_chunks(all_batch_requests, CHUNK_SIZE))
-    print(f"Split into {len(request_chunks)} batches (upto {CHUNK_SIZE} images per batch)")
+    print(f"Split into {len(request_chunks)} batches ({CHUNK_SIZE} images per batch)")
     sys.stdout.flush()
     
     all_predictions = []
@@ -1350,7 +1074,7 @@ def evaluate_building(building_name, size_param):
         
         # Save batch file
         batch_filepath = save_batch_file(
-            chunk_requests, output_dir, building_name, size_param, chunk_idx
+            chunk_requests, output_dir, building_name, grid_size, chunk_idx
         )
         
         # Submit batch (skip if dry-run)
@@ -1360,7 +1084,7 @@ def evaluate_building(building_name, size_param):
             continue
         
         try:
-            batch_id = submit_batch(batch_filepath, building_name, size_param)
+            batch_id = submit_batch(batch_filepath, building_name, grid_size)
         except Exception as e:
             print(f"ERROR submitting batch chunk {chunk_idx}: {e}")
             sys.stdout.flush()
@@ -1381,7 +1105,7 @@ def evaluate_building(building_name, size_param):
             continue
         
         # Process results
-        chunk_predictions = process_batch_results(results_file, ground_truth_data)
+        chunk_predictions = process_batch_results(results_file, ground_truth_df)
         all_predictions.extend(chunk_predictions)
         print(f"Processed {len(chunk_predictions)} predictions from chunk {chunk_idx}")
         sys.stdout.flush()
@@ -1399,20 +1123,15 @@ def evaluate_building(building_name, size_param):
     metrics = calculate_metrics(all_predictions)
     
     # Save results
-    save_building_results(building_name, size_param, metrics, all_predictions)
+    save_building_results(building_name, grid_size, metrics, all_predictions)
     
     # Print summary
     print(f"\n{building_name} Results:")
     print(f"  Total Samples: {metrics['total_samples']}")
     print(f"  Unparseable: {metrics['unparseable_responses']}")
-    
-    if Config.TASK_VARIANT == "grid_direction":
-        print(f"  Grid Cell Accuracy: {metrics['grid_cell_accuracy']:.2%}")
-        print(f"  Direction Accuracy: {metrics['direction_accuracy']:.2%}")
-        print(f"  Exact Match Accuracy: {metrics['exact_match_accuracy']:.2%}")
-    else:  # labeled_arrows
-        print(f"  Label Accuracy: {metrics['label_accuracy']:.2%}")
-    
+    print(f"  Grid Cell Accuracy: {metrics['grid_cell_accuracy']:.2%}")
+    print(f"  Direction Accuracy: {metrics['direction_accuracy']:.2%}")
+    print(f"  Exact Match Accuracy: {metrics['exact_match_accuracy']:.2%}")
     sys.stdout.flush()
     
     return metrics, all_predictions
@@ -1443,12 +1162,7 @@ def main():
     print(f"  Model: {model_config['display_name']}")
     print(f"  Task Variant: {Config.TASK_VARIANT}")
     print(f"  Prompt Type: {Config.PROMPT_TYPE}")
-    
-    if Config.TASK_VARIANT == "grid_direction":
-        print(f"  Grid Sizes: {Config.GRID_SIZES}")
-    else:
-        print(f"  Arrow Counts: {Config.ARROW_COUNTS}")
-    
+    print(f"  Grid Sizes: {Config.GRID_SIZES}")
     print(f"  Timestamp: {Config.TIMESTAMP}")
     sys.stdout.flush()
     
@@ -1466,44 +1180,30 @@ def main():
         print(f"  Invalid buildings: {len(invalid_buildings)}")
         sys.stdout.flush()
     
-    # Process each size (grid or arrow)
+    # Process each grid size
     all_results = {}
-    skip_summary = {}  # Track skipped buildings per size
+    skip_summary = {}  # Track skipped buildings per grid size
     
-    # Get size list based on task variant
-    if Config.TASK_VARIANT == "grid_direction":
-        size_list = Config.GRID_SIZES
-        size_name = "grid size"
-    else:
-        size_list = Config.ARROW_COUNTS
-        size_name = "arrow count"
-    
-    for size_param in size_list:
+    for grid_size in Config.GRID_SIZES:
         print(f"\n{'='*80}")
-        if Config.TASK_VARIANT == "grid_direction":
-            print(f"PROCESSING GRID SIZE: {size_param}x{size_param}")
-        else:
-            print(f"PROCESSING ARROW COUNT: {size_param}")
+        print(f"PROCESSING GRID SIZE: {grid_size}x{grid_size}")
         print(f"{'='*80}")
         sys.stdout.flush()
         
-        # Validate buildings for this size
-        print(f"\nValidating buildings for {size_name} {size_param}...")
-        valid_for_size = []
+        # Validate buildings for this grid size
+        print(f"\nValidating buildings for grid size {grid_size}...")
+        valid_for_grid = []
         skipped_reasons = {}
         
         for building_name in buildings_to_process:
-            if Config.TASK_VARIANT == "grid_direction":
-                is_valid, reason = validate_building_for_grid(building_name, size_param)
-            else:
-                is_valid, reason = validate_building_for_arrows(building_name, size_param)
+            is_valid, reason = validate_building_for_grid(building_name, grid_size)
             
             if is_valid:
-                valid_for_size.append(building_name)
+                valid_for_grid.append(building_name)
             else:
                 skipped_reasons[building_name] = reason
         
-        print(f"  Valid: {len(valid_for_size)}")
+        print(f"  Valid: {len(valid_for_grid)}")
         print(f"  Skipped: {len(skipped_reasons)}")
         sys.stdout.flush()
         
@@ -1519,18 +1219,18 @@ def main():
             sys.stdout.flush()
             
             # Store for final summary
-            skip_summary[size_param] = skipped_reasons
+            skip_summary[grid_size] = skipped_reasons
         
         # Process valid buildings
-        size_results = []
+        grid_results = []
         
-        for building_name in valid_for_size:
-            metrics, predictions = evaluate_building(building_name, size_param)
+        for building_name in valid_for_grid:
+            metrics, predictions = evaluate_building(building_name, grid_size)
             
             if metrics is not None:
-                size_results.append((building_name, metrics))
+                grid_results.append((building_name, metrics))
         
-        all_results[size_param] = size_results
+        all_results[grid_size] = grid_results
     
     # Save combined results
     if not Config.SINGLE_BUILDING_MODE:
@@ -1544,11 +1244,8 @@ def main():
         print(f"\n{'='*80}")
         print("SKIPPED BUILDINGS SUMMARY")
         print(f"{'='*80}")
-        for size_param, skipped in skip_summary.items():
-            if Config.TASK_VARIANT == "grid_direction":
-                print(f"\nGrid Size {size_param}x{size_param}: {len(skipped)} skipped")
-            else:
-                print(f"\nArrow Count {size_param}: {len(skipped)} skipped")
+        for grid_size, skipped in skip_summary.items():
+            print(f"\nGrid Size {grid_size}x{grid_size}: {len(skipped)} skipped")
             
             # Group by reason
             by_reason = {}

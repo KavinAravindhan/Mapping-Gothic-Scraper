@@ -16,11 +16,22 @@ export OPENAI_API_KEY="your-key-here"
 # Test without submitting
 python3 evaluate_gpt5.py --dry-run
 
+nohup python3 evaluate_gpt5.py --dry-run > z_evaluate_gpt.log 2>&1 &
+
 # Actually run
 python3 evaluate_gpt5.py
 
 nohup python3 evaluate_gpt5.py > z_evaluate_gpt.log 2>&1 &
 
-(mapping_gothic_scraper) kr3131@seahorse:~/Mapping-Gothic-Scraper$ nohup python3 evaluate_gpt5.py > z_evaluate_gpt.log 2>&1 &
-[1] 51584
+# To check the process is running
+ps -p 2635037
+
+(mapping_gothic_scraper) kr3131@seahorse:~/Mapping-Gothic-Scraper$ nohup python3 evaluate_qwen3.py > z_evaluate_qwen.log 2>&1 &
+[1] 2635037
 (mapping_gothic_scraper) kr3131@seahorse:~/Mapping-Gothic-Scraper$ 
+
+Hi Milad,
+This is the file I am running: /home/kr3131/Mapping-Gothic-Scraper/evaluate_qwen3.py
+Model using here: Qwen/Qwen3-VL-8B-Instruct
+To run it in the background and log the terminal output I am using the command:
+nohup python3 evaluate_qwen3.py > z_evaluate_qwen.log 2>&1 &

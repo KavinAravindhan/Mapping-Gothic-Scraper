@@ -1,0 +1,8 @@
+# GPT Evaluation For Grid Size 10 x 10
+/mnt/swordfish-pool2/kavin/maps_output_analysis/gpt_evaluation/v2_grid_10
+
+# GPT Evaluation For All Grid Sizes
+/mnt/swordfish-pool2/kavin/maps_output_analysis/gpt_evaluation/v3_all_grids
+
+# GPT Evaluation For All Arrow Counts
+/mnt/swordfish-pool2/kavin/maps_output_analysis/gpt_evaluation/v4_all_arrows

@@ -12,8 +12,6 @@ import torch
 from datetime import datetime
 from tqdm import tqdm
 import re
-
-# vLLM imports
 from vllm import LLM, SamplingParams
 from transformers import AutoProcessor
 
@@ -23,11 +21,11 @@ class Config:
     SINGLE_BUILDING_MODE = False  # True for single building, False for all buildings
     SINGLE_BUILDING_NAME = "Beaumont-sur-Oise-Eglise-Saint-Leonor"
 
-    SKIP_BUILDINGS = ["Lausanne-Cathedrale-Notre-Dame"]  # Buildings to skip
+    SKIP_BUILDINGS = ["Lausanne-Cathedrale-Notre-Dame"]
     
     # Debug settings
     DEBUG_MODE = False  # Set to True to print first few responses
-    DEBUG_SAMPLES = 3   # Number of responses to print in debug mode
+    DEBUG_SAMPLES = 3
     
     # Paths
     SOURCE_BASE_PATH = "/mnt/swordfish-pool2/kavin/maps_output"  # Original building data
@@ -42,7 +40,7 @@ class Config:
     ARROW_COUNTS = [10, 15, 20]  # List of arrow counts to evaluate: [10, 15, 20]
     
     # Task variant: "grid_direction" or "labeled_arrows"
-    TASK_VARIANT = "grid_direction"  # Change to "labeled_arrows" for arrows evaluation
+    TASK_VARIANT = "grid_direction"
     
     # Prompt type: "zero_shot" or "few_shot"
     PROMPT_TYPE = "zero_shot"
@@ -70,9 +68,9 @@ class Config:
         }
     }
     
-    # Generation settings - OPTIMIZED FOR BEST PERFORMANCE
-    MAX_NEW_TOKENS = 512  # Balanced for speed and completeness
-    USE_GREEDY = True     # Deterministic output
+    # Generation settings
+    MAX_NEW_TOKENS = 512
+    USE_GREEDY = True
     TEMPERATURE = 0.1     # Only used if USE_GREEDY=False
     TOP_P = 0.95          # Only used if USE_GREEDY=False
     
@@ -83,9 +81,6 @@ class Config:
     # Environment setup
     HF_CACHE_DIR = "/mnt/swordfish-pool2/kavin/cache"
     CUDA_DEVICE = "7"
-    
-    # For labeled_arrows variant
-    NUM_ARROW_SAMPLES = 15
     
     # Runtime
     TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -567,7 +562,6 @@ You MUST provide both fields even if uncertain."""
 
 
 def load_vllm_model(processor):
-    """Load Qwen3-VL model using vLLM"""
     model_config = Config.get_model_config()
     model_name = model_config["model_name"]
     
@@ -1300,7 +1294,7 @@ def main():
     
     # Process each size (grid or arrow)
     all_results = {}
-    skip_summary = {}  # Track skipped buildings per size
+    skip_summary = {}
     
     # Get size list based on task variant
     if Config.TASK_VARIANT == "grid_direction":
