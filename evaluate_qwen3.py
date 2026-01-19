@@ -12,6 +12,7 @@ import torch
 from datetime import datetime
 from tqdm import tqdm
 import re
+from torch.utils.data import Dataset, DataLoader
 
 # vLLM imports
 from vllm import LLM, SamplingParams
@@ -23,7 +24,8 @@ class Config:
     SINGLE_BUILDING_MODE = False  # True for single building, False for all buildings
     SINGLE_BUILDING_NAME = "Beaumont-sur-Oise-Eglise-Saint-Leonor"
 
-    SKIP_BUILDINGS = ["Lausanne-Cathedrale-Notre-Dame"]  # Buildings to skip
+    # SKIP_BUILDINGS = ["Lausanne-Cathedrale-Notre-Dame"]  # Buildings to skip
+    SKIP_BUILDINGS = []  # Buildings to skip
     
     # Debug settings
     DEBUG_MODE = False  # Set to True to print first few responses
@@ -34,7 +36,7 @@ class Config:
     GRIDDED_BASE_PATH = "/mnt/swordfish-pool2/kavin/maps_output_analysis/grids_floorplan"  # Gridded floorplans
     ARROWS_BASE_PATH = "/mnt/swordfish-pool2/kavin/maps_output_analysis/arrows_floorplan"  # Arrows floorplans
     OUTPUT_BASE_PATH = "/mnt/swordfish-pool2/kavin/maps_output_analysis/qwen_evaluation"  # Results
-    
+
     # Grid configuration
     GRID_SIZES = [10, 15, 20]  # List of grid sizes to evaluate: [10, 15, 20]
     
@@ -42,7 +44,8 @@ class Config:
     ARROW_COUNTS = [10, 15, 20]  # List of arrow counts to evaluate: [10, 15, 20]
     
     # Task variant: "grid_direction" or "labeled_arrows"
-    TASK_VARIANT = "grid_direction"  # Change to "labeled_arrows" for arrows evaluation
+    # TASK_VARIANT = "grid_direction"
+    TASK_VARIANT = "labeled_arrows"
     
     # Prompt type: "zero_shot" or "few_shot"
     PROMPT_TYPE = "zero_shot"
@@ -83,10 +86,8 @@ class Config:
     # Environment setup
     HF_CACHE_DIR = "/mnt/swordfish-pool2/kavin/cache"
     CUDA_DEVICE = "7"
-    
-    # For labeled_arrows variant
-    NUM_ARROW_SAMPLES = 15
-    
+    BATCH_SIZE = 50  # Process 50 images at a time
+
     # Runtime
     TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
     OUTPUT_DIR = None
@@ -140,6 +141,51 @@ class Config:
 # Set environment variables
 os.environ['HF_HOME'] = Config.HF_CACHE_DIR
 os.environ["CUDA_VISIBLE_DEVICES"] = Config.CUDA_DEVICE
+
+class BuildingImageDataset(Dataset):
+    """Dataset for lazy loading of building images"""
+    
+    def __init__(self, floor_plan_path, image_paths, metadata_list, prompt_text, processor):
+        self.floor_plan_path = floor_plan_path
+        self.image_paths = image_paths
+        self.metadata_list = metadata_list
+        self.prompt_text = prompt_text
+        self.processor = processor
+        # Load floor plan once and keep in memory
+        self.floor_plan_image = Image.open(floor_plan_path).convert("RGB")
+    
+    def __len__(self):
+        return len(self.image_paths)
+    
+    def __getitem__(self, idx):
+        # Load photo image on-demand
+        photo_image = Image.open(self.image_paths[idx]).convert("RGB")
+        
+        # Prepare vLLM request
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image"},  # Floor plan
+                    {"type": "image"},  # Photo
+                    {"type": "text", "text": self.prompt_text},
+                ],
+            }
+        ]
+        
+        prompt = self.processor.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True
+        )
+        
+        return {
+            'request': {
+                "prompt": prompt,
+                "multi_modal_data": {"image": [self.floor_plan_image, photo_image]},
+            },
+            'metadata': self.metadata_list[idx]
+        }
 
 
 def generate_column_label(col_index, num_cols):
@@ -392,7 +438,8 @@ ANALYSIS STEPS:
 
 IMPORTANT CONSTRAINTS:
 - Only analyze architectural features CLEARLY VISIBLE in the photograph
-- Gothic churches typically have east-west orientation (altar/apse usually to the east)
+- FLOOR PLAN ORIENTATION: The floor plan is oriented with North at the top, South at the bottom, West on the left, and East on the right
+- Grid directions (N, NE, E, SE, S, SW, W, NW) refer to the floor plan's coordinate system, not real-world cardinal directions
 - Do not assume features not visible in the photo
 - Base your answer on concrete architectural elements you can identify
 - If uncertain, provide your best estimate but acknowledge this in reasoning
@@ -590,34 +637,6 @@ def load_vllm_model(processor):
     
     return llm
 
-
-def prepare_vllm_request(processor, floor_plan_image, photo_image, prompt_text):
-    """Prepare a single request for vLLM batch inference"""
-    # Prepare messages with image placeholders
-    messages = [
-        {
-            "role": "user",
-            "content": [
-                {"type": "image"},  # Placeholder for floor plan
-                {"type": "image"},  # Placeholder for photo
-                {"type": "text", "text": prompt_text},
-            ],
-        }
-    ]
-    
-    # Apply chat template to get prompt
-    prompt = processor.apply_chat_template(
-        messages,
-        tokenize=False,
-        add_generation_prompt=True
-    )
-    
-    return {
-        "prompt": prompt,
-        "multi_modal_data": {"image": [floor_plan_image, photo_image]},
-    }
-
-
 def extract_structured_answer(response_text, task_variant):
     """Extract answer using multiple strategies with robust parsing"""
     result = {
@@ -737,8 +756,7 @@ def parse_response(response_text, task_variant):
 
 def evaluate_building(building_name, size_param, llm, processor):
     """
-    Evaluate a single building with a specific size (grid or arrow) using vLLM batching
-    Returns (metrics, predictions_list) or (None, None) if error
+    Evaluate a single building with lazy image loading in batches
     """
     print(f"\n{'='*60}")
     print(f"Building: {building_name}")
@@ -749,12 +767,12 @@ def evaluate_building(building_name, size_param, llm, processor):
     print(f"{'='*60}")
     sys.stdout.flush()
     
-    # Load ground truth based on task variant
+    # Load ground truth
     try:
         if Config.TASK_VARIANT == "grid_direction":
             ground_truth_data = load_ground_truth(building_name, size_param)
             print(f"Loaded {len(ground_truth_data)} images with ground truth")
-        else:  # labeled_arrows
+        else:
             ground_truth_data = load_arrow_mapping(building_name, size_param)
             print(f"Loaded {len(ground_truth_data)} arrow labels with ground truth")
         sys.stdout.flush()
@@ -763,19 +781,16 @@ def evaluate_building(building_name, size_param, llm, processor):
         sys.stdout.flush()
         return None, None
     
-    # Get floorplan path based on task variant
+    # Get floorplan path
     if Config.TASK_VARIANT == "grid_direction":
         floor_map_path = Config.get_gridded_floorplan_path(building_name, size_param)
-    else:  # labeled_arrows
+    else:
         floor_map_path = Config.get_arrows_floorplan_path(building_name, size_param)
     
     if not os.path.exists(floor_map_path):
         print(f"ERROR: Floorplan not found: {floor_map_path}")
         sys.stdout.flush()
         return None, None
-    
-    # Load floor plan image once
-    floor_plan_image = Image.open(floor_map_path).convert("RGB")
     
     # Get prompt
     if Config.PROMPT_TYPE == "zero_shot":
@@ -787,15 +802,14 @@ def evaluate_building(building_name, size_param, llm, processor):
     building_dir = Config.get_building_source_dir(building_name)
     images_dir = os.path.join(building_dir, 'images')
     
-    # Prepare all requests for batch inference
-    print(f"Preparing batch requests...")
+    # Prepare image paths and metadata (NO IMAGE LOADING YET)
+    print(f"Preparing dataset...")
     sys.stdout.flush()
     
-    batch_requests = []
-    request_metadata = []  # Store metadata for each request
+    image_paths = []
+    metadata_list = []
     
     if Config.TASK_VARIANT == "grid_direction":
-        # ground_truth_data is a DataFrame
         for idx, row in ground_truth_data.iterrows():
             image_path = os.path.join(images_dir, f"{row['image_id']}.jpg")
             
@@ -804,28 +818,14 @@ def evaluate_building(building_name, size_param, llm, processor):
                 sys.stdout.flush()
                 continue
             
-            try:
-                # Load photo image
-                photo_image = Image.open(image_path).convert("RGB")
-                
-                # Prepare request
-                request = prepare_vllm_request(
-                    processor, floor_plan_image, photo_image, prompt_text
-                )
-                
-                batch_requests.append(request)
-                request_metadata.append({
-                    'image_id': row['image_id'],
-                    'ground_truth_cell': row['grid_cell'],
-                    'ground_truth_direction': row['direction']
-                })
-                
-            except Exception as e:
-                print(f"Error preparing request for {row['image_id']}: {e}")
-                sys.stdout.flush()
+            image_paths.append(image_path)
+            metadata_list.append({
+                'image_id': row['image_id'],
+                'ground_truth_cell': row['grid_cell'],
+                'ground_truth_direction': row['direction']
+            })
     
     else:  # labeled_arrows
-        # ground_truth_data is a dict (arrow_mapping)
         for label, info in ground_truth_data.items():
             image_path = os.path.join(images_dir, f"{info['image_id']}.jpg")
             
@@ -834,32 +834,37 @@ def evaluate_building(building_name, size_param, llm, processor):
                 sys.stdout.flush()
                 continue
             
-            try:
-                # Load photo image
-                photo_image = Image.open(image_path).convert("RGB")
-                
-                # Prepare request
-                request = prepare_vllm_request(
-                    processor, floor_plan_image, photo_image, prompt_text
-                )
-                
-                batch_requests.append(request)
-                request_metadata.append({
-                    'image_id': info['image_id'],
-                    'ground_truth_label': label
-                })
-                
-            except Exception as e:
-                print(f"Error preparing request for {info['image_id']}: {e}")
-                sys.stdout.flush()
+            image_paths.append(image_path)
+            metadata_list.append({
+                'image_id': info['image_id'],
+                'ground_truth_label': label
+            })
     
-    if not batch_requests:
-        print("ERROR: No valid requests prepared")
+    if not image_paths:
+        print("ERROR: No valid image paths found")
         sys.stdout.flush()
         return None, None
     
-    print(f"Prepared {len(batch_requests)} requests for batch inference")
+    print(f"Prepared {len(image_paths)} image paths")
     sys.stdout.flush()
+    
+    # Create dataset with lazy loading
+    dataset = BuildingImageDataset(
+        floor_plan_path=floor_map_path,
+        image_paths=image_paths,
+        metadata_list=metadata_list,
+        prompt_text=prompt_text,
+        processor=processor
+    )
+    
+    # Create DataLoader for batching
+    dataloader = DataLoader(
+        dataset,
+        batch_size=Config.BATCH_SIZE,
+        shuffle=False,
+        num_workers=0,  # Keep 0 to avoid multiprocessing issues with PIL
+        collate_fn=lambda x: x  # Return list as-is
+    )
     
     # Prepare sampling params
     if Config.USE_GREEDY:
@@ -874,72 +879,80 @@ def evaluate_building(building_name, size_param, llm, processor):
             top_p=Config.TOP_P,
         )
     
-    # Run batch inference
-    print(f"Running batch inference on {len(batch_requests)} images...")
+    # Process in batches
+    all_predictions = []
+    
+    print(f"Running inference in batches of {Config.BATCH_SIZE}...")
     sys.stdout.flush()
     
-    try:
-        outputs = llm.generate(
-            batch_requests,
-            sampling_params=sampling_params,
-        )
-    except Exception as e:
-        print(f"ERROR during batch inference: {e}")
+    for batch_idx, batch in enumerate(dataloader):
+        print(f"Processing batch {batch_idx + 1}/{len(dataloader)} ({len(batch)} images)...")
         sys.stdout.flush()
-        return None, None
-    
-    print(f"Batch inference completed")
-    sys.stdout.flush()
-    
-    # Process outputs
-    predictions = []
-    
-    for output, metadata in zip(outputs, request_metadata):
-        output_text = output.outputs[0].text if output.outputs else ""
         
-        # Parse response
-        parsed = parse_response(output_text, Config.TASK_VARIANT)
+        # Extract requests and metadata from batch
+        batch_requests = [item['request'] for item in batch]
+        batch_metadata = [item['metadata'] for item in batch]
         
-        # Validate extraction
-        missing_fields = validate_extraction(parsed, Config.TASK_VARIANT)
-        if missing_fields and Config.DEBUG_MODE:
-            print(f"Image {metadata['image_id']}: Missing fields: {', '.join(missing_fields)}")
+        try:
+            # Run inference on this batch
+            outputs = llm.generate(
+                batch_requests,
+                sampling_params=sampling_params,
+            )
+            
+            # Process outputs
+            for output, metadata in zip(outputs, batch_metadata):
+                output_text = output.outputs[0].text if output.outputs else ""
+                
+                # Parse response
+                parsed = parse_response(output_text, Config.TASK_VARIANT)
+                
+                # Validate extraction
+                missing_fields = validate_extraction(parsed, Config.TASK_VARIANT)
+                if missing_fields and Config.DEBUG_MODE:
+                    print(f"Image {metadata['image_id']}: Missing fields: {', '.join(missing_fields)}")
+                    sys.stdout.flush()
+                
+                # Debug output for first few samples
+                if Config.DEBUG_MODE and len(all_predictions) < Config.DEBUG_SAMPLES:
+                    print(f"\n{'='*60}")
+                    print(f"DEBUG - Image {metadata['image_id']}")
+                    print(f"{'='*60}")
+                    print(f"Raw Response:\n{output_text[:500]}...")
+                    print(f"\nParsed:")
+                    if Config.TASK_VARIANT == "grid_direction":
+                        print(f"  GRID_CELL: {parsed.get('grid_cell')}")
+                        print(f"  DIRECTION: {parsed.get('direction')}")
+                    else:
+                        print(f"  ARROW_LABEL: {parsed.get('arrow_label')}")
+                    print(f"  REASONING: {parsed.get('reasoning')[:100]}...")
+                    print(f"{'='*60}\n")
+                    sys.stdout.flush()
+                
+                # Add metadata to parsed result
+                parsed['image_id'] = metadata['image_id']
+                
+                if Config.TASK_VARIANT == "grid_direction":
+                    parsed['ground_truth_cell'] = metadata['ground_truth_cell']
+                    parsed['ground_truth_direction'] = metadata['ground_truth_direction']
+                else:
+                    parsed['ground_truth_label'] = metadata['ground_truth_label']
+                
+                all_predictions.append(parsed)
+        
+        except Exception as e:
+            print(f"ERROR during batch {batch_idx + 1} inference: {e}")
             sys.stdout.flush()
-        
-        # Add debug output for first few samples
-        if Config.DEBUG_MODE and len(predictions) < Config.DEBUG_SAMPLES:
-            print(f"\n{'='*60}")
-            print(f"DEBUG - Image {metadata['image_id']}")
-            print(f"{'='*60}")
-            print(f"Raw Response:\n{output_text[:500]}...")
-            print(f"\nParsed:")
-            if Config.TASK_VARIANT == "grid_direction":
-                print(f"  GRID_CELL: {parsed.get('grid_cell')}")
-                print(f"  DIRECTION: {parsed.get('direction')}")
-            else:
-                print(f"  ARROW_LABEL: {parsed.get('arrow_label')}")
-            print(f"  REASONING: {parsed.get('reasoning')[:100]}...")
-            print(f"{'='*60}\n")
-            sys.stdout.flush()
-        
-        # Add metadata to parsed result
-        parsed['image_id'] = metadata['image_id']
-        
-        if Config.TASK_VARIANT == "grid_direction":
-            parsed['ground_truth_cell'] = metadata['ground_truth_cell']
-            parsed['ground_truth_direction'] = metadata['ground_truth_direction']
-        else:
-            parsed['ground_truth_label'] = metadata['ground_truth_label']
-        
-        predictions.append(parsed)
+            # Continue with next batch instead of failing completely
+            continue
     
-    print(f"Completed processing {len(predictions)} predictions")
+    print(f"Completed processing {len(all_predictions)} predictions")
     sys.stdout.flush()
     
     # Calculate metrics
-    metrics = calculate_metrics(predictions, Config.TASK_VARIANT)
+    metrics = calculate_metrics(all_predictions, Config.TASK_VARIANT)
     
-    return metrics, predictions
+    return metrics, all_predictions
 
 
 def calculate_metrics(predictions, task_variant):

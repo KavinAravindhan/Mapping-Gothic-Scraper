@@ -1,0 +1,269 @@
+FEW-SHOT EXAMPLES CREATION PROMPT - GRID DIRECTION
+
+You are analyzing a Gothic church floor plan and an interior/exterior photograph from 12th–13th century France.
+
+ARCHITECTURAL CONTEXT:
+This is a Gothic church building with typical features including:
+- Nave (central space), side aisles, transept (crossing), choir, apse
+- Columns/pillars supporting pointed arches and ribbed vaults
+- Large windows (often with tracery), clerestory windows
+- Ambulatory (walkway around choir/apse in some churches)
+- Stone walls, vaulted ceilings, decorative capitals
+- Exterior elements may include towers, portals, buttresses, and gables
+
+TASK: Explain why the photograph was taken from the specified grid cell and direction.
+
+GRID INFORMATION:
+- Grid size: {grid_size}×{grid_size} grid overlaid on the floor plan
+- Columns: A to {last_col} (left to right)
+- Rows: 1 to {grid_size} (top to bottom)
+- Directions: N (North), NE (Northeast), E (East), SE (Southeast), S (South), SW (Southwest), W (West), NW (Northwest)
+
+GROUND TRUTH LOCATION:
+- Grid Cell: {grid_cell}
+- Direction: {direction}
+
+FLOOR PLAN ORIENTATION:
+- North is at the top, South at the bottom, West on the left, East on the right
+- Grid directions (N, NE, E, SE, S, SW, W, NW) refer to the floor plan coordinate system
+
+ANALYSIS STEPS:
+
+1. EXAMINE the specified grid cell ({grid_cell}) on the floor plan:
+   - Identify what part of the church this cell falls in or near (nave, side aisle, transept arm, crossing, choir, apse, ambulatory, or exterior perimeter)
+   - Note nearby plan elements such as columns (dots/circles), wall thickness/edges, openings, curvature, or junctions
+
+2. USE the viewing direction ({direction}) to predict the view:
+   - Determine what would be directly ahead in this direction (e.g., nave bays, crossing, apse curvature, exterior façade wall)
+   - Determine what would likely fall to the left and right (e.g., an arcade line, a wall with windows, a side aisle boundary)
+
+3. IDENTIFY architectural features clearly visible in the photograph:
+   - Column/pier spacing and alignment (how many supports are visible, bay rhythm)
+   - Pointed arches, vault ribs, ceiling height differences (if visible)
+   - Window placement and orientation (left/right/ahead; large traceried window vs smaller openings)
+   - Wall planes, openings, curvature, or exterior buttress rhythm (if exterior)
+
+4. EXPLAIN the correspondence between plan and photo:
+   - State the 2–3 strongest visible photo cues and tie each one to what the floor plan indicates at {grid_cell}
+   - Explicitly connect left/right/ahead features in the photo to the {direction} from {grid_cell}
+   - If any detail is ambiguous, acknowledge it briefly, but still justify why this location/direction is the best match
+
+IMPORTANT GUIDELINES:
+- Only analyze architectural features CLEARLY VISIBLE in the photograph
+- Do not assume features not visible in the photo
+- Be specific about spatial relationships (e.g., “arcade line on the left,” “wall/window band ahead,” “open crossing to the right”)
+- Reference floor plan structural elements (columns shown as dots/circles, wall lines, openings, curved apse geometry)
+- Keep the explanation to 2–3 sentences, focusing on the most confirmatory evidence
+
+OUTPUT FORMAT (MANDATORY):
+REASONING: [2-3 sentences explaining why {grid_cell} and {direction} match the photograph, including:
+1. 2–3 visible architectural features in the photograph
+2. what the floor plan shows at/near {grid_cell}
+3. how the {direction} explains what appears ahead vs left/right in the photo]
+
+Now analyze the provided floor plan and photograph. Explain why grid cell {grid_cell} with direction {direction} corresponds to what is shown in the image.
+
+
+
+
+
+FEW-SHOT EXAMPLES CREATION PROMPT - LABELED ARROWS
+
+
+You are analyzing a Gothic church floor plan with labeled arrows and an interior photograph from 12th-13th century France.
+
+ARCHITECTURAL CONTEXT:
+This is a Gothic church building with typical features including:
+- Nave (central space), side aisles, transept (crossing), choir, apse
+- Columns/pillars supporting pointed arches and ribbed vaults
+- Large windows (often with tracery), clerestory windows
+- Ambulatory (walkway around choir/apse in some churches)
+- Stone walls, vaulted ceilings, decorative capitals
+
+TASK: Explain why the provided ground truth arrow label matches the photograph’s location and viewing direction.
+
+INPUTS PROVIDED:
+- The floor plan image contains {arrow_count} (10 / 15 / 20) labeled arrows
+- Arrow labels range from {label_range} (A to J / A to O / A to T)
+- Each arrow shows a specific position and viewing direction within the church
+- FLOOR PLAN ORIENTATION: North is at the top, South at the bottom, West on the left, East on the right
+- You are given:
+  1. An interior photograph
+  2. A floor plan with labeled arrows
+  3. The ground truth arrow label: {given_label}
+  4. The ground truth viewing direction: {given_direction}
+
+ANALYSIS STEPS:
+
+1. IDENTIFY visible Gothic architectural features in the photograph:
+   - Column/pillar positions and spacing (arcade rhythm, number of bays visible)
+   - Pointed arches and ribbed vault configurations (if visible)
+   - Window locations, sizes, and which side they appear on (left/right/front)
+   - Wall positions, openings, curvature, or aisle/nave height differences
+   - Spatial arrangement cues (nave axis, side aisle view, transept/crossing openness, choir/apse curvature)
+
+2. LOCATE the ground truth arrow label on the floor plan:
+   - Identify where {given_label} is positioned (nave, side aisle, transept, crossing, choir, apse, ambulatory)
+   - Identify the viewing direction of {given_label} based on the arrow orientation
+   - Note nearby structural markers on the plan (column dots/circles, wall lines, openings)
+
+3. JUSTIFY the match between photo and plan:
+   - Explain how the visible features in the photograph align with what would be expected from {given_label}'s location
+   - Verify that the left/right/front elements in the photo are consistent with the arrow’s viewing direction
+   - Use only concrete evidence visible in the photograph; do not assume unseen features
+
+IMPORTANT CONSTRAINTS:
+- Only analyze architectural features CLEARLY VISIBLE in the photograph
+- The label is already provided; do not search for a different label
+- Both the location AND the viewing direction of {given_label} must be supported by evidence
+- Do not assume features not visible in the photo
+- Base your reasoning on concrete architectural elements you can identify
+
+OUTPUT FORMAT (MANDATORY - YOU MUST PROVIDE THIS FIELD):
+REASONING: [2-3 sentences explaining why {given_label} matches, including:
+1. 2-3 visible architectural features in the photograph
+2. where {given_label} lies on the floor plan (nave/aisle/transept/choir/etc.)
+3. how {given_label}'s viewing direction explains what appears left/right/front in the photo]
+
+Now analyze the provided floor plan and photograph and justify the given label.
+
+
+
+
+
+
+ZERO-SHOT PROMPT - GRID DIRECTION
+
+
+You are analyzing a Gothic church floor plan and an interior/exterior photograph from 12th–13th century France.
+
+ARCHITECTURAL CONTEXT:
+This is a Gothic church building with typical features including:
+- Nave (central space), side aisles, transept (crossing), choir, apse
+- Columns/pillars supporting pointed arches and ribbed vaults
+- Large windows (often with tracery), clerestory windows
+- Ambulatory (walkway around choir/apse in some churches)
+- Stone walls, vaulted ceilings, decorative capitals
+- Exterior elements may include buttresses, portals, gables, and towers
+
+TASK: Determine where the photo was taken (grid cell) and the camera direction (one of 8 compass directions) using only clearly visible architectural evidence.
+
+GRID INFORMATION:
+- Grid size: {grid_size}×{grid_size} grid overlaid on the floor plan
+- Columns: A to {last_col} (left to right)
+- Rows: 1 to {grid_size} (top to bottom)
+- Directions: N (North), NE (Northeast), E (East), SE (Southeast), S (South), SW (Southwest), W (West), NW (Northwest)
+
+FLOOR PLAN ORIENTATION:
+- North is at the top, South at the bottom, West on the left, East on the right
+- Direction labels (N, NE, E, SE, S, SW, W, NW) refer to the floor plan coordinate system
+
+ANALYSIS STEPS:
+
+1. IDENTIFY visible Gothic architectural features in the photograph (use only what is clearly visible):
+   - Column/pillar positions and spacing (number of bays visible, arcade rhythm)
+   - Pointed arches, vault ribs, ceiling height changes (if visible)
+   - Window locations and orientation (left/right/ahead; clerestory vs aisle-level)
+   - Wall positions, openings, curvature, or thickness cues
+   - Spatial arrangement cues (central nave vs side aisle, transept crossing openness, choir/apse curvature)
+   - If exterior: façade composition, portals, buttresses, gables, and wall extensions
+
+2. LOCATE these features on the gridded floor plan:
+   - Match column positions shown as dots/circles and their spacing pattern
+   - Identify where windows/openings would be located along the perimeter or internal walls
+   - Determine which major section fits best (nave, side aisle, transept, crossing, choir, apse, ambulatory)
+   - Use distinctive plan geometry (straight nave vs projecting transept arms vs rounded apse)
+
+3. DETERMINE camera position (GRID_CELL):
+   - Choose the single grid cell that best contains the viewpoint consistent with the identified section and nearby plan markers
+   - Prefer locations that explain proximity to a wall or colonnade, and the symmetry/asymmetry in the photograph
+
+4. DETERMINE camera direction (DIRECTION):
+   - Select the direction the camera is facing (N/NE/E/SE/S/SW/W/NW) based on what appears directly ahead
+   - Verify direction using left/right evidence (e.g., windows on one side, arcade line on the other, wall directly in front)
+   - Ensure the direction is consistent with the plan layout from the chosen grid cell
+
+IMPORTANT CONSTRAINTS:
+- Only analyze architectural features CLEARLY VISIBLE in the photograph
+- Do not assume features not visible in the photo
+- Base your answer on concrete architectural elements you can identify
+- Provide your best estimate if uncertain, but acknowledge uncertainty in the reasoning
+- You must output exactly one GRID_CELL and exactly one DIRECTION from the allowed set
+
+OUTPUT FORMAT (MANDATORY - YOU MUST PROVIDE ALL THREE FIELDS):
+REASONING: [2-3 sentences identifying key Gothic features visible and their location on the plan]
+GRID_CELL: [Letter][Number]
+DIRECTION: [One of: N, NE, E, SE, S, SW, W, NW]
+
+EXAMPLE OUTPUT:
+REASONING: The photograph shows an exterior Gothic transept façade with a large pointed traceried window above a centered portal, framed by heavy buttresses and a steep gable. On the floor plan, grid cell E1 lies directly in front of the projecting north transept arm, where the thick outer wall and corner masses would produce this frontal façade view. Facing S from E1 aligns the camera toward the transept front and the attached main church body behind it, matching the façade-first composition seen in the photo.
+GRID_CELL: E1
+DIRECTION: S
+
+Now analyze the provided floor plan and photograph. You MUST provide all three fields (REASONING, GRID_CELL, DIRECTION) even if uncertain.
+
+
+
+
+
+
+ZERO-SHOT PROMPT - LABELED ARROWS
+
+
+You are analyzing a Gothic church floor plan with labeled arrows and an interior/exterior photograph from 12th–13th century France.
+
+ARCHITECTURAL CONTEXT:
+This is a Gothic church building with typical features including:
+- Nave (central space), side aisles, transept (crossing), choir, apse
+- Columns/pillars supporting pointed arches and ribbed vaults
+- Large windows (often with tracery), clerestory windows
+- Ambulatory (walkway around choir/apse in some churches)
+- Stone walls, vaulted ceilings, decorative capitals
+- Exterior elements may include towers, portals, buttresses, gables, and façade massing
+
+TASK: Identify which labeled arrow corresponds to the photograph’s location and viewing direction.
+
+ARROW INFORMATION:
+- The floor plan contains {arrow_count} labeled arrows
+- Arrow labels range from {label_range}
+- Each arrow shows a specific position and viewing direction within the church
+- FLOOR PLAN ORIENTATION: North is at the top, South at the bottom, West on the left, East on the right
+
+ANALYSIS STEPS:
+
+1. IDENTIFY visible Gothic architectural features in the photograph (use only what is clearly visible):
+   - Column/pillar positions and spacing (bay rhythm, number of supports visible)
+   - Pointed arches and vault configurations (if visible)
+   - Window placement and orientation (left/right/ahead; large traceried windows vs smaller aisle windows)
+   - Wall positions, openings, curvature, and thickness cues
+   - Spatial layout cues (nave axis, side aisle perspective, transept/crossing openness, choir/apse curvature)
+   - If exterior: tower/portal presence, buttress rhythm, façade gable shape, and wall massing direction
+
+2. LOCATE these features on the floor plan with arrows:
+   - Match column dots/circles and their spacing pattern to the photograph’s rhythm
+   - Identify where major openings/windows would lie along outer walls (when visible)
+   - Determine which zone fits best (nave, aisle, crossing, transept arm, choir, apse, ambulatory, exterior perimeter)
+   - Use distinctive plan geometry (straight nave vs projecting transept arms vs rounded apse) to narrow location
+
+3. MATCH to the correct arrow:
+   - Choose the arrow whose position best matches the inferred viewpoint location
+   - Verify the arrow direction matches what appears ahead vs left/right in the photograph
+   - Confirm both location AND viewing direction using 2–3 concrete visible cues
+
+IMPORTANT CONSTRAINTS:
+- Only analyze architectural features CLEARLY VISIBLE in the photograph
+- Each arrow represents a specific viewpoint; both position and direction matter
+- Do not assume features not visible in the photo
+- Base your answer on concrete architectural elements you can identify
+- The answer must be one of the {arrow_count} labeled arrows ({label_range})
+- If uncertain, provide your best estimate but acknowledge uncertainty in the reasoning
+
+OUTPUT FORMAT (MANDATORY - YOU MUST PROVIDE BOTH FIELDS):
+REASONING: [2-3 sentences identifying key visible Gothic features and explaining why they match the arrow’s location and direction]
+ARROW_LABEL: [Single letter from {label_range}]
+
+EXAMPLE OUTPUT:
+REASONING: In the photograph we see the west-end tower mass on the left, plus a long, buttressed nave wall receding away and leading the eye toward the crossing/transept gable ahead—clear exterior Gothic cues. On the floor plan, arrow A sits outside the west side near the southwest corner of the church mass, and its northeastward direction means you would look diagonally along the south flank toward the crossing/transept, matching the photo’s left-to-right progression (tower closest at left → nave/transept extending to the right/front).
+ARROW_LABEL: A
+
+Now analyze the provided floor plan and photograph. You MUST provide both fields (REASONING, ARROW_LABEL) even if uncertain.

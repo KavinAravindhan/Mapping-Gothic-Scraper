@@ -1,0 +1,148 @@
+FEW-SHOT EXAMPLES - GRID DIRECTION
+
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/grids_floorplan/grid_size_10/Auxerre-Cathedrale-Saint-Etienne_floorplan_gridded.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Auxerre-Cathedrale-Saint-Etienne/images/1084_00129.jpg
+1084_00129,E1,S
+REASONING: The photograph shows an exterior Gothic façade with a large pointed traceried window above a main portal, framed by massive corner buttresses/turret-like supports and a steep gable—typical of a transept “front.” On the floor plan, grid cell E1 sits just north of the projecting north transept arm (around E2–F3), directly in front of its thick outer wall and corner masses; from there, looking S gives a straight-on view of that transept façade, exactly matching the photo’s centered portal + huge window composition. The way the church fabric continues off to the side in the photo (roofline and buttressed wall extending laterally) is consistent with the plan showing the main body (crossing/nave and aisles) attached immediately south of this transept front, so the façade reads as the dominant element from E1 facing south.
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/grids_floorplan/grid_size_10/Canterbury-Cathedral_floorplan_gridded.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Canterbury-Cathedral/images/1285_00075.jpg
+1285_00075,I6,E
+REASONING: The photograph shows the eastern termination of the church: a curved apse wall filled with tall Gothic stained-glass lancet windows, with ribbed vaulting overhead and a heavy pier/column framing the view at the side—exactly the kind of “end-of-church” vista you get when looking into the chevet. On the floor plan, grid cell I6 lies inside the choir/apse zone just before the rounded end (the semicircular apse and its surrounding curved wall are centered here), with piers and the apse perimeter immediately to the east. If you stand in I6 and look E, you are looking straight into the apse closure: the curved outer wall (shown by the arc at the far right) corresponds to the photograph’s wraparound window wall, while the nearby pier positions along the curve explain why the image is “framed” by vertical supports at the edges and why the main visual emphasis is a band of large windows directly ahead.
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/grids_floorplan/grid_size_10/Hambye-Eglise-Notre-Dame_floorplan_gridded.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Hambye-Eglise-Notre-Dame/images/1132_00020.jpg
+1132_00020,F7,E
+REASONING: The photograph shows a massive cylindrical pier immediately to the left, carrying a pointed arcade opening, with the aisle/circulation space continuing forward under rib-vaulted Gothic bays; the brighter, more open zone beyond the left arcade reads as the larger church volume opening off the aisle (typical of a nave/choir arcade). In the floor plan, grid cell F7 sits on the south side of the choir/transept area, right beside a major pier of the arcade (the heavy black pier symbol) and just inside the south-side aisle/chapel band bounded by thicker walls. Looking E from F7, the plan predicts exactly this composition: arcade piers and openings on the left (toward the central vessel), the outer wall/chapel mass on the right, and a forward view through successive bays toward the eastern choir/chevet, matching the photo’s left-hand pier-and-arch sequence and the vaulted passage continuing eastward.
+
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/grids_floorplan/grid_size_15/Laval-Eglise-Notre-Dame-d-Avenieres_floorplan_gridded.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Laval-Eglise-Notre-Dame-d-Avenieres/images/1138_00015.jpg
+1138_00015,M7,NE
+REASONING: The photograph is a tight close-up of a carved stone head functioning like a corbel/console under a projecting stone course (you can see the overhanging block above it and the weathered masonry/lichen around it), which is the kind of decorative exterior (or outer-ambulatory wall) detail you find along the chevet/apse chapels rather than in the open nave. On the floor plan, M7 sits on the curving outer edge of the apse/radiating-chapel zone, right where the wall thickens and breaks into buttress-like projections around the chevet—exactly the place where a cornice line and its corbels would run. Looking NE from M7 aims you toward that north-eastern chapel/apse exterior wall segment, so the camera would naturally pick up a close-range sculptural support under the eaves/cornice on the chevet, matching both the location (apse perimeter) and the orientation (toward the outer NE curve) shown on the plan.
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/grids_floorplan/grid_size_15/Orleans-Cathedrale-Sainte-Croix_floorplan_gridded.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Orleans-Cathedrale-Sainte-Croix/images/1162_00065.jpg
+1162_00065,L10,E
+REASONING: The photograph shows a narrow Gothic side passage with repeating pointed transverse arches and rib-vault bays receding into the distance, a massive clustered pier/arcade line very close on the left, and a series of wall/chapel openings on the right (the bays with colored/blue arch reveals), which is exactly the spatial “rhythm” you get when standing in an ambulatory/choir aisle and looking along it. On the floor plan, grid cell L10 sits on the south side of the choir/ambulatory just west of the rounded apse, where the plan shows (i) an inner colonnade/pier line separating the ambulatory from the main choir (to the north, i.e., your left when facing east) and (ii) the outer wall with chapel/bay articulations along the curved apse edge (to the south, i.e., your right). Viewing direction E from L10 therefore produces the same composition as the photo: arcade/pier line on the left, outer wall/chapel openings on the right, and multiple successive vault bays leading your eye toward the eastern apse termination.
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/grids_floorplan/grid_size_15/Rouen-Cathedrale-Notre-Dame_floorplan_gridded.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Rouen-Cathedrale-Notre-Dame/images/1178_00013.jpg
+1178_00013,H14,N
+REASONING: The photograph shows an exterior Gothic transept-style portal: a deep pointed-arch doorway with rich archivolts/tympanum, tall buttresses/pier-like supports framing it, and a large circular rose window centered above—elements typical of a transept end façade rather than an interior nave view. On the floor plan, grid cell H14 sits just south of the church’s central mass, directly outside the south projecting block of the transept/choir complex (the heavy outer wall line and the paired, thick corner masses read as the façade and its buttresses), with a central axis line leading into the building. Facing N from H14 places you squarely in front of that southern façade, so the portal would be straight ahead (with flanking buttresses left/right), matching the photo’s centered doorway composition and the “big façade feature” implied by the plan at the south end of the crossing/transept zone.
+
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/grids_floorplan/grid_size_20/Sees-Cathedrale-Notre-Dame_floorplan_gridded.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Sees-Cathedrale-Notre-Dame/images/1196_00009.jpg
+1196_00009,K10,SE
+REASONING: The photograph shows the east end of the church: high ribbed vaults stepping toward a polygonal/rounded apse, a ring of tall clerestory/lancet windows with tracery lighting the choir, and a massive clustered pier with a pointed arcade opening on the right. On the floor plan, grid cell **K10** sits at the **crossing/choir threshold** where the nave meets the transept/choir, right beside one of the **major crossing piers** (the large dark “blob” supports) and aligned with the central vessel leading to the apse. From **K10 looking SE**, your view runs diagonally into the **choir/apse** (explaining the centered apse windows and converging vault ribs) while placing the **south-side pier and arcade** close in the right foreground—matching the prominent right-hand pier and the side opening visible in the photo.
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/grids_floorplan/grid_size_20/Toulouse-Cathedrale-Saint-Etienne_floorplan_gridded.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Toulouse-Cathedrale-Saint-Etienne/images/1303_00007.jpg
+1303_00007,F13,NE
+REASONING: The photograph shows a side-walk space with a **solid outer wall on the left** (including a tall **stained-glass lancet**) and, on the right, a **receding arcade of pointed arches on columns** beneath **ribbed vaulting**, with a brighter opening further ahead (toward the crossing/choir). On the floor plan, **F13 sits in the western nave bay close to the south side**, right beside the thick **south exterior wall and buttress line**, and within a bay indicated by the **X-shaped rib-vault diagonals**; from here, looking **NE** points diagonally **toward the interior arcade and eastward toward the crossing**. This matches the photo because the **south wall** would read as the continuous surface with windows on the **left**, while the **nave/aisle arcade** would line up on the **right** and repeat into the distance, and the large arch and changing light ahead align with moving NE toward the more open eastern parts of the church.
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/grids_floorplan/grid_size_20/Villeneuve-sur-Yonne-Eglise-Notre-Dame_floorplan_gridded.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Villeneuve-sur-Yonne-Eglise-Notre-Dame/images/1069_00033.jpg
+1069_00033,H2,S
+REASONING: The photograph shows the **north exterior elevation** of a Gothic church: repeating **buttresses** dividing the wall into bays, large **pointed-arch windows with tracery** at the aisle level, and a second tier of larger **clerestory windows** above, plus a small doorway at ground level. On the floor plan, **H2 lies just outside the church on the north side**, aligned with the long **north wall of the nave/side aisle**, where the plan clearly marks periodic **wall projections/buttress masses** along that flank. Looking **S** from H2 means you are facing directly toward that north wall, so the **bay-by-bay rhythm of buttresses and window openings** in the photo matches the **regularly spaced exterior supports** shown on the plan at that same longitudinal position, confirming both the location (north side at H) and the southward viewing direction.
+
+
+
+
+
+FEW-SHOT EXAMPLES - LABELED ARROWS
+
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/arrows_floorplan/arrows_10/Angers-Cathedrale-Saint-Maurice/Angers-Cathedrale-Saint-Maurice_arrows_visualization.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Angers-Cathedrale-Saint-Maurice/images/1212_00065.jpg
+"H": {
+    "image_id": "1212_00065",
+    "x": 0.6141091143310483,
+    "y": 0.3404580625737807,
+    "direction": "NW"
+}
+REASONING: In the photograph, we see a long rhythm of pointed nave arcades and ribbed vault bays receding into the distance, with a bright line of high clerestory/upper windows along one side—this is exactly the kind of deep axial view you get when standing at the crossing and looking back into the nave. On the floor plan, H sits at the crossing (where nave and transept intersect), and facing Northwest from that position means the camera is looking back toward the western nave while also catching the north-side arcade/windows to the right, matching the photo’s strong side-wall arcade + long nave perspective.
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/arrows_floorplan/arrows_10/Dol-de-Bretagne-Cathedrale-Saint-Samson/Dol-de-Bretagne-Cathedrale-Saint-Samson_arrows_visualization.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Dol-de-Bretagne-Cathedrale-Saint-Samson/images/1119_00001.jpg
+"A": {
+    "image_id": "1119_00001",
+    "x": -0.0310282730700054,
+    "y": 0.4241915064281372,
+    "direction": "NE"
+}
+REASONING: In the photograph we see the west-end tower mass on the left, plus a long, buttressed nave wall receding away and leading the eye toward the crossing/transept gable ahead—clear exterior Gothic cues. On the floor plan, arrow A sits outside the west side near the southwest corner of the church mass, and its Northeast direction means you would look diagonally along the south flank toward the crossing/transept, exactly matching the photo’s left-to-right progression (tower closest at left → nave/transept extending to the right/front).
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/arrows_floorplan/arrows_10/Glastonbury-Abbey/Glastonbury-Abbey_arrows_visualization.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Glastonbury-Abbey/images/2423_00028.jpg
+"D": {
+    "image_id": "2423_00028",
+    "x": 0.157763388788984,
+    "y": 0.1654477758533345,
+    "direction": "E"
+}
+REASONING: In the photograph, we see a long, straight vessel with parallel nave walls and a repeating arcade rhythm on both the left and right, looking toward a large opening/arch at the far end, which strongly indicates a view down the main west–east axis rather than toward a curved apse or across a transept. On the floor plan, arrow D sits in the western end of the nave/galilee approach area (just inside the west front) and points East, which is exactly the position where you would expect to see symmetrical side arcades flanking the central space and the church stretching forward in a straight line. Because D is aimed East, the photo’s left/right walls correspond to the north and south sides of the nave, matching the mirrored aisle openings visible on both sides.
+
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/arrows_floorplan/arrows_15/Melun-Eglise-Notre-Dame/Melun-Eglise-Notre-Dame_arrows_visualization.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Melun-Eglise-Notre-Dame/images/1031_00052.jpg
+"L": {
+    "image_id": "1031_00052",
+    "x": 0.433547805143935,
+    "y": 0.3065739322199565,
+    "direction": "N"
+}
+REASONING: The photograph shows high pointed transverse arches and ribbed vaults springing from tall nave supports, with a row of clerestory-level windows set high in the wall—features that strongly indicate we are standing in the main nave volume rather than the curved apse/choir or the wider transept crossing. On the floor plan, arrow L sits in the central nave bay (mid-nave, just west of the crossing) and its arrow points North, which matches a view looking straight up the nave axis, where you would expect to see the repeating nave vault/arch rhythm and high wall windows on the sides. Because L is centered in the nave and aimed north, the scene should read as a longitudinal nave perspective (not curving or opening laterally), consistent with what the photo shows.
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/arrows_floorplan/arrows_15/Paris-Sainte-Chapelle/Paris-Sainte-Chapelle_arrows_visualization.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Paris-Sainte-Chapelle/images/1168_00173.jpg
+"O": {
+    "image_id": "1168_00173",
+    "x": 0.2158986974869262,
+    "y": 0.2287081097256726,
+    "direction": "W"
+}
+REASONING: The photograph is a tight view of a stained-glass opening framed by heavy stone tracery (a foiled/oculus-like window), which is the kind of prominent decorated window you expect on an end wall rather than along the repeating side bays. On the floor plan, O sits in the westernmost part of the nave near the entrance/portal zone, right up against the thick west wall massing. Since O’s arrow points West, the camera would be facing the west façade, making a richly framed stained-glass window on that west wall exactly what should appear in front of the viewer.
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/arrows_floorplan/arrows_15/Saint-Mary-Redcliffe/Saint-Mary-Redcliffe_arrows_visualization.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Saint-Mary-Redcliffe/images/2417_00015.jpg
+"F": {
+    "image_id": "2417_00015",
+    "x": 0.106844796379693,
+    "y": 0.006971136225785,
+    "direction": "S"
+}
+REASONING: The photograph shows the church’s western entrance massing with a large pointed-arch portal, tall buttressed tower, and Gothic window tracery stretching along the flank—features you would expect when positioned at the far west/north-west end of the plan. On the floor plan, F sits in the north-west/west entrance zone (near the outer western structures), and a south-facing view from F naturally frames the main entry volume ahead, with the tower reading to the right (west side) and the long elevation of the nave/aisle extending across the left side, matching the photo’s left–right composition.
+
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/arrows_floorplan/arrows_20/Tewkesbury-Abbey/Tewkesbury-Abbey_arrows_visualization.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Tewkesbury-Abbey/images/2436_00044.jpg
+"R": {
+    "image_id": "2436_00044",
+    "x": 0.2354479014444691,
+    "y": 0.1067169496952804,
+    "direction": "SE"
+}
+REASONING: The photograph shows the long side elevation of the nave with a repeating rhythm of tall pointed Gothic windows and a clerestory band above, plus a large crossing tower/mass rising at the left end—exactly what you would expect when viewing the church from the outside along the north side. On the floor plan, R sits just north of the nave, and with a Southeast viewing direction it means you are looking diagonally along the nave toward the crossing/choir end, which explains why the tower appears to the left (near the west/crossing mass) while the windowed nave wall stretches away toward the right/front (toward the east).
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/arrows_floorplan/arrows_20/Vendome-Eglise-de-la-Trinite/Vendome-Eglise-de-la-Trinite_arrows_visualization.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Vendome-Eglise-de-la-Trinite/images/1208_00020.jpg
+"M": {
+    "image_id": "1208_00020",
+    "x": 0.6901117225833535,
+    "y": 0.2307470457489354,
+    "direction": "SW"
+}
+REASONING: The photograph shows a long run of dark wooden choir stalls tightly lining the side of the church, with tall Gothic piers/arcades and high clerestory windows lighting the space from the left—features typical of the choir edge just beside the crossing rather than the open nave. On the floor plan, M sits immediately east of the main crossing piers (at the choir–crossing junction), so standing there would naturally place the choir furnishings close in the foreground while the larger structural arches of the crossing open up nearby. The Southwest viewing direction from M explains why the view tracks diagonally back toward the broader church interior (toward the crossing/nave) while keeping the side-wall windows consistently on one side of the frame.
+
+/mnt/swordfish-pool2/kavin/maps_output_analysis/arrows_floorplan/arrows_20/Winchester-Cathedral/Winchester-Cathedral_arrows_visualization.jpg
+/mnt/swordfish-pool2/kavin/maps_output/Winchester-Cathedral/images/2438_00059.jpg
+"P": {
+    "image_id": "2438_00059",
+    "x": 0.3121872936910712,
+    "y": 0.0137691627425997,
+    "direction": "S"
+}
+REASONING: The photograph shows a long, straight exterior elevation with a repeated bay rhythm: large pointed Gothic windows separated by strong vertical buttresses, plus a smaller upper band of openings (clerestory level), which is exactly what you expect along the side wall of the nave. On the floor plan, P is placed on the north (top) side of the nave, roughly mid-length, and its arrow points South, meaning the camera is standing outside the north flank and looking toward the church wall. That south-facing view explains why the photo is dominated by a continuous nave-side wall with repeated window-buttress spacing (and not the curved apse/ambulatory or the cloister side).

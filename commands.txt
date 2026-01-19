@@ -2,16 +2,21 @@ watch -n 1 nvidia-smi
 
 # Create Grid on the Floorplan
 python3 create_grid_overlay.py
+nohup python3 create_grid_overlay.py > z_create_grid.log 2>&1 &
 
 # Create Arrows on the Floorplan
 python3 visualize_arrows_floor_map_sampled.py
+nohup python3 visualize_arrows_floor_map_sampled.py > z_visualize_arrows.log 2>&1 &
 
+# Evaluate Qwen3
 nohup python3 evaluate_qwen3.py > z_evaluate_qwen.log 2>&1 &
 
 # unbuffered mode
 nohup python3 -u evaluate_qwen3.py > z_evaluate_qwen.log 2>&1 &
 
 export OPENAI_API_KEY="your-key-here"
+
+# Evaluate GPT5
 
 # Test without submitting
 python3 evaluate_gpt5.py --dry-run
@@ -25,13 +30,3 @@ nohup python3 evaluate_gpt5.py > z_evaluate_gpt.log 2>&1 &
 
 # To check the process is running
 ps -p 2635037
-
-(mapping_gothic_scraper) kr3131@seahorse:~/Mapping-Gothic-Scraper$ nohup python3 evaluate_qwen3.py > z_evaluate_qwen.log 2>&1 &
-[1] 2635037
-(mapping_gothic_scraper) kr3131@seahorse:~/Mapping-Gothic-Scraper$ 
-
-Hi Milad,
-This is the file I am running: /home/kr3131/Mapping-Gothic-Scraper/evaluate_qwen3.py
-Model using here: Qwen/Qwen3-VL-8B-Instruct
-To run it in the background and log the terminal output I am using the command:
-nohup python3 evaluate_qwen3.py > z_evaluate_qwen.log 2>&1 &

@@ -1,10 +1,7 @@
 # create_grid_overlay.py
 
-# Standard library imports
 import os
 from pathlib import Path
-
-# Third-party imports
 from PIL import Image, ImageDraw, ImageFont
 import pandas as pd
 import numpy as np
@@ -59,6 +56,12 @@ def generate_column_labels(num_columns):
 def calculate_padding(coordinates_df, img_width, img_height, margin=100):
     """
     Calculate padding needed based on coordinate ranges
+    
+    IMPORTANT COORDINATE SYSTEM NOTE:
+    - x coordinates are normalized: 0 (left) to 1 (right) of floor plan width
+    - y coordinates are in "width units": both x and y were divided by floor plan WIDTH
+    - To get proper y range, we need to normalize: y_normalized = y * (width / height)
+    
     Returns: (left_padding, top_padding, right_padding, bottom_padding)
     """
     if coordinates_df is None or len(coordinates_df) == 0:
@@ -67,14 +70,23 @@ def calculate_padding(coordinates_df, img_width, img_height, margin=100):
     
     x_coords = coordinates_df['x'].values
     y_coords = coordinates_df['y'].values
-    min_x, max_x = x_coords.min(), x_coords.max()
-    min_y, max_y = y_coords.min(), y_coords.max()
     
-    print(f"  Coordinate ranges: X=[{min_x:.3f}, {max_x:.3f}], Y=[{min_y:.3f}, {max_y:.3f}]")
+    # Normalize y coordinates from "width units" to proper 0-1 range for height
+    aspect_ratio = img_width / img_height
+    y_coords_normalized = y_coords * aspect_ratio
+    
+    min_x, max_x = x_coords.min(), x_coords.max()
+    min_y, max_y = y_coords_normalized.min(), y_coords_normalized.max()
+    
+    print(f"  Coordinate ranges (raw): X=[{x_coords.min():.3f}, {x_coords.max():.3f}], Y=[{y_coords.min():.3f}, {y_coords.max():.3f}]")
+    print(f"  Coordinate ranges (normalized): X=[{min_x:.3f}, {max_x:.3f}], Y=[{min_y:.3f}, {max_y:.3f}]")
     
     # Calculate padding needed
+    # For x: coordinates are already in proper 0-1 range
     left_padding = int(abs(min(0, min_x)) * img_width) + margin
     right_padding = int(max(0, max_x - 1) * img_width) + margin
+    
+    # For y: use normalized coordinates
     top_padding = int(abs(min(0, min_y)) * img_height) + margin
     bottom_padding = int(max(0, max_y - 1) * img_height) + margin
     
@@ -225,6 +237,14 @@ def generate_ground_truth(coordinates_df, orig_img_width, orig_img_height,
                          grid_size, output_path):
     """
     Generate ground truth CSV file mapping image IDs to grid cells
+    
+    IMPORTANT COORDINATE SYSTEM NOTE:
+    - x coordinates: normalized 0-1 (left to right) of floor plan width
+    - y coordinates: in "width units" (both x and y were divided by floor plan WIDTH)
+    - Conversion to pixels:
+      - x_pixel = x * floor_plan_width
+      - y_pixel = y * floor_plan_width (NOT height!)
+    - We then normalize y to proper range: y_normalized = y * (width / height)
     """
     if coordinates_df is None or len(coordinates_df) == 0:
         print(f"  No coordinates available, skipping ground truth generation")
@@ -232,15 +252,24 @@ def generate_ground_truth(coordinates_df, orig_img_width, orig_img_height,
     
     ground_truth_data = []
     
+    # Calculate aspect ratio for y coordinate normalization
+    aspect_ratio = orig_img_width / orig_img_height
+    
     for idx, row in coordinates_df.iterrows():
         image_id = row['image_id']
-        x_norm = row['x']
-        y_norm = row['y']
+        x_raw = row['x']
+        y_raw = row['y']
         direction = row['direction']
         
-        # Convert normalized coordinates to pixel coordinates on padded image
-        x_pixel = x_norm * orig_img_width + left_pad
-        y_pixel = y_norm * orig_img_height + top_pad
+        # X coordinate: already normalized, convert directly to pixels
+        # x in range [0, 1] maps to [0, orig_img_width]
+        x_pixel = x_raw * orig_img_width + left_pad
+        
+        # Y coordinate: in "width units", need to convert to pixels using WIDTH
+        # y_raw * orig_img_width gives the actual pixel position in the original coordinate system
+        # Then normalize to [0, 1] range for height and convert to pixels
+        y_normalized = y_raw * aspect_ratio
+        y_pixel = y_normalized * orig_img_height + top_pad
         
         # Convert to grid cell
         grid_cell = pixel_to_grid_cell(x_pixel, y_pixel, padded_width, padded_height, 
@@ -263,7 +292,7 @@ def process_single_building(building_name, source_base_path, output_base_path,
                             grid_sizes, line_width=3, label_size=80, margin=100):
     """
     Process a single building and create grids for all grid sizes
-    Returns number of successful saves
+    Returns number of successful saves and aspect ratio check flag
     """
     print(f"\n{'='*80}")
     print(f"Processing building: {building_name}")
@@ -275,7 +304,7 @@ def process_single_building(building_name, source_base_path, output_base_path,
     
     if not os.path.exists(floorplan_path):
         print(f"Skipping {building_name}: No floorplan found at {floorplan_path}")
-        return 0
+        return 0, False
     
     # Load coordinates if available
     coordinates_path = os.path.join(source_base_path, building_name, "coordinates.csv")
@@ -295,9 +324,14 @@ def process_single_building(building_name, source_base_path, output_base_path,
         image = Image.open(floorplan_path)
         orig_width, orig_height = image.size
         print(f"Original dimensions: {orig_width}x{orig_height}")
+        
+        # Sanity check: floor plans should typically be wider than tall
+        unusual_aspect = orig_width < orig_height
+        if unusual_aspect:
+            print(f"  WARNING: Unusual aspect ratio - width ({orig_width}) < height ({orig_height})")
     except Exception as e:
         print(f"Error loading floorplan for {building_name}: {e}")
-        return 0
+        return 0, False
     
     successful_saves = 0
     
@@ -348,7 +382,7 @@ def process_single_building(building_name, source_base_path, output_base_path,
         except Exception as e:
             print(f"Error creating grid for {building_name} with size {grid_size}: {e}")
     
-    return successful_saves
+    return successful_saves, unusual_aspect
 
 
 def process_all_buildings(source_base_path, output_base_path, grid_sizes, 
@@ -372,9 +406,10 @@ def process_all_buildings(source_base_path, output_base_path, grid_sizes,
     total_successful_saves = 0
     buildings_with_floorplans = 0
     buildings_without_floorplans = 0
+    buildings_with_unusual_aspect = []
     
     for building_name in sorted(building_folders):
-        saves = process_single_building(
+        saves, unusual_aspect = process_single_building(
             building_name, 
             source_base_path, 
             output_base_path, 
@@ -387,10 +422,12 @@ def process_all_buildings(source_base_path, output_base_path, grid_sizes,
         if saves > 0:
             buildings_with_floorplans += 1
             total_successful_saves += saves
+            if unusual_aspect:
+                buildings_with_unusual_aspect.append(building_name)
         else:
             buildings_without_floorplans += 1
     
-    return total_successful_saves, buildings_with_floorplans, buildings_without_floorplans
+    return total_successful_saves, buildings_with_floorplans, buildings_without_floorplans, buildings_with_unusual_aspect
 
 
 if __name__ == "__main__":
@@ -412,7 +449,7 @@ if __name__ == "__main__":
     # Process based on mode
     if SINGLE_BUILDING_MODE:
         print("Running in SINGLE BUILDING MODE")
-        saves = process_single_building(
+        saves, unusual_aspect = process_single_building(
             SINGLE_BUILDING_NAME,
             SOURCE_BASE_PATH,
             OUTPUT_BASE_PATH,
@@ -427,10 +464,12 @@ if __name__ == "__main__":
         print(f"Building: {SINGLE_BUILDING_NAME}")
         print(f"Total grids created: {saves}")
         print(f"Expected grids: {len(GRID_SIZES)}")
+        if unusual_aspect:
+            print(f"WARNING: Building has unusual aspect ratio (height > width)")
         
     else:
         print("Running in ALL BUILDINGS MODE")
-        total_saves, buildings_with, buildings_without = process_all_buildings(
+        total_saves, buildings_with, buildings_without, unusual_buildings = process_all_buildings(
             SOURCE_BASE_PATH,
             OUTPUT_BASE_PATH,
             GRID_SIZES,
@@ -446,3 +485,8 @@ if __name__ == "__main__":
         print(f"Buildings with floorplans: {buildings_with}")
         print(f"Buildings without floorplans: {buildings_without}")
         print(f"Total buildings scanned: {buildings_with + buildings_without}")
+        
+        if unusual_buildings:
+            print(f"\nBuildings with unusual aspect ratio (height > width): {len(unusual_buildings)}")
+            for building in unusual_buildings:
+                print(f"  - {building}")
